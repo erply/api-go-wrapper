@@ -1,4 +1,4 @@
-module api-go-wrapper
+module github.com/erply/api-go-wrapper
 
 go 1.13
 

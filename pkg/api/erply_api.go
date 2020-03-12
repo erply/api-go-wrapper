@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	erro "api-go-wrapper/pkg/errors"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
 )
 
 //IClient ...
