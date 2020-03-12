@@ -20,7 +20,7 @@ func NewErplyApiService(sessionKey, clientCode string) *erplyApiService {
 	return &erplyApiService{api.NewClient(sessionKey, clientCode, nil)}
 }
 
-//GetSalesDocument erply API request
+//getPointsOfSale erply API request
 func (s *erplyApiService) getPointsOfSale(posID string) (string, error) {
 	res, err := s.GetPointsOfSaleByID(posID)
 	if err != nil {
