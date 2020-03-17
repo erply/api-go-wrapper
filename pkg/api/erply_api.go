@@ -575,22 +575,21 @@ func (cli *erplyClient) GetPointsOfSaleByID(posID string) (*PointOfSale, error) 
 //VerifyIdentityToken ...
 func (cli *erplyClient) VerifyIdentityToken(jwt string) (*SessionInfo, error) {
 	method := VerifyIdentityTokenMethod
-	req, err := newPostHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
-	}
-
 	params := url.Values{}
 	params.Add("request", method)
 	params.Add("clientCode", cli.clientCode)
 	params.Add("setContentType", "1")
 	params.Add("jwt", jwt)
-	req.URL.RawQuery = params.Encode()
-
+	req, err := newPostHTTPRequest(cli, params)
+	if err != nil {
+		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
+	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	resp, err := doRequest(req, cli)
 	if err != nil {
 		return nil, erplyerr(fmt.Sprintf("%s request failed", method), err)
 	}
+
 	res := &verifyIdentityTokenResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erplyerr(fmt.Sprintf("unmarshaling %s response failed", method), err)
@@ -606,14 +605,15 @@ func (cli *erplyClient) VerifyIdentityToken(jwt string) (*SessionInfo, error) {
 //GetIdentityToken ...
 func (cli *erplyClient) GetIdentityToken() (*IdentityToken, error) {
 	method := GetIdentityToken
-	req, err := newPostHTTPRequest(cli)
+
+	params := getMandatoryParameters(cli, method)
+	queryParams := getMandatoryParameters(cli, method)
+
+	req, err := newPostHTTPRequest(cli, params)
 	if err != nil {
 		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
 	}
-
-	params := getMandatoryParameters(cli, method)
-	req.URL.RawQuery = params.Encode()
-
+	req.URL.RawQuery = queryParams.Encode()
 	resp, err := doRequest(req, cli)
 	if err != nil {
 		return nil, erplyerr(fmt.Sprintf("%s request failed", method), err)
@@ -1040,8 +1040,8 @@ func getHTTPRequest(cli *erplyClient) (*http.Request, error) {
 	return req, err
 }
 
-func newPostHTTPRequest(cli *erplyClient) (*http.Request, error) {
-	req, err := http.NewRequest("POST", cli.url, nil)
+func newPostHTTPRequest(cli *erplyClient, params url.Values) (*http.Request, error) {
+	req, err := http.NewRequest("POST", cli.url, strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, erplyerr("failed to build HTTP request", err)
 

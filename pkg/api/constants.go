@@ -1,7 +1,7 @@
 package api
 
 const (
-	baseURL = "https://%s.erply.com/api"
+	baseURL = "https://%s.erply.com/api/"
 	//GetSalesDocumentsMethod ...
 	GetSalesDocumentsMethod = "getSalesDocuments"
 	//GetCustomersMethod ...
