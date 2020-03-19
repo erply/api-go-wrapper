@@ -141,7 +141,12 @@ type CustomerImportReport struct {
 }
 
 type PointOfSale struct {
-	WarehouseID int `json:"warehouseID"`
+	PointOfSaleID uint   `json:"warehouseID"`
+	Name          string `json:"warehouseID"`
+	WarehouseID   int    `json:"warehouseID"`
+	WarehouseName string `json:"warehouseID"`
+	Added         uint64 `json:"added"`
+	LastModified  uint64 `json:"lastModified"`
 }
 
 type PurchaseDocImportReports []PurchaseDocImportReport
@@ -340,4 +345,47 @@ type EmployeeProduct struct {
 	ProductCode  string `json:"productCode"`
 	ProductName  string `json:"productName"`
 	ProductGroup uint   `json:"productGroup"`
+}
+
+type BusinessArea struct {
+	Id           uint   `json:"id"`
+	Name         string `json:"name"`
+	Added        uint64 `json:"added"`
+	LastModified uint64 `json:"lastModified"`
+}
+
+type Project struct {
+	ProjectID    uint   `json:"projectID"`
+	Name         string `json:"name"`
+	CustomerID   uint   `json:"customerID"`
+	CustomerName string `json:"customerName"`
+	EmployeeID   uint   `json:"employeeID"`
+	EmployeeName string `json:"employeeName"`
+	TypeID       uint   `json:"typeID"`
+	TypeName     string `json:"typeName"`
+	StatusID     uint   `json:"statusID"`
+	StatusName   string `json:"statusName"`
+	StartDate    string `json:"startDate"`
+	EndDate      string `json:"endDate"`
+	Notes        string `json:"notes"`
+	LastModified uint64 `json:"lastModified"`
+}
+
+type ProjectStatus struct {
+	ProjectStatusID uint   `json:"projectStatusID"`
+	Name            string `json:"name"`
+	Finished        byte   `json:"finished"`
+	Added           uint64 `json:"added"`
+	LastModified    uint64 `json:"lastModified"`
+}
+
+type Currency struct {
+	CurrencyID   uint   `json:"currencyID"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Default      byte   `json:"default"`
+	NameShort    string `json:"nameShort"`
+	NameFraction string `json:"nameFraction"`
+	Added        uint64 `json:"added"`
+	LastModified uint64 `json:"lastModified"`
 }

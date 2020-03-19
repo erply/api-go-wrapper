@@ -289,6 +289,70 @@ func (cli *erplyClient) GetEmployees(ctx context.Context, filters map[string]str
 	return res.Employees, nil
 }
 
+// GetBusinessAreas will list business areas according to specified filters.
+func (cli *erplyClient) GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error) {
+	resp, err := cli.sendRequest(ctx, GetBusinessAreasMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetBusinessAreasResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetBusinessAreasResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.BusinessAreas, nil
+}
+
+// GetProjects will list projects according to specified filters.
+func (cli *erplyClient) GetProjects(ctx context.Context, filters map[string]string) ([]Project, error) {
+	resp, err := cli.sendRequest(ctx, GetProjectsMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProjectsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetProjectsResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Projects, nil
+}
+
+// GetProjectStatus will list projects statuses according to specified filters.
+func (cli *erplyClient) GetProjectStatus(ctx context.Context, filters map[string]string) ([]ProjectStatus, error) {
+	resp, err := cli.sendRequest(ctx, GetProjectStatusesMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProjectStatusesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetProjectStatusesResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.ProjectStatuses, nil
+}
+
+// GetCurrencies will list currencies according to specified filters.
+func (cli *erplyClient) GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error) {
+	resp, err := cli.sendRequest(ctx, GetCurrenciesMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCurrenciesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetCurrenciesResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Currencies, nil
+}
+
 //GetSalesDocumentById erply API request
 func (cli *erplyClient) GetSalesDocumentByID(id string) ([]SaleDocument, error) {
 	req, err := getHTTPRequest(cli)
@@ -618,6 +682,22 @@ func (cli *erplyClient) GetCompanyInfo() (*CompanyInfo, error) {
 	}
 
 	return &res.CompanyInfos[0], nil
+}
+
+// GetPointsOfSale will list points of sale according to specified filters.
+func (cli *erplyClient) GetPointsOfSale(ctx context.Context, filters map[string]string) ([]PointOfSale, error) {
+	resp, err := cli.sendRequest(ctx, GetPointsOfSaleMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetPointsOfSaleResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetPointsOfSaleResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.PointsOfSale, nil
 }
 
 //GetPointsOfSale ...
@@ -1193,6 +1273,26 @@ type GetCountriesResponse struct {
 type GetEmployeesResponse struct {
 	Status    Status     `json:"status"`
 	Employees []Employee `json:"records"`
+}
+
+type GetBusinessAreasResponse struct {
+	Status        Status         `json:"status"`
+	BusinessAreas []BusinessArea `json:"records"`
+}
+
+type GetProjectsResponse struct {
+	Status   Status    `json:"status"`
+	Projects []Project `json:"records"`
+}
+
+type GetProjectStatusesResponse struct {
+	Status          Status          `json:"status"`
+	ProjectStatuses []ProjectStatus `json:"records"`
+}
+
+type GetCurrenciesResponse struct {
+	Status     Status     `json:"status"`
+	Currencies []Currency `json:"records"`
 }
 
 type GetSalesDocumentResponse struct {
