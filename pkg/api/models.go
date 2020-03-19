@@ -187,7 +187,7 @@ type ConfParameter struct {
 }
 
 type Warehouse struct {
-	WarehouseID            string `json:"warehouseID"`
+	WarehouseID            uint   `json:"warehouseID"`
 	PricelistID            string `json:"pricelistID"`
 	PricelistID2           string `json:"pricelistID2"`
 	PricelistID3           string `json:"pricelistID3"`
