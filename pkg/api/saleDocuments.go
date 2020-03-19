@@ -54,6 +54,8 @@ type SaleDocument struct {
 	ReferenceNumber         string              `json:"referenceNumber"`
 	CustomReferenceNumber   string              `json:"customReferenceNumber"`
 	PaymentStatus           string              `json:"paymentStatus"`
+	Penalty                 string              `json:"penalty"`
+	InvoiceLink             string              `json:"invoiceLink"`
 	InvoiceRows             []InvoiceRow        `json:"rows"`
 }
 
