@@ -481,6 +481,37 @@ func (cli *erplyClient) GetSupplierByName(name string) (*Customer, error) {
 	return &res.Customers[0], nil
 }
 
+//GetUserName from GetUserRights erply API request
+func (cli *erplyClient) GetUserName() (string, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return "", err
+	}
+	params := getMandatoryParameters(cli, GetUserRightsMethod)
+	params.Add("getRowsForAllInvoices", "1")
+	params.Add("getCurrentUser", "1")
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return "", erplyerr("GetUserRights request failed", err)
+	}
+	res := &GetUserRightsResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return "", erplyerr("unmarshaling GetUserRightsResponse failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return "", erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.Records) == 0 {
+		return "", nil
+	}
+
+	return res.Records[0].UserName, nil
+}
+
 //GetVatRatesByVatRateID ...
 func (cli *erplyClient) GetVatRatesByID(vatRateID string) (VatRates, error) {
 	req, err := getHTTPRequest(cli)

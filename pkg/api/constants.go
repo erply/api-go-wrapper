@@ -4,6 +4,7 @@ const (
 	baseURL = "https://%s.erply.com/api/"
 	//GetSalesDocumentsMethod ...
 	GetSalesDocumentsMethod = "getSalesDocuments"
+	GetUserRightsMethod     = "getUserRights"
 	//GetCustomersMethod ...
 	GetCustomersMethod = "getCustomers"
 	getSuppliersMethod = "getSuppliers"
