@@ -13,6 +13,9 @@ type (
 	//Address from getAddresses
 	Address struct {
 		AddressID  int    `json:"addressID"`
+		Address2   string `json:"address2"`
+		Address    string `json:"address"`
+		OwnerID    int    `json:"ownerID"`
 		Street     string `json:"street"`
 		PostalCode string `json:"postalCode"`
 		City       string `json:"city"`

@@ -184,6 +184,7 @@ type InvoiceRow struct {
 type ConfParameter struct {
 	Announcement         string `json:"invoice_announcement_eng"`
 	InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
+	ReverseVatText       string `json:"reverse_vat_text"`
 }
 
 type Warehouse struct {

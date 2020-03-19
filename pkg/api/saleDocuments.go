@@ -29,6 +29,8 @@ type SaleDocument struct {
 	Location *Warehouse
 
 	AddressID               int                 `json:"addressID"`
+	PayerAddressID          int                 `json:"payerAddressID"`
+	ShipToAddressID         string              `json:"shipToAddressID"`
 	ContactID               int                 `json:"contactID"`
 	EmployeeID              int                 `json:"employeeID"`
 	PaymentDays             string              `json:"paymentDays"`
@@ -61,15 +63,6 @@ type BaseDocument struct {
 	Type   string `json:"type"`
 	Date   string `json:"date"`
 }
-
-//SaleDocuments container
-type SaleDocuments struct {
-	Docs        []SaleDocument
-	AmountTotal float64
-}
-
-//SaleDocumentConstructors ..
-type SaleDocumentConstructors []SaleDocumentConstructor
 
 //SaleDocumentConstructor ..
 type SaleDocumentConstructor struct {
