@@ -1,14 +1,18 @@
 package api
 
+import "context"
+
 //IClient interface for cached and simple client
 type IClient interface {
 	GetConfParameters() (*ConfParameter, error)
 	GetWarehouses() (Warehouses, error)
 	GetSalesDocumentByID(id string) ([]SaleDocument, error)
 	GetSalesDocumentsByIDs(id []string) ([]SaleDocument, error)
+	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
 	GetCustomersByIDs(customerID []string) (Customers, error)
 	GetCustomerByRegNumber(regNumber string) (*Customer, error)
 	GetCustomerByGLN(gln string) (*Customer, error)
+	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
 	GetSupplierByName(name string) (*Customer, error)
 	GetVatRatesByID(vatRateID string) (VatRates, error)
 	GetCompanyInfo() (*CompanyInfo, error)
@@ -16,6 +20,8 @@ type IClient interface {
 	GetProductsByIDs(ids []string) ([]Product, error)
 	GetProductsByCode3(code3 string) (*Product, error)
 	GetAddresses() (*Address, error)
+	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
+	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
 	PostPurchaseDocument(in *PurchaseDocumentConstructor, provider string) (PurchaseDocImportReports, error)
 	PostSalesDocumentFromWoocomm(in *SaleDocumentConstructor, shopOrderID string) (SaleDocImportReports, error)
 	PostSalesDocument(in *SaleDocumentConstructor, provider string) (SaleDocImportReports, error)

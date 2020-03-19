@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/pkg/errors"
@@ -241,6 +242,38 @@ func (cli *erplyClient) GetAddresses() (*Address, error) {
 	return &res.Addresses[0], nil
 }
 
+// GetCountries will list countries according to specified filters.
+func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]string) ([]Country, error) {
+	resp, err := cli.sendRequest(ctx, GetCountriesMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCountriesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetCountriesResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Countries, nil
+}
+
+// GetEmployees will list employees according to specified filters.
+func (cli *erplyClient) GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error) {
+	resp, err := cli.sendRequest(ctx, GetEmployeesMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetEmployeesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetEmployeesResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Employees, nil
+}
+
 //GetSalesDocumentById erply API request
 func (cli *erplyClient) GetSalesDocumentByID(id string) ([]SaleDocument, error) {
 	req, err := getHTTPRequest(cli)
@@ -334,6 +367,22 @@ func (cli *erplyClient) GetSalesDocumentsByIDs(ids []string) ([]SaleDocument, er
 func doRequest(req *http.Request, cli *erplyClient) (*http.Response, error) {
 	resp, err := cli.httpClient.Do(req)
 	return resp, err
+}
+
+// GetCustomers will list customers according to specified filters.
+func (cli *erplyClient) GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error) {
+	resp, err := cli.sendRequest(ctx, GetCustomersMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCustomersResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetCustomersResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Customers, nil
 }
 
 // GetCustomers erply API request
@@ -446,6 +495,22 @@ func (cli *erplyClient) GetCustomerByGLN(gln string) (*Customer, error) {
 		return nil, nil
 	}
 	return &res.Customers[0], nil
+}
+
+// GetSuppliers will list suppliers according to specified filters.
+func (cli *erplyClient) GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error) {
+	resp, err := cli.sendRequest(ctx, getSuppliersMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetSuppliersResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetSuppliersResponse ", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Suppliers, nil
 }
 
 func (cli *erplyClient) GetSupplierByName(name string) (*Customer, error) {
@@ -1099,6 +1164,22 @@ type GetCustomersResponse struct {
 	Customers Customers `json:"records"`
 }
 
+//GetSuppliersResponse
+type GetSuppliersResponse struct {
+	Status    Status     `json:"status"`
+	Suppliers []Supplier `json:"records"`
+}
+
+type GetCountriesResponse struct {
+	Status    Status    `json:"status"`
+	Countries []Country `json:"records"`
+}
+
+type GetEmployeesResponse struct {
+	Status    Status     `json:"status"`
+	Employees []Employee `json:"records"`
+}
+
 type GetSalesDocumentResponse struct {
 	Status         Status         `json:"status"`
 	SalesDocuments []SaleDocument `json:"records"`
@@ -1143,4 +1224,26 @@ func erplyerr(msg string, err error) *erro.ErplyError {
 		return erro.NewErplyError("Error", errors.Wrap(err, msg).Error())
 	}
 	return erro.NewErplyError("Error", msg)
+}
+
+func setParams(params url.Values, filters map[string]string) {
+	for k, v := range filters {
+		params.Add(k, v)
+	}
+}
+
+func (cli *erplyClient) sendRequest(ctx context.Context, apiMethod string, filters map[string]string) (*http.Response, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("failed to build http request", err)
+	}
+	req = req.WithContext(ctx)
+	params := getMandatoryParameters(cli, apiMethod)
+	setParams(params, filters)
+	req.URL.RawQuery = params.Encode()
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr(fmt.Sprintf("%v request failed", apiMethod), err)
+	}
+	return resp, nil
 }

@@ -2,16 +2,14 @@ package api
 
 const (
 	baseURL = "https://%s.erply.com/api/"
-	//GetSalesDocumentsMethod ...
-	GetSalesDocumentsMethod = "getSalesDocuments"
-	//GetCustomersMethod ...
-	GetCustomersMethod = "getCustomers"
-	getSuppliersMethod = "getSuppliers"
-	//GetVatRatesMethod ...
-	GetVatRatesMethod = "getVatRates"
-	//GetPaymentsMethod ...
-	GetPaymentsMethod = "getPayments"
-	//GetCompanyInfoMethod ...
+
+	GetSalesDocumentsMethod           = "getSalesDocuments"
+	GetCustomersMethod                = "getCustomers"
+	getSuppliersMethod                = "getSuppliers"
+	GetCountriesMethod                = "getCountries"
+	GetEmployeesMethod                = "getEmployees"
+	GetVatRatesMethod                 = "getVatRates"
+	GetPaymentsMethod                 = "getPayments"
 	GetCompanyInfoMethod              = "getCompanyInfo"
 	VerifyIdentityTokenMethod         = "verifyIdentityToken"
 	GetPointsOfSaleMethod             = "getPointsOfSale"

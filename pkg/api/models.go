@@ -240,3 +240,104 @@ type VerifyUserResponse struct {
 type Records struct {
 	SessionKey string `json:"sessionKey"`
 }
+
+type Supplier struct {
+	SupplierId      uint           `json:"supplierID"`
+	SupplierType    string         `json:"supplierType"`
+	FullName        string         `json:"fullName"`
+	CompanyName     string         `json:"companyName"`
+	FirstName       string         `json:"firstName"`
+	LstName         string         `json:"lastName"`
+	GroupId         uint           `json:"groupID"`
+	GroupName       string         `json:"groupName"`
+	Phone           string         `json:"phone"`
+	Mobile          string         `json:"mobile"`
+	Email           string         `json:"email"`
+	Fax             string         `json:"fax"`
+	Code            string         `json:"code"`
+	IntegrationCode string         `json:"integrationCode"`
+	VatrateID       uint           `json:"vatrateID"`
+	CurrencyCode    string         `json:"currencyCode"`
+	DeliveryTermsID uint           `json:"deliveryTermsID"`
+	CountryId       uint           `json:"countryID"`
+	CountryName     string         `json:"countryName"`
+	CountryCode     string         `json:"countryCode"`
+	Address         string         `json:"address"`
+	Gln             string         `json:"GLN"`
+	Attributes      []ObjAttribute `json:"attributes"`
+
+	// Detail fields
+	VatNumber           string `json:"vatNumber"`
+	Skype               string `json:"skype"`
+	Website             string `json:"website"`
+	BankName            string `json:"bankName"`
+	BankAccountNumber   string `json:"bankAccountNumber"`
+	BankIBAN            string `json:"bankIBAN"`
+	BankSWIFT           string `json:"bankSWIFT"`
+	Birthday            string `json:"birthday"`
+	CompanyID           uint   `json:"companyID"`
+	ParentCompanyName   string `json:"parentCompanyName"`
+	SupplierManagerID   uint   `json:"supplierManagerID"`
+	SupplierManagerName string `json:"supplierManagerName"`
+	PaymentDays         uint   `json:"paymentDays"`
+	Notes               string `json:"notes"`
+	LastModified        string `json:"lastModified"`
+	Added               uint64 `json:"added"`
+}
+
+type ObjAttribute struct {
+	AttributeName  string `json:"attributeName"`
+	AttributeType  string `json:"attributeType"`
+	AttributeValue string `json:"attributeValue"`
+}
+
+type Country struct {
+	CountryId             uint   `json:"countryID"`
+	CountryName           string `json:"countryName"`
+	CountryCode           string `json:"countryCode"`
+	MemberOfEuropeanUnion byte   `json:"memberOfEuropeanUnion"`
+	LastModified          string `json:"lastModified"`
+	Added                 uint64 `json:"added"`
+}
+
+type Employee struct {
+	EmployeeID             uint                `json:"employeeID"`
+	FullName               string              `json:"fullName"`
+	EmployeeName           string              `json:"employeeName"`
+	FirstName              string              `json:"firstName"`
+	LastName               string              `json:"lastName"`
+	Phone                  string              `json:"phone"`
+	Mobile                 string              `json:"mobile"`
+	Email                  string              `json:"email"`
+	Fax                    string              `json:"fax"`
+	Code                   string              `json:"code"`
+	Gender                 string              `json:"gender"`
+	UserID                 uint                `json:"userID"`
+	Username               string              `json:"username"`
+	UserGroupID            string              `json:"userGroupID"`
+	Warehouses             []EmployeeWarehouse `json:"warehouses"`
+	PointsOfSale           string              `json:"pointsOfSale"`
+	ProductIDs             []EmployeeProduct   `json:"productIDs"`
+	Attributes             []ObjAttribute      `json:"attributes"`
+	LastModified           string              `json:"lastModified"`
+	LastModifiedByUserName string              `json:"lastModifiedByUserName"`
+
+	// detail fileds
+	Skype        string `json:"skype"`
+	Birthday     string `json:"birthday"`
+	JobTitleID   uint   `json:"jobTitleID"`
+	JobTitleName string `json:"jobTitleName"`
+	Notes        string `json:"notes"`
+	Added        uint64 `json:"added"`
+}
+
+type EmployeeWarehouse struct {
+	Id uint `json:"id"`
+}
+
+type EmployeeProduct struct {
+	ProductID    uint   `json:"productID"`
+	ProductCode  string `json:"productCode"`
+	ProductName  string `json:"productName"`
+	ProductGroup uint   `json:"productGroup"`
+}
