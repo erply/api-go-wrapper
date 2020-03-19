@@ -149,6 +149,21 @@ func (cli *erplyClient) GetProductUnits() ([]ProductUnit, error) {
 	return res.ProductUnits, nil
 }
 
+func (cli *erplyClient) GetProducts(ctx context.Context, filters map[string]string) ([]Product, error) {
+	resp, err := cli.sendRequest(ctx, GetProductsMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetProductsResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Products, nil
+}
+
 //GetProductsByIDs - NOTE: if product's id is 0 - the product is not in the database. It was created during the sales document creation
 func (cli *erplyClient) GetProductsByIDs(ids []string) ([]Product, error) {
 	if len(ids) == 0 {
