@@ -4,6 +4,7 @@ package api
 type IClient interface {
 	GetConfParameters() (*ConfParameter, error)
 	GetWarehouses() (Warehouses, error)
+	GetUserName() (string, error)
 	GetSalesDocumentByID(id string) ([]SaleDocument, error)
 	GetSalesDocumentsByIDs(id []string) ([]SaleDocument, error)
 	GetCustomersByIDs(customerID []string) (Customers, error)
