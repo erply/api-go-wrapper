@@ -39,8 +39,8 @@ const (
 	PayPal                            = "PayPal"
 	CashOnDelivery                    = "Cash on delivery"
 	//MaxIdleConns for Erply API
-	MaxIdleConns = 1
+	MaxIdleConns = 25
 
 	//MaxConnsPerHost for Erply API
-	MaxConnsPerHost = 1
+	MaxConnsPerHost = 25
 )
