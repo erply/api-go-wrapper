@@ -11,7 +11,7 @@ type Customer struct {
 	GroupID              int            `json:"groupID"`
 	EDI                  string         `json:"EDI"`
 	IsPOSDefaultCustomer int            `json:"isPOSDefaultCustomer"`
-	CountryID            uint           `json:"countryID"`
+	CountryID            string         `json:"countryID"`
 	Phone                string         `json:"phone"`
 	EInvoiceEmail        string         `json:"eInvoiceEmail"`
 	Email                string         `json:"email"`

@@ -14,9 +14,9 @@ type Product struct {
 	Status      string  `json:"status"`
 	Code        string  `json:"code"`
 	Code2       string  `json:"code2"`
-	Code3       string  `json:"code3"`
+	Code3       *string `json:"code3"`
 	Price       float64 `json:"price"`
-	UnitName    string  `json:"unitName"`
+	UnitName    *string `json:"unitName"`
 }
 
 //GetProductUnitsResponse ...

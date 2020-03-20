@@ -141,10 +141,10 @@ type CustomerImportReport struct {
 }
 
 type PointOfSale struct {
-	PointOfSaleID uint   `json:"warehouseID"`
-	Name          string `json:"warehouseID"`
+	PointOfSaleID uint   `json:"pointOfSaleID"`
+	Name          string `json:"name"`
 	WarehouseID   int    `json:"warehouseID"`
-	WarehouseName string `json:"warehouseID"`
+	WarehouseName string `json:"warehouseName"`
 	Added         uint64 `json:"added"`
 	LastModified  uint64 `json:"lastModified"`
 }
@@ -192,12 +192,12 @@ type ConfParameter struct {
 }
 
 type Warehouse struct {
-	WarehouseID            uint   `json:"warehouseID"`
+	WarehouseID            string `json:"warehouseID"`
 	PricelistID            string `json:"pricelistID"`
 	PricelistID2           string `json:"pricelistID2"`
 	PricelistID3           string `json:"pricelistID3"`
-	PricelistID4           string `json:"pricelistID4"`
-	PricelistID5           string `json:"pricelistID5"`
+	PricelistID4           int    `json:"pricelistID4"`
+	PricelistID5           int    `json:"pricelistID5"`
 	Name                   string `json:"name"`
 	Code                   string `json:"code"`
 	AddressID              int    `json:"addressID"`
@@ -306,7 +306,7 @@ type Country struct {
 }
 
 type Employee struct {
-	EmployeeID             uint                `json:"employeeID"`
+	EmployeeID             string              `json:"employeeID"`
 	FullName               string              `json:"fullName"`
 	EmployeeName           string              `json:"employeeName"`
 	FirstName              string              `json:"firstName"`
@@ -317,14 +317,14 @@ type Employee struct {
 	Fax                    string              `json:"fax"`
 	Code                   string              `json:"code"`
 	Gender                 string              `json:"gender"`
-	UserID                 uint                `json:"userID"`
+	UserID                 string              `json:"userID"`
 	Username               string              `json:"username"`
 	UserGroupID            string              `json:"userGroupID"`
 	Warehouses             []EmployeeWarehouse `json:"warehouses"`
 	PointsOfSale           string              `json:"pointsOfSale"`
 	ProductIDs             []EmployeeProduct   `json:"productIDs"`
 	Attributes             []ObjAttribute      `json:"attributes"`
-	LastModified           string              `json:"lastModified"`
+	LastModified           uint64              `json:"lastModified"`
 	LastModifiedByUserName string              `json:"lastModifiedByUserName"`
 
 	// detail fileds
@@ -380,12 +380,12 @@ type ProjectStatus struct {
 }
 
 type Currency struct {
-	CurrencyID   uint   `json:"currencyID"`
+	CurrencyID   string `json:"currencyID"`
 	Code         string `json:"code"`
 	Name         string `json:"name"`
-	Default      byte   `json:"default"`
+	Default      string `json:"default"`
 	NameShort    string `json:"nameShort"`
 	NameFraction string `json:"nameFraction"`
-	Added        uint64 `json:"added"`
-	LastModified uint64 `json:"lastModified"`
+	Added        string `json:"added"`
+	LastModified string `json:"lastModified"`
 }
