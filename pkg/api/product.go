@@ -8,15 +8,29 @@ type GetProductsResponse struct {
 
 //Product ...
 type Product struct {
-	ProductID   int     `json:"productID"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Status      string  `json:"status"`
-	Code        string  `json:"code"`
-	Code2       string  `json:"code2"`
-	Code3       *string `json:"code3"`
-	Price       float64 `json:"price"`
-	UnitName    *string `json:"unitName"`
+	ProductID   int            `json:"productID"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Status      string         `json:"status"`
+	Code        string         `json:"code"`
+	Code2       string         `json:"code2"`
+	Code3       *string        `json:"code3"`
+	Price       float64        `json:"price"`
+	UnitName    *string        `json:"unitName"`
+	Images      []ProductImage `json:"images"`
+}
+
+type ProductImage struct {
+	PictureID       string  `json:"pictureID"`
+	Name            string  `json:"name"`
+	ThumbURL        string  `json:"thumbURL"`
+	SmallURL        string  `json:"smallURL"`
+	LargeURL        string  `json:"largeURL"`
+	FullURL         string  `json:"fullURL"`
+	External        byte    `json:"external"`
+	HostingProvider string  `json:"hostingProvider"`
+	Hash            *string `json:"hash"`
+	Tenant          *string `json:"tenant"`
 }
 
 //GetProductUnitsResponse ...
