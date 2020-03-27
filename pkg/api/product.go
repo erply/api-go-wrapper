@@ -8,16 +8,19 @@ type GetProductsResponse struct {
 
 //Product ...
 type Product struct {
-	ProductID   int            `json:"productID"`
-	Name        string         `json:"name"`
-	Description string         `json:"description"`
-	Status      string         `json:"status"`
-	Code        string         `json:"code"`
-	Code2       string         `json:"code2"`
-	Code3       *string        `json:"code3"`
-	Price       float64        `json:"price"`
-	UnitName    *string        `json:"unitName"`
-	Images      []ProductImage `json:"images"`
+	ProductID          int            `json:"productID"`
+	Name               string         `json:"name"`
+	Description        string         `json:"description"`
+	Status             string         `json:"status"`
+	Code               string         `json:"code"`
+	Code2              string         `json:"code2"`
+	Code3              *string        `json:"code3"`
+	Price              float64        `json:"price"`
+	UnitName           *string        `json:"unitName"`
+	Images             []ProductImage `json:"images"`
+	DisplayedInWebshop byte           `json:"displayedInWebshop"`
+	CategoryId         uint           `json:"categoryID"`
+	CategoryName       string         `json:"categoryName"`
 }
 
 type ProductImage struct {
