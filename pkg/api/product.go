@@ -45,8 +45,8 @@ type ProductCategory struct {
 	ProductCategoryID   uint   `json:"productCategoryID"`
 	ParentCategoryID    uint   `json:"parentCategoryID"`
 	ProductCategoryName string `json:"productCategoryName"`
-	Added               string `json:"added"`
-	LastModified        string `json:"lastModified"`
+	Added               uint64 `json:"added"`
+	LastModified        uint64 `json:"lastModified"`
 }
 
 //GetProductUnitsResponse ...
