@@ -17,6 +17,7 @@ type IClient interface {
 	GetVatRatesByID(vatRateID string) (VatRates, error)
 	GetCompanyInfo() (*CompanyInfo, error)
 	GetProductUnits() ([]ProductUnit, error)
+	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
 	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
 	GetProductsByIDs(ids []string) ([]Product, error)
 	GetProductsByCode3(code3 string) (*Product, error)

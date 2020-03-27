@@ -6,6 +6,11 @@ type GetProductsResponse struct {
 	Products []Product `json:"records"`
 }
 
+type getProductCategoriesResponse struct {
+	Status            Status            `json:"status"`
+	ProductCategories []ProductCategory `json:"records"`
+}
+
 //Product ...
 type Product struct {
 	ProductID          int            `json:"productID"`
@@ -34,6 +39,14 @@ type ProductImage struct {
 	HostingProvider string  `json:"hostingProvider"`
 	Hash            *string `json:"hash"`
 	Tenant          *string `json:"tenant"`
+}
+
+type ProductCategory struct {
+	ProductCategoryID   uint   `json:"productCategoryID"`
+	ParentCategoryID    uint   `json:"parentCategoryID"`
+	ProductCategoryName string `json:"productCategoryName"`
+	Added               string `json:"added"`
+	LastModified        string `json:"lastModified"`
 }
 
 //GetProductUnitsResponse ...
