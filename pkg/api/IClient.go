@@ -18,6 +18,7 @@ type IClient interface {
 	GetCompanyInfo() (*CompanyInfo, error)
 	GetProductUnits() ([]ProductUnit, error)
 	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
+	GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
 	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
 	GetProductsByIDs(ids []string) ([]Product, error)
 	GetProductsByCode3(code3 string) (*Product, error)

@@ -11,11 +11,17 @@ type getProductCategoriesResponse struct {
 	ProductCategories []ProductCategory `json:"records"`
 }
 
+type getProductBrandsResponse struct {
+	Status        Status         `json:"status"`
+	ProductBrands []ProductBrand `json:"records"`
+}
+
 //Product ...
 type Product struct {
 	ProductID          int            `json:"productID"`
 	Name               string         `json:"name"`
 	Description        string         `json:"description"`
+	DescriptionLong    string         `json:"longdesc"`
 	Status             string         `json:"status"`
 	Code               string         `json:"code"`
 	Code2              string         `json:"code2"`
@@ -26,6 +32,8 @@ type Product struct {
 	DisplayedInWebshop byte           `json:"displayedInWebshop"`
 	CategoryId         uint           `json:"categoryID"`
 	CategoryName       string         `json:"categoryName"`
+	BrandID            uint           `json:"brandID"`
+	BrandName          string         `json:"brandName"`
 }
 
 type ProductImage struct {
@@ -47,6 +55,13 @@ type ProductCategory struct {
 	ProductCategoryName string `json:"productCategoryName"`
 	Added               uint64 `json:"added"`
 	LastModified        uint64 `json:"lastModified"`
+}
+
+type ProductBrand struct {
+	ID           uint   `json:"brandID"`
+	Name         string `json:"name"`
+	Added        uint64 `json:"added"`
+	LastModified uint64 `json:"lastModified"`
 }
 
 //GetProductUnitsResponse ...
