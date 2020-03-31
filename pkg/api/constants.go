@@ -29,6 +29,7 @@ const (
 	GetProductsMethod                 = "getProducts"
 	GetProductCategoriesMethod        = "getProductCategories"
 	GetProductBrandsMethod            = "getBrands"
+	GetProductGroupsMethod            = "getProductGroups"
 	GetProductUnitsMethod             = "getProductUnits"
 	clientCode                        = "clientCode"
 	sessionKey                        = "sessionKey"
