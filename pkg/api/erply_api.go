@@ -1129,9 +1129,9 @@ func (cli *erplyClient) PostSalesDocument(in *SaleDocumentConstructor, provider 
 }
 
 func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error) {
-	if in.CompanyName == "" || in.RegistryCode == "" {
-		return nil, erplyerr("Can not save customer with empty name or registry number", nil)
-	}
+	//if in.CompanyName == "" || in.RegistryCode == "" {
+	//	return nil, erplyerr("Can not save customer with empty name or registry number", nil)
+	//}
 	req, err := getHTTPRequest(cli)
 	if err != nil {
 		return nil, erplyerr("failed to build postCustomer request", err)
@@ -1144,7 +1144,7 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	params.Add("code", in.RegistryCode)
 	//params.Add("vatNumber", in.VatNumber)
 	params.Add("email", in.Email)
-	params.Add("phone", in.Phone)
+	//params.Add("phone", in.Phone)
 	//params.Add("bankName", in.BankName)
 	//params.Add("bankAccountNumber", in.BankAccountNumber)
 
