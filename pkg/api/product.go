@@ -46,7 +46,6 @@ type Product struct {
 
 type StockInfo struct {
 	WarehouseID   uint    `json:"warehouseID"`
-	Reserved      int     `json:"reserved"`
 	Free          int     `json:"free"`
 	OrderPending  int     `json:"orderPending"`
 	ReorderPoint  int     `json:"reorderPoint"`
