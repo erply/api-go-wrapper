@@ -51,6 +51,8 @@ type CustomerConstructor struct {
 	Address           string
 	PostalCode        string
 	Country           string
+	FirstName         string
+	LastName          string
 	FullName          string
 	RegistryCode      string
 	VatNumber         string

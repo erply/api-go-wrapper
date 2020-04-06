@@ -1138,6 +1138,8 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	}
 	params := getMandatoryParameters(cli, saveCustomerMethod)
 	params.Add("companyName", in.CompanyName)
+	params.Add("firstName", in.FirstName)
+	params.Add("LastName", in.LastName)
 	params.Add("fullName", in.FullName)
 	params.Add("code", in.RegistryCode)
 	params.Add("vatNumber", in.VatNumber)
