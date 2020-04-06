@@ -1137,16 +1137,16 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 		return nil, erplyerr("failed to build postCustomer request", err)
 	}
 	params := getMandatoryParameters(cli, saveCustomerMethod)
-	params.Add("companyName", in.CompanyName)
+	//params.Add("companyName", in.CompanyName)
 	params.Add("firstName", in.FirstName)
 	params.Add("lastName", in.LastName)
 	params.Add("fullName", in.FullName)
 	params.Add("code", in.RegistryCode)
-	params.Add("vatNumber", in.VatNumber)
+	//params.Add("vatNumber", in.VatNumber)
 	params.Add("email", in.Email)
 	params.Add("phone", in.Phone)
-	params.Add("bankName", in.BankName)
-	params.Add("bankAccountNumber", in.BankAccountNumber)
+	//params.Add("bankName", in.BankName)
+	//params.Add("bankAccountNumber", in.BankAccountNumber)
 
 	req.URL.RawQuery = params.Encode()
 
