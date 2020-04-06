@@ -1089,7 +1089,7 @@ func (cli *erplyClient) PostSalesDocument(in *SaleDocumentConstructor, provider 
 	params.Add("paymentDays", in.DocumentData.PaymentDays)
 	params.Add("paymentInfo", in.DocumentData.InvoiceContentText)
 	params.Add("paymentStatus", "UNPAID")
-	params.Add("customerId", fmt.Sprint(in.DocumentData.CustomerId))
+	params.Add("customerID", fmt.Sprint(in.DocumentData.CustomerId))
 
 	fmt.Println("customerId", fmt.Sprint(in.DocumentData.CustomerId))
 	for id, item := range in.DocumentData.ProductRows {
