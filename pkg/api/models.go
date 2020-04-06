@@ -84,6 +84,7 @@ type DocumentData struct {
 	Delivery CustomerConstructor
 
 	ProductRows ProductRows
+	CustomerId  uint
 }
 
 type ProductRows []ProductRow
