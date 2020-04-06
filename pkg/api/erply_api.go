@@ -1091,6 +1091,7 @@ func (cli *erplyClient) PostSalesDocument(in *SaleDocumentConstructor, provider 
 	params.Add("paymentStatus", "UNPAID")
 	params.Add("customerId", fmt.Sprint(in.DocumentData.CustomerId))
 
+	fmt.Println("customerId", fmt.Sprint(in.DocumentData.CustomerId))
 	for id, item := range in.DocumentData.ProductRows {
 		params.Add(fmt.Sprintf("productID%d", id), item.ProductID)
 		params.Add(fmt.Sprintf("itemName%d", id), item.ItemName)
