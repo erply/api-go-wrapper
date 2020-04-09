@@ -32,6 +32,7 @@ type Product struct {
 	Code2              string             `json:"code2"`
 	Code3              *string            `json:"code3"`
 	Price              float64            `json:"price"`
+	PriceWithVat       float32            `json:"priceWithVat"`
 	UnitName           *string            `json:"unitName"`
 	Images             []ProductImage     `json:"images"`
 	DisplayedInWebshop byte               `json:"displayedInWebshop"`
