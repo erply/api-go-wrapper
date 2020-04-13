@@ -43,6 +43,7 @@ type Product struct {
 	GroupID            uint               `json:"groupID"`
 	GroupName          string             `json:"groupName"`
 	Warehouses         map[uint]StockInfo `json:"warehouses"`
+	RelatedProducts    []string           `json:"relatedProducts"`
 }
 
 type StockInfo struct {
