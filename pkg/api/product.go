@@ -44,6 +44,7 @@ type Product struct {
 	GroupName          string             `json:"groupName"`
 	Warehouses         map[uint]StockInfo `json:"warehouses"`
 	RelatedProducts    []string           `json:"relatedProducts"`
+	Vatrate            float64            `json:"vatrate"`
 }
 
 type StockInfo struct {
@@ -85,14 +86,15 @@ type ProductBrand struct {
 }
 
 type ProductGroup struct {
-	ID              uint   `json:"productGroupID"`
-	Name            string `json:"name"`
-	ShowInWebshop   string `json:"showInWebshop"`
-	NonDiscountable byte   `json:"nonDiscountable"`
-	PositionNo      int    `json:"positionNo"`
-	ParentGroupID   string `json:"parentGroupID"`
-	Added           uint64 `json:"added"`
-	LastModified    uint64 `json:"lastModified"`
+	ID              uint           `json:"productGroupID"`
+	Name            string         `json:"name"`
+	ShowInWebshop   string         `json:"showInWebshop"`
+	NonDiscountable byte           `json:"nonDiscountable"`
+	PositionNo      int            `json:"positionNo"`
+	ParentGroupID   string         `json:"parentGroupID"`
+	Added           uint64         `json:"added"`
+	LastModified    uint64         `json:"lastModified"`
+	SubGroups       []ProductGroup `json:"subGroups"`
 }
 
 //GetProductUnitsResponse ...
