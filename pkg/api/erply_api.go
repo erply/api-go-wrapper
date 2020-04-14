@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 )
@@ -118,6 +119,41 @@ func NewClientV2(partnerKey string, secret string, clientCode string) IClient {
 		},
 	}
 	return &cli
+}
+
+func (cli *erplyClient) VerifyCustomerUser(username, password string) (*WebshopClient, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("VerifyCustomerUser: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, VerifyCustomerUserMethod)
+	params.Set("username", username)
+	params.Set("password", password)
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("VerifyCustomerUser: request failed", err)
+	}
+
+	var res struct {
+		Status  Status
+		Records []WebshopClient
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("VerifyCustomerUser: unmarhsalling response failed", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	if len(res.Records) != 1 {
+		return nil, erplyerr("VerifyCustomerUser: no records in response", nil)
+	}
+
+	return &res.Records[0], nil
 }
 
 func (cli *erplyClient) Close() {
@@ -835,6 +871,35 @@ func (cli *erplyClient) GetIdentityToken() (*IdentityToken, error) {
 	return &res.Result, nil
 }
 
+func (cli *erplyClient) GetJWTToken(partnerKey string) (*JwtToken, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, fmt.Errorf("error building GetJWTToken request: %v", err)
+	}
+
+	params := getMandatoryParameters(cli, GetJWTTokenMethod)
+	params.Set("partnerKey", partnerKey)
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("error making request for GetJWTToken", err)
+	}
+
+	var res JwtTokenResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&res)
+	if err != nil {
+		return nil, erplyerr("error decoding GetJWTToken response", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	return &res.Records, nil
+}
+
 //GetWarehouses ...
 func (cli *erplyClient) GetWarehouses() (Warehouses, error) {
 	req, err := getHTTPRequest(cli)
@@ -1130,6 +1195,49 @@ func (cli *erplyClient) PostSalesDocument(in *SaleDocumentConstructor, provider 
 	return res.ImportReports, nil
 }
 
+func (cli *erplyClient) SaveAddress(in *Address) (int, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return 0, erplyerr("SaveAddress: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, saveAddressMethod)
+	params.Add("addressID", strconv.Itoa(in.AddressID))
+	params.Add("typeID", strconv.Itoa(in.TypeID))
+	params.Add("ownerID", strconv.Itoa(in.OwnerID))
+	params.Add("street", in.Street)
+	params.Add("postalCode", in.PostalCode)
+	params.Add("city", in.City)
+	params.Add("state", in.State)
+	params.Add("country", in.Country)
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return 0, erplyerr("SaveAddress: request failed", err)
+	}
+
+	var res struct {
+		Status  Status
+		Records []Address
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return 0, erplyerr("SaveAddress: JSON unmarshal failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return 0, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.Records) == 0 {
+		return 0, erplyerr("SaveAddress: no records in response", nil)
+	}
+
+	return res.Records[0].AddressID, nil
+}
+
 func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error) {
 	//if in.CompanyName == "" || in.RegistryCode == "" {
 	//	return nil, erplyerr("Can not save customer with empty name or registry number", nil)
@@ -1139,6 +1247,7 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 		return nil, erplyerr("failed to build postCustomer request", err)
 	}
 	params := getMandatoryParameters(cli, saveCustomerMethod)
+	params.Add("customerID", strconv.Itoa(in.CustomerID)) // For updating the existing customer
 	params.Add("companyName", in.CompanyName)
 	params.Add("firstName", in.FirstName)
 	params.Add("lastName", in.LastName)
@@ -1149,7 +1258,8 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	params.Add("phone", in.Phone)
 	params.Add("bankName", in.BankName)
 	params.Add("bankAccountNumber", in.BankAccountNumber)
-	params.Add("address", in.Address)
+	params.Add("username", in.Username)
+	params.Add("password", in.Password)
 
 	req.URL.RawQuery = params.Encode()
 
@@ -1168,6 +1278,23 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 
 	if len(res.CustomerImportReports) == 0 {
 		return nil, nil
+	}
+
+	if in.Address != "" {
+		addr := Address{
+			OwnerID:    res.CustomerImportReports[0].CustomerID,
+			TypeID:     in.AddressTypeID,
+			Street:     in.Address,
+			PostalCode: in.PostalCode,
+			Country:    in.Country,
+			City:       in.City,
+			State:      in.State,
+		}
+
+		_, err := cli.SaveAddress(&addr)
+		if err != nil {
+			return nil, erplyerr("error adding address to customer", err)
+		}
 	}
 
 	return &res.CustomerImportReports[0], nil
@@ -1211,6 +1338,161 @@ func (cli *erplyClient) PostSupplier(in *CustomerConstructor) (*CustomerImportRe
 	}
 
 	return &res.CustomerImportReports[0], nil
+}
+
+func (cli *erplyClient) SavePayment(in *PaymentInfo) (int64, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return 0, erplyerr("SavePayment: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, savePaymentMethod)
+	params.Add("documentID", strconv.Itoa(in.DocumentID))
+	params.Add("type", in.Type)
+	params.Add("currencyCode", in.CurrencyCode)
+	params.Add("date", in.Date)
+	params.Add("sum", in.Sum)
+	params.Add("info", in.Info)
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return 0, erplyerr("SavePayment: error sending POST request", err)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return 0, erplyerr(fmt.Sprintf("SavePayment: bad response status code: %d", resp.StatusCode), nil)
+	}
+
+	var respData struct {
+		Status  Status
+		Records []struct {
+			PaymentID int64 `json:"paymentID"`
+		} `json:"records"`
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&respData)
+	if err != nil {
+		return 0, erplyerr("SavePayment: error decoding JSON response body", err)
+	}
+	if respData.Status.ErrorCode != 0 {
+		return 0, erplyerr(fmt.Sprintf("SavePayment: API error %d", respData.Status.ErrorCode), nil)
+	}
+	if len(respData.Records) < 1 {
+		return 0, erplyerr("SavePayment: no records in response", nil)
+	}
+
+	return respData.Records[0].PaymentID, nil
+}
+
+func (cli *erplyClient) GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("GetPayments: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, GetPaymentsMethod)
+	for k, v := range filters {
+		params.Add(k, v)
+	}
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("GetPayments: error sending request", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, erplyerr(fmt.Sprintf("GetPayments: bad response status code: %d", resp.StatusCode), nil)
+	}
+
+	var respData struct {
+		Status  Status
+		Records []PaymentInfo
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&respData)
+	if err != nil {
+		return nil, erplyerr("GetPayments: error decoding JSON response body", err)
+	}
+	if respData.Status.ErrorCode != 0 {
+		return nil, erplyerr(fmt.Sprintf("GetPayments: API error %d", respData.Status.ErrorCode), nil)
+	}
+
+	return respData.Records, nil
+}
+
+func (cli *erplyClient) CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("CalculateShoppingCart: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, calculateShoppingCartMethod)
+	params.Add("customerID", strconv.FormatUint(uint64(in.CustomerId), 10))
+
+	for i, prod := range in.ProductRows {
+		params.Add(fmt.Sprintf("productID%d", i), prod.ProductID)
+		params.Add(fmt.Sprintf("amount%d", i), prod.Amount)
+	}
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("CalculateShoppingCart: error sending request", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, erplyerr(fmt.Sprintf("CalculateShoppingCart: bad response status code: %d", resp.StatusCode), nil)
+	}
+
+	var respData struct {
+		Status  Status
+		Records []*ShoppingCartTotals
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, erplyerr("CalculateShoppingCart: unmarshaling response failed", err)
+	}
+	if !isJSONResponseOK(&respData.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(respData.Status.ErrorCode), respData.Status.Request+": "+respData.Status.ResponseStatus)
+	}
+	if len(respData.Records) < 1 {
+		return nil, erplyerr("CalculateShoppingCart: no records in response", nil)
+	}
+
+	return respData.Records[0], nil
+}
+
+func (cli *erplyClient) IsCustomerUsernameAvailable(username string) (bool, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return false, erplyerr("IsCustomerUsernameAvailable: failed to build request", err)
+	}
+
+	params := getMandatoryParameters(cli, validateCustomerUsernameMethod)
+	params.Add("username", username)
+
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return false, erplyerr("IsCustomerUsernameAvailable: error sending request", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		return false, erplyerr(fmt.Sprintf("IsCustomerUsernameAvailable: bad response status code: %d", resp.StatusCode), nil)
+	}
+
+	var respData struct {
+		Status Status
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return false, erplyerr("IsCustomerUsernameAvailable: unmarshaling response failed", err)
+	}
+
+	return respData.Status.ErrorCode == 0, nil
 }
 
 func (cli *erplyClient) logProcessingOfCustomerData(log *CustomerDataProcessingLog) error {

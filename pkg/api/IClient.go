@@ -40,5 +40,11 @@ type IClient interface {
 	GetPointsOfSaleByID(posID string) (*PointOfSale, error)
 	VerifyIdentityToken(jwt string) (*SessionInfo, error)
 	GetIdentityToken() (*IdentityToken, error)
+	GetJWTToken(partnerKey string) (*JwtToken, error)
+	SavePayment(in *PaymentInfo) (int64, error)
+	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
+	VerifyCustomerUser(username, password string) (*WebshopClient, error)
+	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)
+	IsCustomerUsernameAvailable(username string) (bool, error)
 	Close()
 }

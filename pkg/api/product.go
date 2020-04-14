@@ -21,9 +21,26 @@ type getProductGroupsResponse struct {
 	ProductGroups []ProductGroup `json:"records"`
 }
 
+type ProductDimensions struct {
+	Name             string `json:"name"`
+	Value            string `json:"value"`
+	DimensionID      int    `json:"dimensionID"`
+	DimensionValueID int    `json:"dimensionValueID"`
+}
+
+type ProductVariaton struct {
+	ProductID  string              `json:"productID"`
+	Name       string              `json:"name"`
+	Code       string              `json:"code"`
+	Code2      string              `json:"code2"`
+	Dimensions []ProductDimensions `json:"dimensions"`
+}
+
 //Product ...
 type Product struct {
 	ProductID          int                `json:"productID"`
+	ParentProductID    int                `json:"parentProductID"`
+	Type               string             `json:"type"`
 	Name               string             `json:"name"`
 	Description        string             `json:"description"`
 	DescriptionLong    string             `json:"longdesc"`
@@ -45,6 +62,8 @@ type Product struct {
 	Warehouses         map[uint]StockInfo `json:"warehouses"`
 	RelatedProducts    []string           `json:"relatedProducts"`
 	Vatrate            float64            `json:"vatrate"`
+	ProductVariations  []string           `json:"productVariations"` // Variations of matrix product
+	VariationList      []ProductVariaton  `json:"variationList"`
 }
 
 type StockInfo struct {

@@ -36,6 +36,10 @@ type Customer struct {
 	Country              string         `json:"country"`
 	State                string         `json:"state"`
 	ContactPersons       ContactPersons `json:"contactPersons"`
+
+	// Web-shop related fields
+	Username  string `json:"webshopUsername"`
+	LastLogin string `json:"webshopLastLogin"`
 }
 type Customers []Customer
 
@@ -47,9 +51,13 @@ type Attribute struct {
 }
 
 type CustomerConstructor struct {
+	CustomerID        int
 	CompanyName       string
 	Address           string
 	PostalCode        string
+	AddressTypeID     int
+	City              string
+	State             string
 	Country           string
 	FirstName         string
 	LastName          string
@@ -60,4 +68,8 @@ type CustomerConstructor struct {
 	Phone             string
 	BankName          string
 	BankAccountNumber string
+
+	// Web-shop related fields
+	Username string
+	Password string
 }

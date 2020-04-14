@@ -26,6 +26,13 @@ type (
 	IdentityToken struct {
 		Jwt string `json:"identityToken"`
 	}
+	JwtTokenResponse struct {
+		Status  Status   `json:"status"`
+		Records JwtToken `json:"records"`
+	}
+	JwtToken struct {
+		Token string `json:"token"`
+	}
 )
 type DocumentDatas []DocumentData
 
@@ -389,4 +396,16 @@ type Currency struct {
 	NameFraction string `json:"nameFraction"`
 	Added        string `json:"added"`
 	LastModified string `json:"lastModified"`
+}
+
+type WebshopClient struct {
+	ClientID        string `json:"clientID"`
+	ClientUsername  string `json:"clientUsername"`
+	ClientName      string `json:"clientName"`
+	ClientFirstName string `json:"clientFirstName"`
+	ClientLastName  string `json:"clientLastName"`
+	ClientGroupID   string `json:"clientGroupID"`
+	ClientGroupName string `json:"clientGroupName"`
+	CompanyID       string `json:"companyID"`
+	CompanyName     string `json:"companyName"`
 }
