@@ -24,7 +24,7 @@ type IClient interface {
 	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
 	GetProductsByIDs(ids []string) ([]Product, error)
 	GetProductsByCode3(code3 string) (*Product, error)
-	GetAddresses() (*Address, error)
+	GetAddresses(filters map[string]string) ([]Address, error)
 	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
 	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)

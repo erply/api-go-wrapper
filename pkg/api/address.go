@@ -14,7 +14,6 @@ type (
 	Address struct {
 		AddressID  int    `json:"addressID"`
 		OwnerID    int    `json:"ownerID"`
-		TypeID     int    `json:"typeID"`
 		Address2   string `json:"address2"`
 		Address    string `json:"address"`
 		Street     string `json:"street"`

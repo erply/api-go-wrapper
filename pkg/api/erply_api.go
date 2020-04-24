@@ -307,14 +307,17 @@ func (cli *erplyClient) GetProductsByCode3(code3 string) (*Product, error) {
 	return &res.Products[0], nil
 }
 
-func (cli *erplyClient) GetAddresses() (*Address, error) {
+func (cli *erplyClient) GetAddresses(filters map[string]string) ([]Address, error) {
 	req, err := getHTTPRequest(cli)
 	if err != nil {
 		return nil, erplyerr("failed to build GetAddresses request", err)
 	}
 
 	params := getMandatoryParameters(cli, GetAddressesMethod)
-	params.Add("ownerID", "1")
+	for fk, fv := range filters {
+		params.Add(fk, fv)
+	}
+
 	req.URL.RawQuery = params.Encode()
 	resp, err := doRequest(req, cli)
 	if err != nil {
@@ -330,10 +333,7 @@ func (cli *erplyClient) GetAddresses() (*Address, error) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
-	if len(res.Addresses) == 0 {
-		return nil, erplyerr(fmt.Sprintf("Addresses were not found"), nil)
-	}
-	return &res.Addresses[0], nil
+	return res.Addresses, nil
 }
 
 // GetCountries will list countries according to specified filters.
@@ -1227,7 +1227,7 @@ func (cli *erplyClient) SaveAddress(in *Address) (int, error) {
 
 	params := getMandatoryParameters(cli, saveAddressMethod)
 	params.Add("addressID", strconv.Itoa(in.AddressID))
-	params.Add("typeID", strconv.Itoa(in.TypeID))
+	params.Add("typeID", "1") // FIXME this should be configurable by the client
 	params.Add("ownerID", strconv.Itoa(in.OwnerID))
 	params.Add("street", in.Street)
 	params.Add("postalCode", in.PostalCode)
@@ -1282,8 +1282,15 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	params.Add("phone", in.Phone)
 	params.Add("bankName", in.BankName)
 	params.Add("bankAccountNumber", in.BankAccountNumber)
-	params.Add("username", in.Username)
-	params.Add("password", in.Password)
+
+	if in.Username != "" {
+		if in.Password == "" {
+			return nil, erplyerr("password for user can not be empty", nil)
+		}
+
+		params.Add("username", in.Username)
+		params.Add("password", in.Password)
+	}
 
 	req.URL.RawQuery = params.Encode()
 
@@ -1305,9 +1312,29 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	}
 
 	if in.Address != "" {
+		var addressID int
+
+		// existing customer is being updated -
+		// overwrite first address record of that customer
+		// or simply create a new address record if there are no existing addresses
+		if in.CustomerID > 0 {
+			addrs, err := cli.GetAddresses(map[string]string{
+				"ownerID":    strconv.Itoa(in.CustomerID),
+				"orderBy":    "addressID",
+				"orderByDir": "ASC",
+			})
+
+			if err != nil {
+				return nil, erplyerr("error getting existing customer addresses: %v", err)
+			}
+			if len(addrs) > 0 {
+				addressID = addrs[0].AddressID
+			}
+		}
+
 		addr := Address{
+			AddressID:  addressID,
 			OwnerID:    res.CustomerImportReports[0].CustomerID,
-			TypeID:     in.AddressTypeID,
 			Street:     in.Address,
 			PostalCode: in.PostalCode,
 			Country:    in.Country,
