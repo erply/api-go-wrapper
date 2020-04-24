@@ -50,7 +50,9 @@ func VerifyUser(username string, password string, clientCode string, client *htt
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return "", erplyerr("failed to decode VerifyUserResponse", err)
 	}
-
+	if len(res.Records) < 1 {
+		return "", erplyerr("VerifyUser: no records in response", nil)
+	}
 	return res.Records[0].SessionKey, nil
 }
 
