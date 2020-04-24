@@ -26,6 +26,13 @@ type (
 	IdentityToken struct {
 		Jwt string `json:"identityToken"`
 	}
+	JwtTokenResponse struct {
+		Status  Status   `json:"status"`
+		Records JwtToken `json:"records"`
+	}
+	JwtToken struct {
+		Token string `json:"token"`
+	}
 )
 type DocumentDatas []DocumentData
 
@@ -84,6 +91,7 @@ type DocumentData struct {
 	Delivery CustomerConstructor
 
 	ProductRows ProductRows
+	CustomerId  uint
 }
 
 type ProductRows []ProductRow
@@ -139,9 +147,27 @@ type CustomerImportReport struct {
 	ClientID   int `json:"clientID"`
 	CustomerID int `json:"customerID"`
 }
+type InstallationRequest struct {
+	CompanyName string `json:"companyName"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	Phone       string `json:"phone"`
+	Email       string `json:"email"`
+	SendEmail   int    `json:"sendEmail"`
+}
+type InstallationResponse struct {
+	ClientCode int    `json:"clientCode"`
+	UserName   string `json:"username"`
+	Password   string `json:"password"`
+}
 
 type PointOfSale struct {
-	WarehouseID int `json:"warehouseID"`
+	PointOfSaleID uint   `json:"pointOfSaleID"`
+	Name          string `json:"name"`
+	WarehouseID   int    `json:"warehouseID"`
+	WarehouseName string `json:"warehouseName"`
+	Added         uint64 `json:"added"`
+	LastModified  uint64 `json:"lastModified"`
 }
 
 type PurchaseDocImportReports []PurchaseDocImportReport
@@ -184,7 +210,6 @@ type InvoiceRow struct {
 type ConfParameter struct {
 	Announcement         string `json:"invoice_announcement_eng"`
 	InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
-	ReverseVatText       string `json:"reverse_vat_text"`
 }
 
 type Warehouse struct {
@@ -192,8 +217,8 @@ type Warehouse struct {
 	PricelistID            string `json:"pricelistID"`
 	PricelistID2           string `json:"pricelistID2"`
 	PricelistID3           string `json:"pricelistID3"`
-	PricelistID4           string `json:"pricelistID4"`
-	PricelistID5           string `json:"pricelistID5"`
+	PricelistID4           int    `json:"pricelistID4"`
+	PricelistID5           int    `json:"pricelistID5"`
 	Name                   string `json:"name"`
 	Code                   string `json:"code"`
 	AddressID              int    `json:"addressID"`
@@ -249,4 +274,160 @@ type GetUserRightsResponse struct {
 
 type UserRights struct {
 	UserName string `json:"userName"`
+}
+
+type Supplier struct {
+	SupplierId      uint           `json:"supplierID"`
+	SupplierType    string         `json:"supplierType"`
+	FullName        string         `json:"fullName"`
+	CompanyName     string         `json:"companyName"`
+	FirstName       string         `json:"firstName"`
+	LstName         string         `json:"lastName"`
+	GroupId         uint           `json:"groupID"`
+	GroupName       string         `json:"groupName"`
+	Phone           string         `json:"phone"`
+	Mobile          string         `json:"mobile"`
+	Email           string         `json:"email"`
+	Fax             string         `json:"fax"`
+	Code            string         `json:"code"`
+	IntegrationCode string         `json:"integrationCode"`
+	VatrateID       uint           `json:"vatrateID"`
+	CurrencyCode    string         `json:"currencyCode"`
+	DeliveryTermsID uint           `json:"deliveryTermsID"`
+	CountryId       uint           `json:"countryID"`
+	CountryName     string         `json:"countryName"`
+	CountryCode     string         `json:"countryCode"`
+	Address         string         `json:"address"`
+	Gln             string         `json:"GLN"`
+	Attributes      []ObjAttribute `json:"attributes"`
+
+	// Detail fields
+	VatNumber           string `json:"vatNumber"`
+	Skype               string `json:"skype"`
+	Website             string `json:"website"`
+	BankName            string `json:"bankName"`
+	BankAccountNumber   string `json:"bankAccountNumber"`
+	BankIBAN            string `json:"bankIBAN"`
+	BankSWIFT           string `json:"bankSWIFT"`
+	Birthday            string `json:"birthday"`
+	CompanyID           uint   `json:"companyID"`
+	ParentCompanyName   string `json:"parentCompanyName"`
+	SupplierManagerID   uint   `json:"supplierManagerID"`
+	SupplierManagerName string `json:"supplierManagerName"`
+	PaymentDays         uint   `json:"paymentDays"`
+	Notes               string `json:"notes"`
+	LastModified        string `json:"lastModified"`
+	Added               uint64 `json:"added"`
+}
+
+type ObjAttribute struct {
+	AttributeName  string `json:"attributeName"`
+	AttributeType  string `json:"attributeType"`
+	AttributeValue string `json:"attributeValue"`
+}
+
+type Country struct {
+	CountryId             uint   `json:"countryID"`
+	CountryName           string `json:"countryName"`
+	CountryCode           string `json:"countryCode"`
+	MemberOfEuropeanUnion byte   `json:"memberOfEuropeanUnion"`
+	LastModified          string `json:"lastModified"`
+	Added                 uint64 `json:"added"`
+}
+
+type Employee struct {
+	EmployeeID             string              `json:"employeeID"`
+	FullName               string              `json:"fullName"`
+	EmployeeName           string              `json:"employeeName"`
+	FirstName              string              `json:"firstName"`
+	LastName               string              `json:"lastName"`
+	Phone                  string              `json:"phone"`
+	Mobile                 string              `json:"mobile"`
+	Email                  string              `json:"email"`
+	Fax                    string              `json:"fax"`
+	Code                   string              `json:"code"`
+	Gender                 string              `json:"gender"`
+	UserID                 string              `json:"userID"`
+	Username               string              `json:"username"`
+	UserGroupID            string              `json:"userGroupID"`
+	Warehouses             []EmployeeWarehouse `json:"warehouses"`
+	PointsOfSale           string              `json:"pointsOfSale"`
+	ProductIDs             []EmployeeProduct   `json:"productIDs"`
+	Attributes             []ObjAttribute      `json:"attributes"`
+	LastModified           uint64              `json:"lastModified"`
+	LastModifiedByUserName string              `json:"lastModifiedByUserName"`
+
+	// detail fileds
+	Skype        string `json:"skype"`
+	Birthday     string `json:"birthday"`
+	JobTitleID   uint   `json:"jobTitleID"`
+	JobTitleName string `json:"jobTitleName"`
+	Notes        string `json:"notes"`
+	Added        uint64 `json:"added"`
+}
+
+type EmployeeWarehouse struct {
+	Id uint `json:"id"`
+}
+
+type EmployeeProduct struct {
+	ProductID    uint   `json:"productID"`
+	ProductCode  string `json:"productCode"`
+	ProductName  string `json:"productName"`
+	ProductGroup uint   `json:"productGroup"`
+}
+
+type BusinessArea struct {
+	Id           uint   `json:"id"`
+	Name         string `json:"name"`
+	Added        uint64 `json:"added"`
+	LastModified uint64 `json:"lastModified"`
+}
+
+type Project struct {
+	ProjectID    uint   `json:"projectID"`
+	Name         string `json:"name"`
+	CustomerID   uint   `json:"customerID"`
+	CustomerName string `json:"customerName"`
+	EmployeeID   uint   `json:"employeeID"`
+	EmployeeName string `json:"employeeName"`
+	TypeID       uint   `json:"typeID"`
+	TypeName     string `json:"typeName"`
+	StatusID     uint   `json:"statusID"`
+	StatusName   string `json:"statusName"`
+	StartDate    string `json:"startDate"`
+	EndDate      string `json:"endDate"`
+	Notes        string `json:"notes"`
+	LastModified uint64 `json:"lastModified"`
+}
+
+type ProjectStatus struct {
+	ProjectStatusID uint   `json:"projectStatusID"`
+	Name            string `json:"name"`
+	Finished        byte   `json:"finished"`
+	Added           uint64 `json:"added"`
+	LastModified    uint64 `json:"lastModified"`
+}
+
+type Currency struct {
+	CurrencyID   string `json:"currencyID"`
+	Code         string `json:"code"`
+	Name         string `json:"name"`
+	Default      string `json:"default"`
+	NameShort    string `json:"nameShort"`
+	NameFraction string `json:"nameFraction"`
+	Added        string `json:"added"`
+	LastModified string `json:"lastModified"`
+}
+
+type WebshopClient struct {
+	ClientID        string `json:"clientID"`
+	ClientUsername  string `json:"clientUsername"`
+	ClientName      string `json:"clientName"`
+	ClientFirstName string `json:"clientFirstName"`
+	ClientLastName  string `json:"clientLastName"`
+	ClientGroupID   string `json:"clientGroupID"`
+	ClientGroupName string `json:"clientGroupName"`
+	CompanyID       string `json:"companyID"`
+	CompanyName     string `json:"companyName"`
 }
