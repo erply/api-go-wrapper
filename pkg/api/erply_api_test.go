@@ -1,6 +1,8 @@
 package api
 
 import (
+	"net/http"
+	"strconv"
 	"testing"
 )
 
@@ -46,6 +48,39 @@ func TestApiRequests(t *testing.T) {
 		t.Log(resp.WarehouseID)
 		if resp.WarehouseID == 0 {
 			t.Error("got no warehouseID key")
+			return
+		}
+	})
+
+	t.Run("test createInstallation & verifyUser", func(t *testing.T) {
+		const (
+			baseUrl    = ""
+			partnerKey = ""
+		)
+		var (
+			req = &InstallationRequest{
+				CompanyName: "aaa",
+				FirstName:   "aasd",
+				LastName:    "asdasd",
+				Phone:       "asd",
+				Email:       "asd@asd.ee",
+				SendEmail:   0,
+			}
+			cli = &http.Client{}
+		)
+
+		resp, err := CreateInstallation(baseUrl, partnerKey, req, cli)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		sk, err := VerifyUser(resp.UserName, resp.Password, strconv.Itoa(resp.ClientCode), cli)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		if sk == "" {
+			t.Error("did not get sk")
 			return
 		}
 	})

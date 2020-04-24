@@ -147,6 +147,19 @@ type CustomerImportReport struct {
 	ClientID   int `json:"clientID"`
 	CustomerID int `json:"customerID"`
 }
+type InstallationRequest struct {
+	CompanyName string `json:"companyName"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	Phone       string `json:"phone"`
+	Email       string `json:"email"`
+	SendEmail   int    `json:"sendEmail"`
+}
+type InstallationResponse struct {
+	ClientCode int    `json:"clientCode"`
+	UserName   string `json:"username"`
+	Password   string `json:"password"`
+}
 
 type PointOfSale struct {
 	PointOfSaleID uint   `json:"pointOfSaleID"`

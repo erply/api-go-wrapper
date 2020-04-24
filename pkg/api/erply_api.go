@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 )
 
@@ -27,9 +25,7 @@ type erplyClient struct {
 }
 
 //VerifyUser will give you session key
-func VerifyUser(username string, password string, clientCode string) (string, error) {
-	client := &http.Client{}
-
+func VerifyUser(username string, password string, clientCode string, client *http.Client) (string, error) {
 	requestUrl := fmt.Sprintf(baseURL, clientCode)
 	params := url.Values{}
 	params.Add("username", username)
@@ -522,11 +518,6 @@ func (cli *erplyClient) GetSalesDocumentsByIDs(ids []string) ([]SaleDocument, er
 	}
 
 	return res.SalesDocuments, nil
-}
-
-func doRequest(req *http.Request, cli *erplyClient) (*http.Response, error) {
-	resp, err := cli.httpClient.Do(req)
-	return resp, err
 }
 
 // GetCustomers will list customers according to specified filters.
@@ -1340,6 +1331,54 @@ func (cli *erplyClient) PostSupplier(in *CustomerConstructor) (*CustomerImportRe
 	return &res.CustomerImportReports[0], nil
 }
 
+func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli *http.Client) (*InstallationResponse, error) {
+
+	params := url.Values{}
+	params.Add("request", createInstallationMethod)
+	params.Add("partnerKey", partnerKey)
+	params.Add("companyName", in.CompanyName)
+	params.Add("firstName", in.FirstName)
+	params.Add("lastName", in.LastName)
+	params.Add("phone", in.Phone)
+	params.Add("email", in.Email)
+	params.Add("sendEmail", strconv.Itoa(in.SendEmail))
+
+	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, erplyerr("failed to build HTTP request", err)
+
+	}
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, &erplyClient{httpClient: cli})
+	if err != nil {
+		return nil, erplyerr("CreateInstallation: error sending POST request", err)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return nil, erplyerr(fmt.Sprintf("CreateInstallation: bad response status code: %d", resp.StatusCode), nil)
+	}
+
+	var respData struct {
+		Status  Status
+		Records []InstallationResponse
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(&respData)
+	if err != nil {
+		return nil, erplyerr("CreateInstallation: error decoding JSON response body", err)
+	}
+	if respData.Status.ErrorCode != 0 {
+		fmt.Println(respData.Status.ErrorField)
+		return nil, erplyerr(fmt.Sprintf("CreateInstallation: API error %d", respData.Status.ErrorCode), nil)
+	}
+	if len(respData.Records) < 1 {
+		return nil, erplyerr("CreateInstallation: no records in response", nil)
+	}
+
+	return &respData.Records[0], nil
+}
+
 func (cli *erplyClient) SavePayment(in *PaymentInfo) (int64, error) {
 	req, err := getHTTPRequest(cli)
 	if err != nil {
@@ -1519,51 +1558,12 @@ func (cli *erplyClient) logProcessingOfCustomerData(log *CustomerDataProcessingL
 	return nil
 }
 
-func isJSONResponseOK(status *Status) bool {
-	return strings.EqualFold(status.ResponseStatus, responseStatusOK)
-}
-
-func getHTTPRequest(cli *erplyClient) (*http.Request, error) {
-	req, err := http.NewRequest("GET", cli.url, nil)
-	if err != nil {
-		return nil, erplyerr("failed to build HTTP request", err)
-
-	}
-	return req, err
-}
-
-func newPostHTTPRequest(cli *erplyClient, params url.Values) (*http.Request, error) {
-	req, err := http.NewRequest("POST", cli.url, strings.NewReader(params.Encode()))
-	if err != nil {
-		return nil, erplyerr("failed to build HTTP request", err)
-
-	}
-	return req, err
-}
-
-func getMandatoryParameters(cli *erplyClient, request string) url.Values {
-	params := url.Values{}
-	params.Add("request", request)
-	params.Add("setContentType", "1")
-	if cli.sessionKey != "" && cli.clientCode != "" {
-		params.Add(sessionKey, cli.sessionKey)
-		params.Add(clientCode, cli.clientCode)
-	}
-	if cli.partnerKey != "" && cli.secret != "" {
-		now := time.Now().Unix()
-		params.Add(applicationKey, GenerateToken(cli.partnerKey, now, request, cli.secret))
-		params.Add(clientCode, cli.clientCode)
-		params.Add("partnerKey", cli.partnerKey)
-		params.Add("timestamp", strconv.Itoa(int(now)))
-	}
-	return params
-}
-
 type Status struct {
 	Request           string  `json:"request"`
 	RequestUnixTime   int     `json:"requestUnixTime"`
 	ResponseStatus    string  `json:"responseStatus"`
 	ErrorCode         int     `json:"errorCode"`
+	ErrorField        string  `json:"errorField"`
 	GenerationTime    float64 `json:"generationTime"`
 	RecordsTotal      int     `json:"recordsTotal"`
 	RecordsInResponse int     `json:"recordsInResponse"`
@@ -1664,33 +1664,4 @@ type GetWarehousesResponse struct {
 type PostCustomerResponse struct {
 	Status                Status                `json:"status"`
 	CustomerImportReports CustomerImportReports `json:"records"`
-}
-
-func erplyerr(msg string, err error) *erro.ErplyError {
-	if err != nil {
-		return erro.NewErplyError("Error", errors.Wrap(err, msg).Error())
-	}
-	return erro.NewErplyError("Error", msg)
-}
-
-func setParams(params url.Values, filters map[string]string) {
-	for k, v := range filters {
-		params.Add(k, v)
-	}
-}
-
-func (cli *erplyClient) sendRequest(ctx context.Context, apiMethod string, filters map[string]string) (*http.Response, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("failed to build http request", err)
-	}
-	req = req.WithContext(ctx)
-	params := getMandatoryParameters(cli, apiMethod)
-	setParams(params, filters)
-	req.URL.RawQuery = params.Encode()
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("%v request failed", apiMethod), err)
-	}
-	return resp, nil
 }

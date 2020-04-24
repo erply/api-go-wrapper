@@ -27,6 +27,7 @@ const (
 	saveAddressMethod                 = "saveAddress"
 	saveSupplierMethod                = "saveSupplier"
 	savePaymentMethod                 = "savePayment"
+	createInstallationMethod          = "createInstallation"
 	GetWarehousesMethod               = "getWarehouses"
 	GetAddressesMethod                = "getAddresses"
 	GetProductsMethod                 = "getProducts"
