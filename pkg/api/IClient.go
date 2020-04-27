@@ -44,6 +44,7 @@ type IClient interface {
 	GetIdentityToken() (*IdentityToken, error)
 	GetJWTToken(partnerKey string) (*JwtToken, error)
 	SavePayment(in *PaymentInfo) (int64, error)
+	SaveAddress(in *AddressRequest) (int, error)
 	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 	VerifyCustomerUser(username, password string) (*WebshopClient, error)
 	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)

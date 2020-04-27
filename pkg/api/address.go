@@ -10,10 +10,10 @@ type (
 	//Addresses from getAddresses
 	Addresses []Address
 
-	//Address from getAddresses
-	Address struct {
+	AddressRequest struct {
 		AddressID  int    `json:"addressID"`
 		OwnerID    int    `json:"ownerID"`
+		TypeID     int    `json:"typeID"`
 		Address2   string `json:"address2"`
 		Address    string `json:"address"`
 		Street     string `json:"street"`
@@ -21,5 +21,19 @@ type (
 		City       string `json:"city"`
 		State      string `json:"state"`
 		Country    string `json:"country"`
+	}
+
+	//Address from getAddresses
+	Address struct {
+		AddressID  int         `json:"addressID"`
+		OwnerID    int         `json:"ownerID"`
+		TypeID     interface{} `json:"typeID"`
+		Address2   string      `json:"address2"`
+		Address    string      `json:"address"`
+		Street     string      `json:"street"`
+		PostalCode string      `json:"postalCode"`
+		City       string      `json:"city"`
+		State      string      `json:"state"`
+		Country    string      `json:"country"`
 	}
 )

@@ -1111,15 +1111,14 @@ func (cli *erplyClient) PostSalesDocument(in *SaleDocumentConstructor, provider 
 	return res.ImportReports, nil
 }
 
-func (cli *erplyClient) SaveAddress(in *Address) (int, error) {
+func (cli *erplyClient) SaveAddress(in *AddressRequest) (int, error) {
 	req, err := getHTTPRequest(cli)
 	if err != nil {
 		return 0, erplyerr("SaveAddress: failed to build request", err)
 	}
-
 	params := getMandatoryParameters(cli, saveAddressMethod)
 	params.Add("addressID", strconv.Itoa(in.AddressID))
-	params.Add("typeID", "1") // FIXME this should be configurable by the client
+	params.Add("typeID", strconv.Itoa(in.TypeID))
 	params.Add("ownerID", strconv.Itoa(in.OwnerID))
 	params.Add("street", in.Street)
 	params.Add("postalCode", in.PostalCode)
