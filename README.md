@@ -1,9 +1,17 @@
-## ERPLY API Go SDK
+ERPLY API Go SDK
+--------
+[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/erply/api-go-wrapper@v0.2.1/pkg/api?tab=doc)
+[![API Reference](https://img.shields.io/badge/api-reference-blue.svg)](https://learn-api.erply.com/)
 
-For available requests please check `pkg/api/IClient.go` file
+This SDK covers the ERPLY API requests. Majority of the available requests can be checked from `pkg/api/IClient.go` file, but some are not there.
+ GoDoc should help for the other ones.
 
-### Example usage as a service
-
+Install
+-------
+   `go get github.com/erply/api-go-wrapper`
+   
+Example usage as a service
+-------
 ```go
 import (
 	"github.com/pkg/errors"
@@ -51,3 +59,11 @@ func (s *erplyApiService) getIdentityToken() (string, error) {
 	return res.Jwt, nil
 }
 ```
+
+Contributing
+-------
+I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
+
+Authors
+-------
+[David Zingerman](https://github.com/Dysar)
