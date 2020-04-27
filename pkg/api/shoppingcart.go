@@ -14,5 +14,7 @@ type ShoppingCartProduct struct {
 	OriginalPriceWithVAT float64 `json:"originalPriceWithVAT"`
 	FinalPrice           float64 `json:"finalPrice"`
 	FinalPriceWithVAT    float64 `json:"finalPriceWithVAT"`
+	RowNetTotal          float64 `json:"rowNetTotal"`
+	RowTotal             float64 `json:"rowTotal"`
 	Discount             float64 `json:"discount"`
 }
