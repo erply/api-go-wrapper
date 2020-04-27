@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
 )
 
 func (cli *erplyClient) VerifyCustomerUser(username, password string) (*WebshopClient, error) {
@@ -1223,9 +1224,10 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 			}
 		}
 
-		addr := Address{
+		addr := AddressRequest{
 			AddressID:  addressID,
 			OwnerID:    res.CustomerImportReports[0].CustomerID,
+			TypeID:     1,
 			Street:     in.Address,
 			PostalCode: in.PostalCode,
 			Country:    in.Country,
