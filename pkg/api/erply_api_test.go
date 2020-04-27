@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 )
 
 func TestApiRequests(t *testing.T) {
@@ -52,6 +53,7 @@ func TestApiRequests(t *testing.T) {
 		}
 	})
 
+	//this test will not work if baseUrl is empty or partnerKey is. If correct baseURL and partner key - works
 	t.Run("test createInstallation & verifyUser", func(t *testing.T) {
 		const (
 			baseUrl    = ""
@@ -66,7 +68,7 @@ func TestApiRequests(t *testing.T) {
 				Email:       "asd@asd.ee",
 				SendEmail:   0,
 			}
-			cli = &http.Client{}
+			cli = &http.Client{Timeout: 10 * time.Second}
 		)
 
 		resp, err := CreateInstallation(baseUrl, partnerKey, req, cli)

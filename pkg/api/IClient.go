@@ -4,6 +4,7 @@ import "context"
 
 //IClient interface for cached and simple client
 type IClient interface {
+	GetServiceEndpoints() (*ServiceEndpoints, error)
 	GetConfParameters() (*ConfParameter, error)
 	GetWarehouses() (Warehouses, error)
 	GetSalesDocumentByID(id string) ([]SaleDocument, error)
