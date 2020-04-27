@@ -3,8 +3,7 @@ ERPLY API Go SDK
 [![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc)
 [![API Reference](https://img.shields.io/badge/api-reference-blue.svg)](https://learn-api.erply.com/)
 
-This SDK covers the ERPLY API requests. Majority of the available requests can be checked from [IClient](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#IClient) file, but some are also [here](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#pkg-index) and [here](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#CreateInstallation).
- GoDoc should help for the other ones.
+This SDK covers the [ERPLY API](https://erply.com/erply-api/) requests. Majority of the available requests can be checked from [IClient](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#IClient) file, but some are also [here](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#pkg-index) and [here](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc#CreateInstallation).
 
 Install
 -------
