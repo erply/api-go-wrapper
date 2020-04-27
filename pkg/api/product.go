@@ -24,6 +24,7 @@ type getProductGroupsResponse struct {
 type ProductDimensions struct {
 	Name             string `json:"name"`
 	Value            string `json:"value"`
+	Order            int    `json:"order"`
 	DimensionID      int    `json:"dimensionID"`
 	DimensionValueID int    `json:"dimensionValueID"`
 }

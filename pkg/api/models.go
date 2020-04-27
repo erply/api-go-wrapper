@@ -267,6 +267,15 @@ type Records struct {
 	SessionKey string `json:"sessionKey"`
 }
 
+type GetUserRightsResponse struct {
+	Status  Status       `json:"status"`
+	Records []UserRights `json:"records"`
+}
+
+type UserRights struct {
+	UserName string `json:"userName"`
+}
+
 type Supplier struct {
 	SupplierId      uint           `json:"supplierID"`
 	SupplierType    string         `json:"supplierType"`
