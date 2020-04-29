@@ -43,8 +43,11 @@ type Product struct {
 	ParentProductID    int                `json:"parentProductID"`
 	Type               string             `json:"type"`
 	Name               string             `json:"name"`
+	NameEng            string             `json:"nameENG"`
 	Description        string             `json:"description"`
+	DescriptionEng     string             `json:"descriptionENG"`
 	DescriptionLong    string             `json:"longdesc"`
+	DescriptionLongEng string             `json:"longdescENG"`
 	Status             string             `json:"status"`
 	Code               string             `json:"code"`
 	Code2              string             `json:"code2"`
