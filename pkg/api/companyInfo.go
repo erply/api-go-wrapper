@@ -47,7 +47,6 @@ type (
 
 //GetCompanyInfo ...
 func (cli *erplyClient) GetCompanyInfo(ctx context.Context) (*CompanyInfo, error) {
-
 	resp, err := cli.sendRequest(ctx, GetCompanyInfoMethod, map[string]string{})
 	if err != nil {
 		return nil, erplyerr("GetCompanyInfo request failed", err)

@@ -28,11 +28,11 @@ func TestAddressManager(t *testing.T) {
 	}
 	t.Log(resp)
 	t.Run("test save address", func(t *testing.T) {
-		req := &AddressRequest{
-			OwnerID: 0, //put your value here
-			TypeID:  0, //put your value here
+		filters := map[string]string{
+			"ownerID": "", //put your value here
+			"typeID":  "", //put your value here
 		}
-		resp, err := cli.SaveAddress(ctx, req)
+		resp, err := cli.SaveAddress(ctx, filters)
 		if err != nil {
 			t.Error(err)
 			return

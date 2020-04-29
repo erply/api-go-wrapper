@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
@@ -27,23 +28,9 @@ type ShoppingCartProduct struct {
 	Discount             float64 `json:"discount"`
 }
 
-func (cli *erplyClient) CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("CalculateShoppingCart: failed to build request", err)
-	}
+func (cli *erplyClient) CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error) {
 
-	params := getMandatoryParameters(cli, calculateShoppingCartMethod)
-	params.Add("customerID", strconv.FormatUint(uint64(in.CustomerId), 10))
-
-	for i, prod := range in.ProductRows {
-		params.Add(fmt.Sprintf("productID%d", i), prod.ProductID)
-		params.Add(fmt.Sprintf("amount%d", i), prod.Amount)
-	}
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, calculateShoppingCartMethod, filters)
 	if err != nil {
 		return nil, erplyerr("CalculateShoppingCart: error sending request", err)
 	}

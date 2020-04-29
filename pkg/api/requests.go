@@ -7,7 +7,6 @@ import (
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -98,57 +97,14 @@ func (cli *erplyClient) GetCurrencies(ctx context.Context, filters map[string]st
 	return res.Currencies, nil
 }
 
-func (cli *erplyClient) PostPurchaseDocument(in *PurchaseDocumentConstructor, provider string) (PurchaseDocImportReports, error) {
-	req, err := getHTTPRequest(cli)
+func (cli *erplyClient) SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error) {
+	resp, err := cli.sendRequest(ctx, savePurchaseDocumentMethod, filters)
 	if err != nil {
-		return nil, erplyerr("failed to build PostSalesDocument request", err)
-	}
-	params := getMandatoryParameters(cli, savePurchaseDocumentMethod)
-
-	params.Add("currencyCode", in.DocumentData.CurrencyCode)
-	params.Add("no", in.DocumentData.InvoiceNumber)
-	params.Add("type", "PRCINVOICE")
-	params.Add("date", in.DocumentData.Date)
-	//params.Add("time", in.InvoiceInformation.)
-	// set to POS owner or company info if seller is omitted
-	if in.SellerParty != nil {
-		params.Add("supplierID", strconv.Itoa(in.SellerParty.ID))
-		if in.SellerParty.ContactPersons != nil && len(in.SellerParty.ContactPersons) > 0 {
-			params.Add("contactID", strconv.Itoa(in.SellerParty.ContactPersons[0].ContactPersonID))
-		} else if in.SellerParty.CustomerAddresses != nil && len(in.SellerParty.CustomerAddresses) > 0 {
-			params.Add("addressID", strconv.Itoa(in.SellerParty.CustomerAddresses[0].AddressID))
-		}
-	}
-	if in.PaymentParty != nil {
-		params.Add("payerID", strconv.Itoa(in.PaymentParty.ID))
-		if in.PaymentParty.CustomerAddresses != nil && len(in.PaymentParty.CustomerAddresses) > 0 {
-			params.Add("payerAddressID", strconv.Itoa(in.PaymentParty.CustomerAddresses[0].AddressID))
-		}
-	}
-
-	//params.Add("confirmInvoice", "0")
-	params.Add("customNumber", fmt.Sprintf("%s-%s", provider, in.DocumentData.InvoiceNumber))
-	params.Add("referenceNumber", in.DocumentData.PaymentReferenceNumber)
-	params.Add("notes", in.DocumentData.Notes)
-	params.Add("paymentDays", in.DocumentData.PaymentDays)
-	params.Add("paid", "0")
-
-	for id, item := range in.DocumentData.ProductRows {
-		params.Add(fmt.Sprintf("productID%d", id), item.ProductID)
-		params.Add(fmt.Sprintf("itemName%d", id), item.ItemName)
-		params.Add(fmt.Sprintf("amount%d", id), item.Amount)
-		params.Add(fmt.Sprintf("price%d", id), item.Price)
-		params.Add(fmt.Sprintf("TotalSalesTax%d", id), item.VatRate)
-	}
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr("PostSalesDocument request failed", err)
+		return nil, erplyerr(savePurchaseDocumentMethod+" request failed", err)
 	}
 	res := &PostPurchaseDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("unmarshaling PostSalesDocumentResponse failed", err)
+		return nil, erplyerr("unmarshaling savePurchaseDocumentResponse failed", err)
 	}
 
 	if !isJSONResponseOK(&res.Status) {
@@ -162,19 +118,8 @@ func (cli *erplyClient) PostPurchaseDocument(in *PurchaseDocumentConstructor, pr
 	return res.ImportReports, nil
 }
 
-func (cli *erplyClient) logProcessingOfCustomerData(log *CustomerDataProcessingLog) error {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return erplyerr("failed to build logProcessingOfCustomerData request", err)
-	}
-
-	params := url.Values{}
-	params.Add("request", logProcessingOfCustomerDataMethod)
-	params.Add(sessionKey, cli.sessionKey)
-	params.Add(clientCode, cli.clientCode)
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
+func (cli *erplyClient) logProcessingOfCustomerData(ctx context.Context, filters map[string]string) error {
+	resp, err := cli.sendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
 	if err != nil {
 		return erplyerr("logProcessingOfCustomerData request failed", err)
 	}

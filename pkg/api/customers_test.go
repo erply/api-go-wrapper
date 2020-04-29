@@ -39,6 +39,11 @@ func TestCustomerManager(t *testing.T) {
 	//works
 	t.Run("test post customer", func(t *testing.T) {
 
+		params := map[string]string{
+			"companyName": testingCustomer.CompanyName,
+		}
+		params["username"] = testingCustomer.Username
+		params["password"] = testingCustomer.Password
 		report, err := cli.PostCustomer(ctx, testingCustomer)
 		if err != nil {
 			t.Error(err)

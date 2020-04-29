@@ -85,6 +85,17 @@ type (
 		Password string
 	}
 
+	WebshopClient struct {
+		ClientID        string `json:"clientID"`
+		ClientUsername  string `json:"clientUsername"`
+		ClientName      string `json:"clientName"`
+		ClientFirstName string `json:"clientFirstName"`
+		ClientLastName  string `json:"clientLastName"`
+		ClientGroupID   string `json:"clientGroupID"`
+		ClientGroupName string `json:"clientGroupName"`
+		CompanyID       string `json:"companyID"`
+		CompanyName     string `json:"companyName"`
+	}
 	GetCustomersResponse struct {
 		Status    Status    `json:"status"`
 		Customers Customers `json:"records"`
@@ -96,39 +107,15 @@ type (
 	}
 
 	CustomerManager interface {
-		PostCustomer(ctx context.Context, in *CustomerRequest) (*CustomerImportReport, error)
+		PostCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
 		GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
 		VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error)
 		ValidateCustomerUsername(ctx context.Context, username string) (bool, error)
 	}
 )
 
-func (cli *erplyClient) PostCustomer(ctx context.Context, in *CustomerRequest) (*CustomerImportReport, error) {
-	//if in.CompanyName == "" || in.RegistryCode == "" {
-	//	return nil, erplyerr("Can not save customer with empty name or registry number", nil)
-	//}
-	params := map[string]string{
-		"customerID":        strconv.Itoa(in.CustomerID), // For updating the existing customer
-		"companyName":       in.CompanyName,
-		"firstName":         in.FirstName,
-		"lastName":          in.LastName,
-		"fullName":          in.FullName,
-		"code":              in.RegistryCode,
-		"vatNumber":         in.VatNumber,
-		"email":             in.Email,
-		"phone":             in.Phone,
-		"bankName":          in.BankName,
-		"bankAccountNumber": in.BankAccountNumber,
-	}
-	if in.Username != "" {
-		if in.Password == "" {
-			return nil, erplyerr("password for user can not be empty", nil)
-		}
-		params["username"] = in.Username
-		params["password"] = in.Password
-	}
-
-	resp, err := cli.sendRequest(ctx, saveCustomerMethod, params)
+func (cli *erplyClient) PostCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
+	resp, err := cli.sendRequest(ctx, saveCustomerMethod, filters)
 	if err != nil {
 		return nil, erplyerr("PostCustomer request failed", err)
 	}
