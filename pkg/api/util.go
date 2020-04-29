@@ -2,9 +2,6 @@ package api
 
 import (
 	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"github.com/pkg/errors"
@@ -13,12 +10,6 @@ import (
 	"strings"
 )
 
-func GenerateToken(partnerKey string, timestamp int64, request, secret string) string {
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(fmt.Sprintf("%s%s%d", partnerKey, request, timestamp)))
-	return hex.EncodeToString(h.Sum(nil))
-
-}
 func isJSONResponseOK(status *Status) bool {
 	return strings.EqualFold(status.ResponseStatus, responseStatusOK)
 }

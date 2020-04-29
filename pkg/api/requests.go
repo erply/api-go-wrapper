@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
@@ -62,34 +63,26 @@ func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]str
 }
 
 //GetUserName from GetUserRights erply API request
-func (cli *erplyClient) GetUserName() (string, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return "", err
-	}
-	params := getMandatoryParameters(cli, GetUserRightsMethod)
-	params.Add("getRowsForAllInvoices", "1")
-	params.Add("getCurrentUser", "1")
-	req.URL.RawQuery = params.Encode()
+func (cli *erplyClient) GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error) {
 
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, GetUserRightsMethod, filters)
 	if err != nil {
-		return "", erplyerr("GetUserRights request failed", err)
+		return nil, erplyerr(GetUserRightsMethod+" request failed", err)
 	}
 	res := &GetUserRightsResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", erplyerr("unmarshaling GetUserRightsResponse failed", err)
+		return nil, erplyerr("unmarshaling GetUserRightsResponse failed", err)
 	}
 
 	if !isJSONResponseOK(&res.Status) {
-		return "", erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.Records) == 0 {
-		return "", nil
+		return nil, errors.New("no records found")
 	}
 
-	return res.Records[0].UserName, nil
+	return res.Records, nil
 }
 
 // GetEmployees will list employees according to specified filters.

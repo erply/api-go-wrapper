@@ -1,6 +1,9 @@
 package api
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 //works
 func TestErplyClient_GetConfParameters(t *testing.T) {
@@ -15,7 +18,7 @@ func TestErplyClient_GetConfParameters(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	resp, err := cli.GetConfParameters()
+	resp, err := cli.GetConfParameters(context.Background())
 	if err != nil {
 		t.Error(err)
 		return

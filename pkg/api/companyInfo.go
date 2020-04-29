@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
@@ -38,19 +39,16 @@ type (
 		Status       Status       `json:"status"`
 		CompanyInfos CompanyInfos `json:"records"`
 	}
+
+	CompanyManager interface {
+		GetCompanyInfo(ctx context.Context) (*CompanyInfo, error)
+	}
 )
 
 //GetCompanyInfo ...
-func (cli *erplyClient) GetCompanyInfo() (*CompanyInfo, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("failed to build GetCompanyInfo request", err)
-	}
+func (cli *erplyClient) GetCompanyInfo(ctx context.Context) (*CompanyInfo, error) {
 
-	params := getMandatoryParameters(cli, GetCompanyInfoMethod)
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, GetCompanyInfoMethod, map[string]string{})
 	if err != nil {
 		return nil, erplyerr("GetCompanyInfo request failed", err)
 	}

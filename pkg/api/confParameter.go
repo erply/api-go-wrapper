@@ -1,26 +1,16 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
-	"net/url"
 	"strconv"
 )
 
-func (cli *erplyClient) GetConfParameters() (*ConfParameter, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("failed to build GetConfParameters request", err)
-	}
+func (cli *erplyClient) GetConfParameters(ctx context.Context) (*ConfParameter, error) {
 
-	params := url.Values{}
-	params.Add("request", GetConfParametersMethod)
-	params.Add(sessionKey, cli.sessionKey)
-	params.Add(clientCode, cli.clientCode)
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, GetConfParametersMethod, map[string]string{})
 	if err != nil {
 		return nil, erplyerr("GetConfParameters request failed", err)
 	}
@@ -40,7 +30,12 @@ func (cli *erplyClient) GetConfParameters() (*ConfParameter, error) {
 	return &res.ConfParameters[0], nil
 }
 
-type ConfParameter struct {
-	Announcement         string `json:"invoice_announcement_eng"`
-	InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
-}
+type (
+	ConfParameter struct {
+		Announcement         string `json:"invoice_announcement_eng"`
+		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
+	}
+	ConfManager interface {
+		GetConfParameters(ctx context.Context) (*ConfParameter, error)
+	}
+)

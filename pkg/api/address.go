@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
@@ -8,7 +9,7 @@ import (
 
 type (
 	//GetAddressesResponse ..
-	GetAddressesResponse struct {
+	AddressesResponse struct {
 		Status    Status    `json:"status"`
 		Addresses Addresses `json:"records"`
 	}
@@ -42,26 +43,21 @@ type (
 		State      string      `json:"state"`
 		Country    string      `json:"country"`
 	}
+
+	AddressManager interface {
+		GetAddresses(ctx context.Context, filters map[string]string) ([]Address, error)
+		SaveAddress(ctx context.Context, in *AddressRequest) ([]Address, error)
+	}
 )
 
-func (cli *erplyClient) GetAddresses(filters map[string]string) ([]Address, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("failed to build GetAddresses request", err)
-	}
+func (cli *erplyClient) GetAddresses(ctx context.Context, filters map[string]string) ([]Address, error) {
 
-	params := getMandatoryParameters(cli, GetAddressesMethod)
-	for fk, fv := range filters {
-		params.Add(fk, fv)
-	}
-
-	req.URL.RawQuery = params.Encode()
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, GetAddressesMethod, filters)
 	if err != nil {
 		return nil, erplyerr("GetAddresses request failed", err)
 	}
 
-	res := &GetAddressesResponse{}
+	res := &AddressesResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erplyerr("unmarshaling GetAddressesResponse failed", err)
 	}
@@ -72,44 +68,34 @@ func (cli *erplyClient) GetAddresses(filters map[string]string) ([]Address, erro
 
 	return res.Addresses, nil
 }
-func (cli *erplyClient) SaveAddress(in *AddressRequest) (int, error) {
-	req, err := getHTTPRequest(cli)
+func (cli *erplyClient) SaveAddress(ctx context.Context, in *AddressRequest) ([]Address, error) {
+	filters := map[string]string{
+		"addressID":  strconv.Itoa(in.AddressID),
+		"typeID":     strconv.Itoa(in.TypeID),
+		"ownerID":    strconv.Itoa(in.OwnerID),
+		"street":     in.Street,
+		"postalCode": in.PostalCode,
+		"city":       in.City,
+		"state":      in.State,
+		"country":    in.Country,
+	}
+
+	resp, err := cli.sendRequest(ctx, saveAddressMethod, filters)
 	if err != nil {
-		return 0, erplyerr("SaveAddress: failed to build request", err)
+		return nil, erplyerr(saveAddressMethod+": request failed", err)
 	}
-	params := getMandatoryParameters(cli, saveAddressMethod)
-	params.Add("addressID", strconv.Itoa(in.AddressID))
-	params.Add("typeID", strconv.Itoa(in.TypeID))
-	params.Add("ownerID", strconv.Itoa(in.OwnerID))
-	params.Add("street", in.Street)
-	params.Add("postalCode", in.PostalCode)
-	params.Add("city", in.City)
-	params.Add("state", in.State)
-	params.Add("country", in.Country)
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return 0, erplyerr("SaveAddress: request failed", err)
-	}
-
-	var res struct {
-		Status  Status
-		Records []Address
-	}
-
+	res := &AddressesResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return 0, erplyerr("SaveAddress: JSON unmarshal failed", err)
+		return nil, erplyerr(saveAddressMethod+": JSON unmarshal failed", err)
 	}
 
 	if !isJSONResponseOK(&res.Status) {
-		return 0, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
-	if len(res.Records) == 0 {
-		return 0, erplyerr("SaveAddress: no records in response", nil)
+	if len(res.Addresses) == 0 {
+		return nil, erplyerr(saveAddressMethod+": no records in response", nil)
 	}
 
-	return res.Records[0].AddressID, nil
+	return res.Addresses, nil
 }

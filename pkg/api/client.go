@@ -16,9 +16,9 @@ type IClient interface {
 	ServiceDiscoverer
 	TokenProvider
 
-	GetConfParameters() (*ConfParameter, error)
+	ConfManager
 	WarehouseManager
-	GetUserName() (string, error)
+	GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
 
 	//sales document requests
 	GetSalesDocumentByID(id string) ([]SaleDocument, error)
@@ -32,15 +32,15 @@ type IClient interface {
 	GetCustomersByIDs(customerID []string) (Customers, error)
 	GetCustomerByRegNumber(regNumber string) (*Customer, error)
 	GetCustomerByGLN(gln string) (*Customer, error)
-	PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error)
+	//PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error)
 
 	//supplier requests
 	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
 	GetSupplierByName(name string) (*Customer, error)
 	PostSupplier(in *CustomerConstructor) (*CustomerImportReport, error)
 
-	GetVatRatesByID(vatRateID string) (VatRates, error)
-	GetCompanyInfo() (*CompanyInfo, error)
+	VatRateManager
+	CompanyManager
 
 	//product requests
 	GetProductUnits() ([]ProductUnit, error)
@@ -51,7 +51,6 @@ type IClient interface {
 	GetProductsByIDs(ids []string) ([]Product, error)
 	GetProductsByCode3(code3 string) (*Product, error)
 
-	GetAddresses(filters map[string]string) ([]Address, error)
 	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
 	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
@@ -63,18 +62,13 @@ type IClient interface {
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
 	PostPurchaseDocument(in *PurchaseDocumentConstructor, provider string) (PurchaseDocImportReports, error)
 
-	//POS requests
-	GetPointsOfSale(ctx context.Context, filters map[string]string) ([]PointOfSale, error)
-	GetPointsOfSaleByID(posID string) (*PointOfSale, error)
-
-	//token requests
-	//TokenProvider
+	PointOfSaleManager
 
 	//payment requests
 	SavePayment(in *PaymentInfo) (int64, error)
 	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 
-	SaveAddress(in *AddressRequest) (int, error)
+	AddressManager
 	VerifyCustomerUser(username, password string) (*WebshopClient, error)
 	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)
 	IsCustomerUsernameAvailable(username string) (bool, error)

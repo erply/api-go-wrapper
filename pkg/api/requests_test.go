@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 )
 
@@ -19,7 +20,9 @@ func TestApiRequests(t *testing.T) {
 	}
 	//works
 	t.Run("test getUsername", func(t *testing.T) {
-		resp, err := cli.GetUserName()
+		resp, err := cli.GetUserRights(context.Background(), map[string]string{
+			"getCurrentUser": "1",
+		})
 		if err != nil {
 			t.Error(err)
 			return

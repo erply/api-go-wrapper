@@ -93,7 +93,7 @@ type PostCustomerResponse struct {
 	CustomerImportReports CustomerImportReports `json:"records"`
 }
 
-func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error) {
+/*func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error) {
 	//if in.CompanyName == "" || in.RegistryCode == "" {
 	//	return nil, erplyerr("Can not save customer with empty name or registry number", nil)
 	//}
@@ -181,7 +181,7 @@ func (cli *erplyClient) PostCustomer(in *CustomerConstructor) (*CustomerImportRe
 	}
 
 	return &res.CustomerImportReports[0], nil
-}
+}*/
 func (cli *erplyClient) GetCustomerByGLN(gln string) (*Customer, error) {
 	if gln == "" {
 		return nil, erplyerr("Customer gln can not be empty", nil)

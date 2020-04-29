@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestErplyClient_GetCompanyInfo(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	resp, err := cli.GetCompanyInfo()
+	resp, err := cli.GetCompanyInfo(context.Background())
 	if err != nil {
 		t.Error(err)
 		return
