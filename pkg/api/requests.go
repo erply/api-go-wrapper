@@ -11,41 +11,6 @@ import (
 	"strconv"
 )
 
-func (cli *erplyClient) VerifyCustomerUser(username, password string) (*WebshopClient, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("VerifyCustomerUser: failed to build request", err)
-	}
-
-	params := getMandatoryParameters(cli, VerifyCustomerUserMethod)
-	params.Set("username", username)
-	params.Set("password", password)
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr("VerifyCustomerUser: request failed", err)
-	}
-
-	var res struct {
-		Status  Status
-		Records []WebshopClient
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("VerifyCustomerUser: unmarhsalling response failed", err)
-	}
-	if !isJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
-	}
-	if len(res.Records) != 1 {
-		return nil, erplyerr("VerifyCustomerUser: no records in response", nil)
-	}
-
-	return &res.Records[0], nil
-}
-
 // GetCountries will list countries according to specified filters.
 func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]string) ([]Country, error) {
 	resp, err := cli.sendRequest(ctx, GetCountriesMethod, filters)
@@ -195,35 +160,6 @@ func (cli *erplyClient) PostPurchaseDocument(in *PurchaseDocumentConstructor, pr
 	}
 
 	return res.ImportReports, nil
-}
-
-func (cli *erplyClient) IsCustomerUsernameAvailable(username string) (bool, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return false, erplyerr("IsCustomerUsernameAvailable: failed to build request", err)
-	}
-
-	params := getMandatoryParameters(cli, validateCustomerUsernameMethod)
-	params.Add("username", username)
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return false, erplyerr("IsCustomerUsernameAvailable: error sending request", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		return false, erplyerr(fmt.Sprintf("IsCustomerUsernameAvailable: bad response status code: %d", resp.StatusCode), nil)
-	}
-
-	var respData struct {
-		Status Status
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return false, erplyerr("IsCustomerUsernameAvailable: unmarshaling response failed", err)
-	}
-
-	return respData.Status.ErrorCode == 0, nil
 }
 
 func (cli *erplyClient) logProcessingOfCustomerData(log *CustomerDataProcessingLog) error {

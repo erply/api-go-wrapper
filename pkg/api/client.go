@@ -28,16 +28,10 @@ type IClient interface {
 	DeleteDocumentsByID(id string) error
 
 	//customer requests
-	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
-	GetCustomersByIDs(customerID []string) (Customers, error)
-	GetCustomerByRegNumber(regNumber string) (*Customer, error)
-	GetCustomerByGLN(gln string) (*Customer, error)
-	//PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error)
+	CustomerManager
 
 	//supplier requests
-	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
-	GetSupplierByName(name string) (*Customer, error)
-	PostSupplier(in *CustomerConstructor) (*CustomerImportReport, error)
+	SupplierManager
 
 	VatRateManager
 	CompanyManager
@@ -69,9 +63,9 @@ type IClient interface {
 	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 
 	AddressManager
-	VerifyCustomerUser(username, password string) (*WebshopClient, error)
+
 	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)
-	IsCustomerUsernameAvailable(username string) (bool, error)
+
 	Close()
 }
 

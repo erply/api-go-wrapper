@@ -133,10 +133,10 @@ type DocumentData struct {
 	//Search by exact warehouse code.
 	WarehouseCode string
 	//seller company registry code
-	Seller   CustomerConstructor
-	Payer    CustomerConstructor
-	Buyer    CustomerConstructor
-	Delivery CustomerConstructor
+	Seller   CustomerRequest
+	Payer    CustomerRequest
+	Buyer    CustomerRequest
+	Delivery CustomerRequest
 
 	ProductRows ProductRows
 	CustomerId  uint
