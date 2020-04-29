@@ -36,14 +36,7 @@ type IClient interface {
 	VatRateManager
 	CompanyManager
 
-	//product requests
-	GetProductUnits() ([]ProductUnit, error)
-	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
-	GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
-	GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
-	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
-	GetProductsByIDs(ids []string) ([]Product, error)
-	GetProductsByCode3(code3 string) (*Product, error)
+	ProductManager
 
 	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
 	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
