@@ -1,6 +1,9 @@
 package api
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 //works
 func TestErplyClient_GetWarehouses(t *testing.T) {
@@ -10,8 +13,12 @@ func TestErplyClient_GetWarehouses(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(sk, cc, nil)
-	resp, err := cli.GetWarehouses()
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	resp, err := cli.GetWarehouses(context.Background())
 	if err != nil {
 		t.Error(err)
 		return

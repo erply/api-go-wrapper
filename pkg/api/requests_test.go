@@ -12,7 +12,11 @@ func TestApiRequests(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(sk, cc, nil)
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	//works
 	t.Run("test getUsername", func(t *testing.T) {
 		resp, err := cli.GetUserName()

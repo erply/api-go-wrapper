@@ -13,7 +13,11 @@ func TestPOSRequests(t *testing.T) {
 		sk = ""
 		cc = ""
 	)
-	cli := NewClient(sk, cc, nil)
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	t.Run("test by ID", func(t *testing.T) {
 		resp, err := cli.GetPointsOfSaleByID("1")
 		if err != nil {

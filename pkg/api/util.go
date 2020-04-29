@@ -10,9 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
-	"time"
 )
 
 func GenerateToken(partnerKey string, timestamp int64, request, secret string) string {
@@ -26,16 +24,7 @@ func isJSONResponseOK(status *Status) bool {
 }
 
 func getHTTPRequest(cli *erplyClient) (*http.Request, error) {
-	req, err := http.NewRequest("GET", cli.url, nil)
-	if err != nil {
-		return nil, erplyerr("failed to build HTTP request", err)
-
-	}
-	return req, err
-}
-
-func newPostHTTPRequest(cli *erplyClient, params url.Values) (*http.Request, error) {
-	req, err := http.NewRequest("POST", cli.url, strings.NewReader(params.Encode()))
+	req, err := http.NewRequest("POST", cli.url, nil)
 	if err != nil {
 		return nil, erplyerr("failed to build HTTP request", err)
 
@@ -47,16 +36,10 @@ func getMandatoryParameters(cli *erplyClient, request string) url.Values {
 	params := url.Values{}
 	params.Add("request", request)
 	params.Add("setContentType", "1")
-	if cli.sessionKey != "" && cli.clientCode != "" {
-		params.Add(sessionKey, cli.sessionKey)
-		params.Add(clientCode, cli.clientCode)
-	}
-	if cli.partnerKey != "" && cli.secret != "" {
-		now := time.Now().Unix()
-		params.Add(applicationKey, GenerateToken(cli.partnerKey, now, request, cli.secret))
-		params.Add(clientCode, cli.clientCode)
+	params.Add(sessionKey, cli.sessionKey)
+	params.Add(clientCode, cli.clientCode)
+	if cli.partnerKey != "" {
 		params.Add("partnerKey", cli.partnerKey)
-		params.Add("timestamp", strconv.Itoa(int(now)))
 	}
 	return params
 }

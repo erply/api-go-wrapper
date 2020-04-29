@@ -1,31 +1,36 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
-	"net/url"
 	"strconv"
 )
 
-//VerifyIdentityToken ...
-func (cli *erplyClient) VerifyIdentityToken(jwt string) (*SessionInfo, error) {
-	method := VerifyIdentityTokenMethod
-	params := url.Values{}
-	params.Add("request", method)
-	params.Add("clientCode", cli.clientCode)
-	params.Add("setContentType", "1")
-	params.Add("jwt", jwt)
-	req, err := newPostHTTPRequest(cli, params)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("%s request failed", method), err)
-	}
+type TokenProvider interface {
+	VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
+	GetIdentityToken(ctx context.Context) (*IdentityToken, error)
+}
 
+//interface only for partner tokens
+type PartnerTokenProvider interface {
+	GetJWTToken(ctx context.Context) (*JwtToken, error)
+}
+
+//VerifyIdentityToken ...
+func (cli *erplyClient) VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error) {
+	method := VerifyIdentityTokenMethod
+	params := map[string]string{
+		//params.Add("request", method)
+		//params.Add("clientCode", cli.clientCode)
+		//params.Add("setContentType", "1")
+		"jwt": jwt,
+	}
+	resp, err := cli.sendRequest(ctx, method, params)
+	if err != nil {
+		return nil, err
+	}
 	res := &verifyIdentityTokenResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erplyerr(fmt.Sprintf("unmarshaling %s response failed", method), err)
@@ -39,18 +44,10 @@ func (cli *erplyClient) VerifyIdentityToken(jwt string) (*SessionInfo, error) {
 }
 
 //GetIdentityToken ...
-func (cli *erplyClient) GetIdentityToken() (*IdentityToken, error) {
+func (cli *erplyClient) GetIdentityToken(ctx context.Context) (*IdentityToken, error) {
 	method := GetIdentityToken
 
-	params := getMandatoryParameters(cli, method)
-	queryParams := getMandatoryParameters(cli, method)
-
-	req, err := newPostHTTPRequest(cli, params)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
-	}
-	req.URL.RawQuery = queryParams.Encode()
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, method, map[string]string{})
 	if err != nil {
 		return nil, erplyerr(fmt.Sprintf("%s request failed", method), err)
 	}
@@ -66,22 +63,13 @@ func (cli *erplyClient) GetIdentityToken() (*IdentityToken, error) {
 	return &res.Result, nil
 }
 
-func (cli *erplyClient) GetJWTToken(partnerKey string) (*JwtToken, error) {
-	req, err := getHTTPRequest(cli)
+//only for partnerClient
+func (cli *erplyClient) GetJWTToken(ctx context.Context) (*JwtToken, error) {
+
+	resp, err := cli.sendRequest(ctx, GetJWTTokenMethod, map[string]string{})
 	if err != nil {
-		return nil, fmt.Errorf("error building GetJWTToken request: %v", err)
+		return nil, err
 	}
-
-	params := getMandatoryParameters(cli, GetJWTTokenMethod)
-	params.Set("partnerKey", partnerKey)
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr("error making request for GetJWTToken", err)
-	}
-
 	var res JwtTokenResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&res)

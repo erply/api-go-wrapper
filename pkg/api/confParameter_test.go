@@ -10,7 +10,11 @@ func TestErplyClient_GetConfParameters(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(sk, cc, nil)
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	resp, err := cli.GetConfParameters()
 	if err != nil {
 		t.Error(err)

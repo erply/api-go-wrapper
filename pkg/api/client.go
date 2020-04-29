@@ -1,7 +1,9 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -9,18 +11,91 @@ import (
 	"time"
 )
 
-//IClient ...
+//IClient interface for cached and simple client
+type IClient interface {
+	ServiceDiscoverer
+	TokenProvider
+
+	GetConfParameters() (*ConfParameter, error)
+	WarehouseManager
+	GetUserName() (string, error)
+
+	//sales document requests
+	GetSalesDocumentByID(id string) ([]SaleDocument, error)
+	GetSalesDocumentsByIDs(id []string) ([]SaleDocument, error)
+	PostSalesDocumentFromWoocomm(in *SaleDocumentConstructor, shopOrderID string) (SaleDocImportReports, error)
+	PostSalesDocument(in *SaleDocumentConstructor, provider string) (SaleDocImportReports, error)
+	DeleteDocumentsByID(id string) error
+
+	//customer requests
+	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
+	GetCustomersByIDs(customerID []string) (Customers, error)
+	GetCustomerByRegNumber(regNumber string) (*Customer, error)
+	GetCustomerByGLN(gln string) (*Customer, error)
+	PostCustomer(in *CustomerConstructor) (*CustomerImportReport, error)
+
+	//supplier requests
+	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
+	GetSupplierByName(name string) (*Customer, error)
+	PostSupplier(in *CustomerConstructor) (*CustomerImportReport, error)
+
+	GetVatRatesByID(vatRateID string) (VatRates, error)
+	GetCompanyInfo() (*CompanyInfo, error)
+
+	//product requests
+	GetProductUnits() ([]ProductUnit, error)
+	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
+	GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
+	GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
+	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
+	GetProductsByIDs(ids []string) ([]Product, error)
+	GetProductsByCode3(code3 string) (*Product, error)
+
+	GetAddresses(filters map[string]string) ([]Address, error)
+	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
+	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
+	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
+
+	//project requests
+	GetProjects(ctx context.Context, filters map[string]string) ([]Project, error)
+	GetProjectStatus(ctx context.Context, filters map[string]string) ([]ProjectStatus, error)
+
+	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
+	PostPurchaseDocument(in *PurchaseDocumentConstructor, provider string) (PurchaseDocImportReports, error)
+
+	//POS requests
+	GetPointsOfSale(ctx context.Context, filters map[string]string) ([]PointOfSale, error)
+	GetPointsOfSaleByID(posID string) (*PointOfSale, error)
+
+	//token requests
+	//TokenProvider
+
+	//payment requests
+	SavePayment(in *PaymentInfo) (int64, error)
+	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
+
+	SaveAddress(in *AddressRequest) (int, error)
+	VerifyCustomerUser(username, password string) (*WebshopClient, error)
+	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)
+	IsCustomerUsernameAvailable(username string) (bool, error)
+	Close()
+}
+
+type IPartnerClient interface {
+	IClient
+	PartnerTokenProvider
+}
+
 type erplyClient struct {
 	sessionKey string
 	clientCode string
 	partnerKey string
-	secret     string
 	url        string
 	httpClient *http.Client
 }
 
 //VerifyUser will give you session key
-func VerifyUser(username string, password string, clientCode string, client *http.Client) (string, error) {
+func VerifyUser(username, password, clientCode string, client *http.Client) (string, error) {
 	requestUrl := fmt.Sprintf(baseURL, clientCode)
 	params := url.Values{}
 	params.Add("username", username)
@@ -55,64 +130,61 @@ func VerifyUser(username string, password string, clientCode string, client *htt
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
 // and a custom http Client if needs to be overwritten. if nil will use default http client provided by the SDK
-func NewClient(sessionKey string, clientCode string, customCli *http.Client) IClient {
+func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, error) {
 
-	tr := &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   10 * time.Second,
-			KeepAlive: 10 * time.Second,
-		}).DialContext,
-		TLSHandshakeTimeout: 10 * time.Second,
-
-		ExpectContinueTimeout: 4 * time.Second,
-		ResponseHeaderTimeout: 3 * time.Second,
-
-		MaxIdleConns:    MaxIdleConns,
-		MaxConnsPerHost: MaxConnsPerHost,
+	if sessionKey == "" || clientCode == "" {
+		return nil, errors.New("sessionKey and clientCode are required")
 	}
 
 	cli := erplyClient{
 		sessionKey: sessionKey,
 		clientCode: clientCode,
 		url:        fmt.Sprintf(baseURL, clientCode),
-		httpClient: &http.Client{
-			Transport: tr,
-			Timeout:   5 * time.Second,
-		},
+		httpClient: getDefaultHTTPClient(),
 	}
 	if customCli != nil {
 		cli.httpClient = customCli
 	}
-	return &cli
+	return &cli, nil
 }
 
-func NewClientV2(partnerKey string, secret string, clientCode string) IClient {
-	tr := &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   10 * time.Second,
-			KeepAlive: 10 * time.Second,
-		}).DialContext,
-		TLSHandshakeTimeout: 10 * time.Second,
-
-		ExpectContinueTimeout: 4 * time.Second,
-		ResponseHeaderTimeout: 3 * time.Second,
-
-		MaxIdleConns:    MaxIdleConns,
-		MaxConnsPerHost: MaxConnsPerHost,
+func NewPartnerClient(sessionKey, clientCode, partnerKey string, customCli *http.Client) (IPartnerClient, error) {
+	if sessionKey == "" || clientCode == "" || partnerKey == "" {
+		return nil, errors.New("sessionKey, clientCode and partnerKey are required")
 	}
 
 	cli := erplyClient{
-		partnerKey: partnerKey,
-		secret:     secret,
+		sessionKey: sessionKey,
 		clientCode: clientCode,
+		partnerKey: partnerKey,
 		url:        fmt.Sprintf(baseURL, clientCode),
-		httpClient: &http.Client{
-			Transport: tr,
-			Timeout:   5 * time.Second,
-		},
+		httpClient: getDefaultHTTPClient(),
 	}
-	return &cli
+	if customCli != nil {
+		cli.httpClient = customCli
+	}
+	return &cli, nil
 }
+
 func (cli *erplyClient) Close() {
 	cli.httpClient.CloseIdleConnections()
+}
+
+func getDefaultHTTPClient() *http.Client {
+	return &http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   10 * time.Second,
+				KeepAlive: 10 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout: 10 * time.Second,
+
+			ExpectContinueTimeout: 4 * time.Second,
+			ResponseHeaderTimeout: 3 * time.Second,
+
+			MaxIdleConns:    MaxIdleConns,
+			MaxConnsPerHost: MaxConnsPerHost,
+		},
+		Timeout: 5 * time.Second,
+	}
 }

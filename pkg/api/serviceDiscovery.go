@@ -1,13 +1,17 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"github.com/pkg/errors"
-	"net/url"
 	"strconv"
 )
+
+type ServiceDiscoverer interface {
+	GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, error)
+}
 
 type getServiceEndpointsResponse struct {
 	Status  Status
@@ -28,26 +32,16 @@ type Endpoint struct {
 	Documentation string `json:"documentation"`
 }
 
-func (cli *erplyClient) GetServiceEndpoints() (*ServiceEndpoints, error) {
-	method := "getServiceEndpoints"
-	params := url.Values{}
-	params.Add("clientCode", cli.clientCode)
-	params.Add("request", method)
-
-	req, err := newPostHTTPRequest(cli, params)
+func (cli *erplyClient) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, error) {
+	const method = "getServiceEndpoints"
+	resp, err := cli.sendRequest(ctx, method, map[string]string{})
 	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("failed to build %s request", method), err)
-	}
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	resp, err := doRequest(req, cli)
-	if err != nil {
-		return nil, erplyerr(fmt.Sprintf("%s request failed", method), err)
+		return nil, err
 	}
 
 	res := &getServiceEndpointsResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, errors.Wrap(err, "failed to decode VerifyUserResponse")
+		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode %s response", method))
 	}
 	if !isJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)

@@ -11,7 +11,11 @@ func TestErplyClient_GetVatRatesByID(t *testing.T) {
 		vatRateID = ""
 	)
 
-	cli := NewClient(sk, cc, nil)
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	resp, err := cli.GetVatRatesByID(vatRateID)
 	if err != nil {
 		t.Error(err)

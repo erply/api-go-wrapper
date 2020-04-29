@@ -1,6 +1,9 @@
 package api
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 //works
 func TestTokenRequests(t *testing.T) {
@@ -11,10 +14,16 @@ func TestTokenRequests(t *testing.T) {
 		jwt        = ""
 		partnerKey = ""
 	)
-	cli := NewClient(sk, cc, nil)
+	var (
+		ctx = context.Background()
+	)
+	cli, err := NewClient(sk, cc, nil)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	t.Run("test VerifyIdentityToken", func(t *testing.T) {
-		specCli := NewClient("", cc, nil)
-		resp, err := specCli.VerifyIdentityToken(jwt)
+		resp, err := cli.VerifyIdentityToken(ctx, jwt)
 		if err != nil {
 			t.Error(err)
 			return
@@ -26,7 +35,7 @@ func TestTokenRequests(t *testing.T) {
 		}
 	})
 	t.Run("test GetIdentityToken", func(t *testing.T) {
-		resp, err := cli.GetIdentityToken()
+		resp, err := cli.GetIdentityToken(ctx)
 		if err != nil {
 			t.Error(err)
 			return
@@ -38,7 +47,12 @@ func TestTokenRequests(t *testing.T) {
 		}
 	})
 	t.Run("test GetJWTToken", func(t *testing.T) {
-		resp, err := cli.GetJWTToken(partnerKey)
+		partnerCli, err := NewPartnerClient(sk, cc, partnerKey, nil)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+		resp, err := partnerCli.GetJWTToken(ctx)
 		if err != nil {
 			t.Error(err)
 			return
