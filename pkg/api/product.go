@@ -1,5 +1,13 @@
 package api
 
+import (
+	"context"
+	"encoding/json"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"strconv"
+	"strings"
+)
+
 //GetProductsResponse ...
 type GetProductsResponse struct {
 	Status   Status    `json:"status"`
@@ -127,4 +135,153 @@ type GetProductUnitsResponse struct {
 type ProductUnit struct {
 	UnitID string `json:"unitID"`
 	Name   string `json:"name"`
+}
+
+func (cli *erplyClient) GetProductUnits() ([]ProductUnit, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("failed to build GetProductUnits request", err)
+	}
+
+	params := getMandatoryParameters(cli, GetProductUnitsMethod)
+	req.URL.RawQuery = params.Encode()
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("GetProductUnits request failed", err)
+	}
+
+	res := &GetProductUnitsResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("unmarshaling GetProductUnitsResponse failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	return res.ProductUnits, nil
+}
+
+func (cli *erplyClient) GetProducts(ctx context.Context, filters map[string]string) ([]Product, error) {
+	resp, err := cli.sendRequest(ctx, GetProductsMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal GetProductsResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.Products, nil
+}
+
+func (cli *erplyClient) GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error) {
+	resp, err := cli.sendRequest(ctx, GetProductCategoriesMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res getProductCategoriesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal getProductCategoriesResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.ProductCategories, nil
+}
+
+func (cli *erplyClient) GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error) {
+	resp, err := cli.sendRequest(ctx, GetProductBrandsMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res getProductBrandsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal getProductBrandsResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.ProductBrands, nil
+}
+
+func (cli *erplyClient) GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error) {
+	resp, err := cli.sendRequest(ctx, GetProductGroupsMethod, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res getProductGroupsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("failed to unmarshal getProductGroupsResponse", err)
+	}
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.ProductGroups, nil
+}
+
+//GetProductsByIDs - NOTE: if product's id is 0 - the product is not in the database. It was created during the sales document creation
+func (cli *erplyClient) GetProductsByIDs(ids []string) ([]Product, error) {
+	if len(ids) == 0 {
+		return nil, erplyerr("No ids provided for products request", nil)
+	}
+
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("failed to build GetProducts request", err)
+	}
+
+	params := getMandatoryParameters(cli, GetProductsMethod)
+	params.Add("productIDs", strings.Join(ids, ","))
+	req.URL.RawQuery = params.Encode()
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("GetProducts request failed", err)
+	}
+
+	res := &GetProductsResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("unmarshaling GetProductsResponse failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	return res.Products, nil
+}
+
+func (cli *erplyClient) GetProductsByCode3(code3 string) (*Product, error) {
+	if code3 == "" {
+		return nil, erplyerr("No code3 provided for product request", nil)
+	}
+
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("failed to build GetProducts request", err)
+	}
+
+	params := getMandatoryParameters(cli, GetProductsMethod)
+	params.Add("code3", code3)
+	req.URL.RawQuery = params.Encode()
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("GetProducts request failed", err)
+	}
+
+	res := &GetProductsResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("unmarshaling GetProductsResponse failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	if len(res.Products) == 0 {
+		return nil, erplyerr("no such product found", err)
+	}
+
+	return &res.Products[0], nil
 }

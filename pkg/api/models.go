@@ -1,5 +1,53 @@
 package api
 
+type Status struct {
+	Request           string  `json:"request"`
+	RequestUnixTime   int     `json:"requestUnixTime"`
+	ResponseStatus    string  `json:"responseStatus"`
+	ErrorCode         int     `json:"errorCode"`
+	ErrorField        string  `json:"errorField"`
+	GenerationTime    float64 `json:"generationTime"`
+	RecordsTotal      int     `json:"recordsTotal"`
+	RecordsInResponse int     `json:"recordsInResponse"`
+}
+
+type PostPurchaseDocumentResponse struct {
+	Status        Status                   `json:"status"`
+	ImportReports PurchaseDocImportReports `json:"records"`
+}
+
+type GetCountriesResponse struct {
+	Status    Status    `json:"status"`
+	Countries []Country `json:"records"`
+}
+
+type GetEmployeesResponse struct {
+	Status    Status     `json:"status"`
+	Employees []Employee `json:"records"`
+}
+
+type GetBusinessAreasResponse struct {
+	Status        Status         `json:"status"`
+	BusinessAreas []BusinessArea `json:"records"`
+}
+type GetCurrenciesResponse struct {
+	Status     Status     `json:"status"`
+	Currencies []Currency `json:"records"`
+}
+
+//CustomerDataProcessingLog ...
+type CustomerDataProcessingLog struct {
+	activityType string
+	fields       []string
+	customerIds  []int
+}
+
+//GetConfParametersResponse ...
+type GetConfParametersResponse struct {
+	Status         Status          `json:"status"`
+	ConfParameters []ConfParameter `json:"records"`
+}
+
 type PurchaseDocumentConstructors []PurchaseDocumentConstructor
 
 type PurchaseDocumentConstructor struct {
@@ -147,28 +195,6 @@ type CustomerImportReport struct {
 	ClientID   int `json:"clientID"`
 	CustomerID int `json:"customerID"`
 }
-type InstallationRequest struct {
-	CompanyName string `json:"companyName"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Phone       string `json:"phone"`
-	Email       string `json:"email"`
-	SendEmail   int    `json:"sendEmail"`
-}
-type InstallationResponse struct {
-	ClientCode int    `json:"clientCode"`
-	UserName   string `json:"username"`
-	Password   string `json:"password"`
-}
-
-type PointOfSale struct {
-	PointOfSaleID uint   `json:"pointOfSaleID"`
-	Name          string `json:"name"`
-	WarehouseID   int    `json:"warehouseID"`
-	WarehouseName string `json:"warehouseName"`
-	Added         uint64 `json:"added"`
-	LastModified  uint64 `json:"lastModified"`
-}
 
 type PurchaseDocImportReports []PurchaseDocImportReport
 type PurchaseDocImportReport struct {
@@ -176,14 +202,6 @@ type PurchaseDocImportReport struct {
 	CustomNumber string `json:"customNumber"`
 	Rounding     int    `json:"rounding"`
 	Total        int    `json:"total"`
-}
-
-type SaleDocImportReports []SaleDocImportReport
-type SaleDocImportReport struct {
-	InvoiceID    int     `json:"invoiceID"`
-	CustomNumber string  `json:"customNumber"`
-	Rounding     float64 `json:"rounding"`
-	Total        float64 `json:"total"`
 }
 
 type InvoiceRow struct {
@@ -207,53 +225,6 @@ type InvoiceRow struct {
 	CampaignIDs       string  `json:"campaignIDs"`
 }
 
-type ConfParameter struct {
-	Announcement         string `json:"invoice_announcement_eng"`
-	InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
-}
-
-type Warehouse struct {
-	WarehouseID            string `json:"warehouseID"`
-	PricelistID            string `json:"pricelistID"`
-	PricelistID2           string `json:"pricelistID2"`
-	PricelistID3           string `json:"pricelistID3"`
-	PricelistID4           int    `json:"pricelistID4"`
-	PricelistID5           int    `json:"pricelistID5"`
-	Name                   string `json:"name"`
-	Code                   string `json:"code"`
-	AddressID              int    `json:"addressID"`
-	Address                string `json:"address"`
-	Street                 string `json:"street"`
-	Address2               string `json:"address2"`
-	City                   string `json:"city"`
-	State                  string `json:"state"`
-	Country                string `json:"country"`
-	ZIPcode                string `json:"ZIPcode"`
-	StoreGroups            string `json:"storeGroups"`
-	CompanyName            string `json:"companyName"`
-	CompanyCode            string `json:"companyCode"`
-	CompanyVatNumber       string `json:"companyVatNumber"`
-	Phone                  string `json:"phone"`
-	Fax                    string `json:"fax"`
-	Email                  string `json:"email"`
-	Website                string `json:"website"`
-	BankName               string `json:"bankName"`
-	BankAccountNumber      string `json:"bankAccountNumber"`
-	Iban                   string `json:"iban"`
-	Swift                  string `json:"swift"`
-	UsesLocalQuickButtons  int    `json:"usesLocalQuickButtons"`
-	DefaultCustomerGroupID int    `json:"defaultCustomerGroupID"`
-	IsOfflineInventory     int    `json:"isOfflineInventory"`
-	TimeZone               string `json:"timeZone"`
-	Attributes             []struct {
-		AttributeName  string `json:"attributeName"`
-		AttributeType  string `json:"attributeType"`
-		AttributeValue string `json:"attributeValue"`
-	} `json:"attributes"`
-}
-
-type Warehouses []Warehouse
-
 type UserCredentials struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
@@ -274,50 +245,6 @@ type GetUserRightsResponse struct {
 
 type UserRights struct {
 	UserName string `json:"userName"`
-}
-
-type Supplier struct {
-	SupplierId      uint           `json:"supplierID"`
-	SupplierType    string         `json:"supplierType"`
-	FullName        string         `json:"fullName"`
-	CompanyName     string         `json:"companyName"`
-	FirstName       string         `json:"firstName"`
-	LstName         string         `json:"lastName"`
-	GroupId         uint           `json:"groupID"`
-	GroupName       string         `json:"groupName"`
-	Phone           string         `json:"phone"`
-	Mobile          string         `json:"mobile"`
-	Email           string         `json:"email"`
-	Fax             string         `json:"fax"`
-	Code            string         `json:"code"`
-	IntegrationCode string         `json:"integrationCode"`
-	VatrateID       uint           `json:"vatrateID"`
-	CurrencyCode    string         `json:"currencyCode"`
-	DeliveryTermsID uint           `json:"deliveryTermsID"`
-	CountryId       uint           `json:"countryID"`
-	CountryName     string         `json:"countryName"`
-	CountryCode     string         `json:"countryCode"`
-	Address         string         `json:"address"`
-	Gln             string         `json:"GLN"`
-	Attributes      []ObjAttribute `json:"attributes"`
-
-	// Detail fields
-	VatNumber           string `json:"vatNumber"`
-	Skype               string `json:"skype"`
-	Website             string `json:"website"`
-	BankName            string `json:"bankName"`
-	BankAccountNumber   string `json:"bankAccountNumber"`
-	BankIBAN            string `json:"bankIBAN"`
-	BankSWIFT           string `json:"bankSWIFT"`
-	Birthday            string `json:"birthday"`
-	CompanyID           uint   `json:"companyID"`
-	ParentCompanyName   string `json:"parentCompanyName"`
-	SupplierManagerID   uint   `json:"supplierManagerID"`
-	SupplierManagerName string `json:"supplierManagerName"`
-	PaymentDays         uint   `json:"paymentDays"`
-	Notes               string `json:"notes"`
-	LastModified        string `json:"lastModified"`
-	Added               uint64 `json:"added"`
 }
 
 type ObjAttribute struct {
@@ -383,32 +310,6 @@ type BusinessArea struct {
 	Added        uint64 `json:"added"`
 	LastModified uint64 `json:"lastModified"`
 }
-
-type Project struct {
-	ProjectID    uint   `json:"projectID"`
-	Name         string `json:"name"`
-	CustomerID   uint   `json:"customerID"`
-	CustomerName string `json:"customerName"`
-	EmployeeID   uint   `json:"employeeID"`
-	EmployeeName string `json:"employeeName"`
-	TypeID       uint   `json:"typeID"`
-	TypeName     string `json:"typeName"`
-	StatusID     uint   `json:"statusID"`
-	StatusName   string `json:"statusName"`
-	StartDate    string `json:"startDate"`
-	EndDate      string `json:"endDate"`
-	Notes        string `json:"notes"`
-	LastModified uint64 `json:"lastModified"`
-}
-
-type ProjectStatus struct {
-	ProjectStatusID uint   `json:"projectStatusID"`
-	Name            string `json:"name"`
-	Finished        byte   `json:"finished"`
-	Added           uint64 `json:"added"`
-	LastModified    uint64 `json:"lastModified"`
-}
-
 type Currency struct {
 	CurrencyID   string `json:"currencyID"`
 	Code         string `json:"code"`

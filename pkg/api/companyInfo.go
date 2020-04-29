@@ -1,5 +1,11 @@
 package api
 
+import (
+	"encoding/json"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"strconv"
+)
+
 type (
 	//CompanyInfos ..
 	CompanyInfos []CompanyInfo
@@ -27,5 +33,39 @@ type (
 
 		//field for ConfParameters
 		ConfParameters ConfParameter
+	} //GetCompanyInfoResponse ...
+	GetCompanyInfoResponse struct {
+		Status       Status       `json:"status"`
+		CompanyInfos CompanyInfos `json:"records"`
 	}
 )
+
+//GetCompanyInfo ...
+func (cli *erplyClient) GetCompanyInfo() (*CompanyInfo, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erplyerr("failed to build GetCompanyInfo request", err)
+	}
+
+	params := getMandatoryParameters(cli, GetCompanyInfoMethod)
+	req.URL.RawQuery = params.Encode()
+
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erplyerr("GetCompanyInfo request failed", err)
+	}
+	res := &GetCompanyInfoResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erplyerr("unmarshaling GetCompanyInfoResponse failed", err)
+	}
+
+	if !isJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.CompanyInfos) == 0 {
+		return nil, nil
+	}
+
+	return &res.CompanyInfos[0], nil
+}

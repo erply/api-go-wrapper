@@ -113,3 +113,6 @@ func NewClientV2(partnerKey string, secret string, clientCode string) IClient {
 	}
 	return &cli
 }
+func (cli *erplyClient) Close() {
+	cli.httpClient.CloseIdleConnections()
+}

@@ -9,6 +9,25 @@ import (
 	"strconv"
 )
 
+type getServiceEndpointsResponse struct {
+	Status  Status
+	Records []ServiceEndpoints `json:"records"`
+}
+
+type ServiceEndpoints struct {
+	Cafa        Endpoint `json:"cafa"`
+	Pim         Endpoint `json:"pim"`
+	Wms         Endpoint `json:"wms"`
+	Promotion   Endpoint `json:"promotion"`
+	Reports     Endpoint `json:"reports"`
+	Json        Endpoint `json:"json"`
+	Assignments Endpoint `json:"assignments"`
+}
+type Endpoint struct {
+	Url           string `json:"url"`
+	Documentation string `json:"documentation"`
+}
+
 func (cli *erplyClient) GetServiceEndpoints() (*ServiceEndpoints, error) {
 	method := "getServiceEndpoints"
 	params := url.Values{}
@@ -37,23 +56,4 @@ func (cli *erplyClient) GetServiceEndpoints() (*ServiceEndpoints, error) {
 		return nil, errors.New("no records in response")
 	}
 	return &res.Records[0], nil
-}
-
-type getServiceEndpointsResponse struct {
-	Status  Status
-	Records []ServiceEndpoints `json:"records"`
-}
-
-type ServiceEndpoints struct {
-	Cafa        Endpoint `json:"cafa"`
-	Pim         Endpoint `json:"pim"`
-	Wms         Endpoint `json:"wms"`
-	Promotion   Endpoint `json:"promotion"`
-	Reports     Endpoint `json:"reports"`
-	Json        Endpoint `json:"json"`
-	Assignments Endpoint `json:"assignments"`
-}
-type Endpoint struct {
-	Url           string `json:"url"`
-	Documentation string `json:documentation""`
 }
