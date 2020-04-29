@@ -15,8 +15,8 @@ type Warehouse struct {
 	PricelistID            string `json:"pricelistID"`
 	PricelistID2           string `json:"pricelistID2"`
 	PricelistID3           string `json:"pricelistID3"`
-	PricelistID4           int    `json:"pricelistID4"`
-	PricelistID5           int    `json:"pricelistID5"`
+	PricelistID4           string `json:"pricelistID4"`
+	PricelistID5           string `json:"pricelistID5"`
 	Name                   string `json:"name"`
 	Code                   string `json:"code"`
 	AddressID              int    `json:"addressID"`
