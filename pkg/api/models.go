@@ -58,14 +58,6 @@ type UserCredentials struct {
 	Password string `json:"password"`
 }
 
-type VerifyUserResponse struct {
-	Records []Records `json:"records"`
-}
-
-type Records struct {
-	SessionKey string `json:"sessionKey"`
-}
-
 type GetUserRightsResponse struct {
 	Status  common.Status `json:"status"`
 	Records []UserRights  `json:"records"`

@@ -1,9 +1,7 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	"github.com/erply/api-go-wrapper/pkg/api/company"
@@ -14,9 +12,7 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
 	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
 	"github.com/erply/api-go-wrapper/pkg/common"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
-	"net/url"
 )
 
 type Client struct {
@@ -43,38 +39,6 @@ type Client struct {
 
 	//Service Discovery
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
-}
-
-//VerifyUser will give you session key
-func VerifyUser(username, password, clientCode string, client *http.Client) (string, error) {
-	requestUrl := fmt.Sprintf(baseURL, clientCode)
-	params := url.Values{}
-	params.Add("username", username)
-	params.Add("clientCode", clientCode)
-	params.Add("password", password)
-	params.Add("request", "verifyUser")
-
-	req, err := http.NewRequest("POST", requestUrl, nil)
-	if err != nil {
-		return "", erro.NewFromError("failed to build HTTP request", err)
-	}
-
-	req.URL.RawQuery = params.Encode()
-	req.Header.Add("Accept", "application/json")
-	resp, err := client.Do(req)
-
-	if err != nil {
-		return "", erro.NewFromError("failed to build VerifyUser request", err)
-	}
-
-	res := &VerifyUserResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", erro.NewFromError("failed to decode VerifyUserResponse", err)
-	}
-	if len(res.Records) < 1 {
-		return "", erro.NewFromError("VerifyUser: no records in response", nil)
-	}
-	return res.Records[0].SessionKey, nil
 }
 
 // NewClient Takes three params:
