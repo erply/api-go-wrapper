@@ -13,6 +13,7 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/sales"
 	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
 	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
@@ -65,6 +66,7 @@ type IPartnerClient interface {
 }
 
 type erplyClient struct {
+	*common.Client
 	AddressProvider addresses.Manager
 	//Token requests
 	AuthProvider auth.Provider

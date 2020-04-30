@@ -2,43 +2,32 @@ package api
 
 import (
 	"github.com/erply/api-go-wrapper/pkg/api/customers"
-	"github.com/erply/api-go-wrapper/pkg/api/products"
 	"github.com/erply/api-go-wrapper/pkg/api/sales"
+	"github.com/erply/api-go-wrapper/pkg/common"
 )
 
-type Status struct {
-	Request           string  `json:"request"`
-	RequestUnixTime   int     `json:"requestUnixTime"`
-	ResponseStatus    string  `json:"responseStatus"`
-	ErrorCode         int     `json:"errorCode"`
-	ErrorField        string  `json:"errorField"`
-	GenerationTime    float64 `json:"generationTime"`
-	RecordsTotal      int     `json:"recordsTotal"`
-	RecordsInResponse int     `json:"recordsInResponse"`
-}
-
 type PostPurchaseDocumentResponse struct {
-	Status        Status                   `json:"status"`
+	Status        common.Status            `json:"status"`
 	ImportReports PurchaseDocImportReports `json:"records"`
 }
 
 type GetCountriesResponse struct {
-	Status    Status    `json:"status"`
-	Countries []Country `json:"records"`
+	Status    common.Status `json:"status"`
+	Countries []Country     `json:"records"`
 }
 
 type GetEmployeesResponse struct {
-	Status    Status     `json:"status"`
-	Employees []Employee `json:"records"`
+	Status    common.Status `json:"status"`
+	Employees []Employee    `json:"records"`
 }
 
 type GetBusinessAreasResponse struct {
-	Status        Status         `json:"status"`
+	Status        common.Status  `json:"status"`
 	BusinessAreas []BusinessArea `json:"records"`
 }
 type GetCurrenciesResponse struct {
-	Status     Status     `json:"status"`
-	Currencies []Currency `json:"records"`
+	Status     common.Status `json:"status"`
+	Currencies []Currency    `json:"records"`
 }
 
 //CustomerDataProcessingLog ...
@@ -170,26 +159,26 @@ type Country struct {
 }
 
 type Employee struct {
-	EmployeeID             string              `json:"employeeID"`
-	FullName               string              `json:"fullName"`
-	EmployeeName           string              `json:"employeeName"`
-	FirstName              string              `json:"firstName"`
-	LastName               string              `json:"lastName"`
-	Phone                  string              `json:"phone"`
-	Mobile                 string              `json:"mobile"`
-	Email                  string              `json:"email"`
-	Fax                    string              `json:"fax"`
-	Code                   string              `json:"code"`
-	Gender                 string              `json:"gender"`
-	UserID                 string              `json:"userID"`
-	Username               string              `json:"username"`
-	UserGroupID            string              `json:"userGroupID"`
-	Warehouses             []EmployeeWarehouse `json:"warehouses"`
-	PointsOfSale           string              `json:"pointsOfSale"`
-	ProductIDs             []EmployeeProduct   `json:"productIDs"`
-	Attributes             []ObjAttribute      `json:"attributes"`
-	LastModified           uint64              `json:"lastModified"`
-	LastModifiedByUserName string              `json:"lastModifiedByUserName"`
+	EmployeeID             string                `json:"employeeID"`
+	FullName               string                `json:"fullName"`
+	EmployeeName           string                `json:"employeeName"`
+	FirstName              string                `json:"firstName"`
+	LastName               string                `json:"lastName"`
+	Phone                  string                `json:"phone"`
+	Mobile                 string                `json:"mobile"`
+	Email                  string                `json:"email"`
+	Fax                    string                `json:"fax"`
+	Code                   string                `json:"code"`
+	Gender                 string                `json:"gender"`
+	UserID                 string                `json:"userID"`
+	Username               string                `json:"username"`
+	UserGroupID            string                `json:"userGroupID"`
+	Warehouses             []EmployeeWarehouse   `json:"warehouses"`
+	PointsOfSale           string                `json:"pointsOfSale"`
+	ProductIDs             []EmployeeProduct     `json:"productIDs"`
+	Attributes             []common.ObjAttribute `json:"attributes"`
+	LastModified           uint64                `json:"lastModified"`
+	LastModifiedByUserName string                `json:"lastModifiedByUserName"`
 
 	// detail fileds
 	Skype        string `json:"skype"`

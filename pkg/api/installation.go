@@ -1,10 +1,11 @@
 package api
 
-/*
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/api/common"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -27,23 +28,27 @@ type InstallationResponse struct {
 
 func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli *http.Client) (*InstallationResponse, error) {
 
-	params := url.Values{}
-	params.Add("request", createInstallationMethod)
-	params.Add("partnerKey", partnerKey)
-	params.Add("companyName", in.CompanyName)
-	params.Add("firstName", in.FirstName)
-	params.Add("lastName", in.LastName)
-	params.Add("phone", in.Phone)
-	params.Add("email", in.Email)
-	params.Add("sendEmail", strconv.Itoa(in.SendEmail))
-
+	if cli == nil {
+		return nil, errors.New("no http cli provided")
+	}
+	/*
+		params := url.Values{}
+		params.Add("request", createInstallationMethod)
+		params.Add("partnerKey", partnerKey)
+		params.Add("companyName", in.CompanyName)
+		params.Add("firstName", in.FirstName)
+		params.Add("lastName", in.LastName)
+		params.Add("phone", in.Phone)
+		params.Add("email", in.Email)
+		params.Add("sendEmail", strconv.Itoa(in.SendEmail))
+	*/
 	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(params.Encode()))
 	if err != nil {
 		return nil, erro.NewFromError("failed to build HTTP request", err)
 
 	}
 	req.URL.RawQuery = params.Encode()
-	resp, err := common.doRequest(req, &erplyClient{httpClient: cli})
+	resp, err := cli.Do(req, &erplyClient{httpClient: cli})
 	if err != nil {
 		return nil, erro.NewFromError("CreateInstallation: error sending POST request", err)
 	}
@@ -71,4 +76,3 @@ func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli
 
 	return &respData.Records[0], nil
 }
-*/

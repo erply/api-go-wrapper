@@ -1,12 +1,11 @@
 package api
 
-/*
 import (
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -22,7 +21,7 @@ func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]str
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
-	if !common.IsJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK((*common.Status)(&res.Status)) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Countries, nil
@@ -132,4 +131,3 @@ func (cli *erplyClient) logProcessingOfCustomerData(ctx context.Context, filters
 
 	return nil
 }
-*/
