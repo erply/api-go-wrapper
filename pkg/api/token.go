@@ -8,15 +8,41 @@ import (
 	"strconv"
 )
 
-type TokenProvider interface {
-	VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
-	GetIdentityToken(ctx context.Context) (*IdentityToken, error)
-}
+type (
+	verifyIdentityTokenResponse struct {
+		Status Status      `json:"status"`
+		Result SessionInfo `json:"records"`
+	}
 
-//interface only for partner tokens
-type PartnerTokenProvider interface {
-	GetJWTToken(ctx context.Context) (*JwtToken, error)
-}
+	SessionInfo struct {
+		SessionKey string `json:"sessionKey"`
+	}
+
+	getIdentityTokenResponse struct {
+		Status Status        `json:"status"`
+		Result IdentityToken `json:"records"`
+	}
+	IdentityToken struct {
+		Jwt string `json:"identityToken"`
+	}
+	JwtTokenResponse struct {
+		Status  Status   `json:"status"`
+		Records JwtToken `json:"records"`
+	}
+	JwtToken struct {
+		Token string `json:"token"`
+	}
+
+	TokenProvider interface {
+		VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
+		GetIdentityToken(ctx context.Context) (*IdentityToken, error)
+	}
+
+	//interface only for partner tokens
+	PartnerTokenProvider interface {
+		GetJWTToken(ctx context.Context) (*JwtToken, error)
+	}
+)
 
 //VerifyIdentityToken ...
 func (cli *erplyClient) VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error) {

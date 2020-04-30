@@ -41,47 +41,6 @@ type CustomerDataProcessingLog struct {
 	fields       []string
 	customerIds  []int
 }
-
-//GetConfParametersResponse ...
-type GetConfParametersResponse struct {
-	Status         Status          `json:"status"`
-	ConfParameters []ConfParameter `json:"records"`
-}
-
-type PurchaseDocumentConstructors []PurchaseDocumentConstructor
-
-type PurchaseDocumentConstructor struct {
-	DocumentData  *DocumentData
-	PaymentParty  *Customer
-	DeliveryParty *Customer
-	SellerParty   *Customer
-	VatRates      VatRates
-}
-type (
-	verifyIdentityTokenResponse struct {
-		Status Status      `json:"status"`
-		Result SessionInfo `json:"records"`
-	}
-
-	SessionInfo struct {
-		SessionKey string `json:"sessionKey"`
-	}
-
-	getIdentityTokenResponse struct {
-		Status Status        `json:"status"`
-		Result IdentityToken `json:"records"`
-	}
-	IdentityToken struct {
-		Jwt string `json:"identityToken"`
-	}
-	JwtTokenResponse struct {
-		Status  Status   `json:"status"`
-		Records JwtToken `json:"records"`
-	}
-	JwtToken struct {
-		Token string `json:"token"`
-	}
-)
 type DocumentDatas []DocumentData
 
 type DocumentData struct {
@@ -163,13 +122,6 @@ type ProductRow struct {
 	// item vat rate
 	VatRate string
 }
-
-const (
-	PAID    PaymentStatus = "PAID"
-	UNPAID  PaymentStatus = "UNPAID"
-	PENDING InvoiceState  = "PENDING"
-	CARD    PaymentType   = "CARD"
-)
 
 type InvoiceState string
 
@@ -319,16 +271,4 @@ type Currency struct {
 	NameFraction string `json:"nameFraction"`
 	Added        string `json:"added"`
 	LastModified string `json:"lastModified"`
-}
-
-type WebshopClient struct {
-	ClientID        string `json:"clientID"`
-	ClientUsername  string `json:"clientUsername"`
-	ClientName      string `json:"clientName"`
-	ClientFirstName string `json:"clientFirstName"`
-	ClientLastName  string `json:"clientLastName"`
-	ClientGroupID   string `json:"clientGroupID"`
-	ClientGroupName string `json:"clientGroupName"`
-	CompanyID       string `json:"companyID"`
-	CompanyName     string `json:"companyName"`
 }

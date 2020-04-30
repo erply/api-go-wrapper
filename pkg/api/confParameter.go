@@ -35,6 +35,12 @@ type (
 		Announcement         string `json:"invoice_announcement_eng"`
 		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
 	}
+	//GetConfParametersResponse ...
+	GetConfParametersResponse struct {
+		Status         Status          `json:"status"`
+		ConfParameters []ConfParameter `json:"records"`
+	}
+
 	ConfManager interface {
 		GetConfParameters(ctx context.Context) (*ConfParameter, error)
 	}

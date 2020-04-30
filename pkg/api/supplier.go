@@ -59,7 +59,7 @@ type (
 	}
 	SupplierManager interface {
 		GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
-		PostSupplier(ctx context.Context, in *CustomerRequest, additionalFilters map[string]string) (*CustomerImportReport, error)
+		PostSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
 	}
 )
 
@@ -78,25 +78,8 @@ func (cli *erplyClient) GetSuppliers(ctx context.Context, filters map[string]str
 	}
 	return res.Suppliers, nil
 }
-func (cli *erplyClient) PostSupplier(ctx context.Context, in *CustomerRequest, additionalFilters map[string]string) (*CustomerImportReport, error) {
-	if in.CompanyName == "" || in.RegistryCode == "" {
-		return nil, erplyerr("Can not save customer with empty name or registry number", nil)
-	}
-	params := map[string]string{
-		"companyName":       in.CompanyName,
-		"fullName":          in.FullName,
-		"code":              in.RegistryCode,
-		"vatNumber":         in.VatNumber,
-		"email":             in.Email,
-		"phone":             in.Phone,
-		"bankName":          in.BankName,
-		"bankAccountNumber": in.BankAccountNumber,
-	}
-
-	for k, v := range additionalFilters {
-		params[k] = v
-	}
-	resp, err := cli.sendRequest(ctx, saveSupplierMethod, params)
+func (cli *erplyClient) PostSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
+	resp, err := cli.sendRequest(ctx, saveSupplierMethod, filters)
 	if err != nil {
 		return nil, erplyerr("PostSupplier request failed", err)
 	}

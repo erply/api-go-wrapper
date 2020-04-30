@@ -36,7 +36,11 @@ func TestSupplierManager(t *testing.T) {
 		t.Log(suppliers)
 	})
 	t.Run("test post supplier", func(t *testing.T) {
-		resp, err := cli.PostSupplier(ctx, testingCustomer, map[string]string{})
+		params := map[string]string{
+			"companyName": testingCustomer.CompanyName,
+			"code":        testingCustomer.RegistryCode,
+		}
+		resp, err := cli.PostSupplier(ctx, params)
 		if err != nil {
 			t.Error(err)
 			return

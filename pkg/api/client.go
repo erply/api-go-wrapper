@@ -15,17 +15,13 @@ import (
 type IClient interface {
 	ServiceDiscoverer
 	TokenProvider
-
 	ConfManager
 	WarehouseManager
+
 	GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
 
 	//sales document requests
-	GetSalesDocumentByID(id string) ([]SaleDocument, error)
-	GetSalesDocumentsByIDs(id []string) ([]SaleDocument, error)
-	PostSalesDocumentFromWoocomm(in *SaleDocumentConstructor, shopOrderID string) (SaleDocImportReports, error)
-	PostSalesDocument(in *SaleDocumentConstructor, provider string) (SaleDocImportReports, error)
-	DeleteDocumentsByID(id string) error
+	SalesDocumentManager
 
 	//customer requests
 	CustomerManager
@@ -43,18 +39,13 @@ type IClient interface {
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 
 	//project requests
-	GetProjects(ctx context.Context, filters map[string]string) ([]Project, error)
-	GetProjectStatus(ctx context.Context, filters map[string]string) ([]ProjectStatus, error)
+	ProjectManager
 
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
-	PostPurchaseDocument(in *PurchaseDocumentConstructor, provider string) (PurchaseDocImportReports, error)
+	SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
 
 	PointOfSaleManager
-
-	//payment requests
-	SavePayment(in *PaymentInfo) (int64, error)
-	GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
-
+	PaymentManager
 	AddressManager
 
 	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)

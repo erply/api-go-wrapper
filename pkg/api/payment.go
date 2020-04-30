@@ -5,44 +5,43 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 )
 
-type PaymentAttribute struct {
-	AttributeName  string `json:"attributeName"`
-	AttributeType  string `json:"attributeType"`
-	AttributeValue string `json:"attributeValue"`
-}
-type PaymentStatus string
-type PaymentType string
-
-type PaymentInfo struct {
-	DocumentID   int    `json:"documentID"` // Invoice ID
-	Type         string `json:"type"`       // CASH, TRANSFER, CARD, CREDIT, GIFTCARD, CHECK, TIP
-	Date         string `json:"date"`
-	Sum          string `json:"sum"`
-	CurrencyCode string `json:"currencyCode"` // EUR, USD
-	Info         string `json:"info"`         // Information about the payer or payment transaction
-	Added        uint64 `json:"added"`
-}
-
-func (cli *erplyClient) SavePayment(in *PaymentInfo) (int64, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return 0, erplyerr("SavePayment: failed to build request", err)
+type (
+	PaymentAttribute struct {
+		AttributeName  string `json:"attributeName"`
+		AttributeType  string `json:"attributeType"`
+		AttributeValue string `json:"attributeValue"`
 	}
+	PaymentStatus string
+	PaymentType   string
 
-	params := getMandatoryParameters(cli, savePaymentMethod)
-	params.Add("documentID", strconv.Itoa(in.DocumentID))
-	params.Add("type", in.Type)
-	params.Add("currencyCode", in.CurrencyCode)
-	params.Add("date", in.Date)
-	params.Add("sum", in.Sum)
-	params.Add("info", in.Info)
+	PaymentInfo struct {
+		DocumentID   int    `json:"documentID"` // Invoice ID
+		Type         string `json:"type"`       // CASH, TRANSFER, CARD, CREDIT, GIFTCARD, CHECK, TIP
+		Date         string `json:"date"`
+		Sum          string `json:"sum"`
+		CurrencyCode string `json:"currencyCode"` // EUR, USD
+		Info         string `json:"info"`         // Information about the payer or payment transaction
+		Added        uint64 `json:"added"`
+	}
+	PaymentManager interface {
+		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
+		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
+	}
+)
 
-	req.URL.RawQuery = params.Encode()
+func (cli *erplyClient) SavePayment(ctx context.Context, filters map[string]string) (int64, error) {
 
-	resp, err := doRequest(req, cli)
+	/*	params.Add("documentID", strconv.Itoa(in.DocumentID))
+		params.Add("type", in.Type)
+		params.Add("currencyCode", in.CurrencyCode)
+		params.Add("date", in.Date)
+		params.Add("sum", in.Sum)
+		params.Add("info", in.Info)
+	*/
+
+	resp, err := cli.sendRequest(ctx, savePaymentMethod, filters)
 	if err != nil {
 		return 0, erplyerr("SavePayment: error sending POST request", err)
 	}
@@ -73,19 +72,7 @@ func (cli *erplyClient) SavePayment(in *PaymentInfo) (int64, error) {
 }
 
 func (cli *erplyClient) GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erplyerr("GetPayments: failed to build request", err)
-	}
-
-	params := getMandatoryParameters(cli, GetPaymentsMethod)
-	for k, v := range filters {
-		params.Add(k, v)
-	}
-
-	req.URL.RawQuery = params.Encode()
-
-	resp, err := doRequest(req, cli)
+	resp, err := cli.sendRequest(ctx, GetPaymentsMethod, filters)
 	if err != nil {
 		return nil, erplyerr("GetPayments: error sending request", err)
 	}
