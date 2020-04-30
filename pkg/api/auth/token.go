@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -35,7 +35,7 @@ type (
 		Token string `json:"token"`
 	}
 
-	TokenProvider interface {
+	Provider interface {
 		VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
 		GetIdentityToken(ctx context.Context) (*IdentityToken, error)
 	}

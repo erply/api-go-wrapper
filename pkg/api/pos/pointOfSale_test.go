@@ -2,11 +2,9 @@ package pos
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
-/*
 //works
 func TestPOSRequests(t *testing.T) {
 	const (
@@ -15,7 +13,7 @@ func TestPOSRequests(t *testing.T) {
 		cc          = ""
 		warehouseID = ""
 	)
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 	t.Run("test by ID", func(t *testing.T) {
 
 		t.Run("test general request", func(t *testing.T) {
@@ -31,4 +29,3 @@ cli := NewClient(sk, cc,"", nil)
 		})
 	})
 }
-*/

@@ -131,29 +131,6 @@ type ProductRow struct {
 
 type InvoiceState string
 
-type ContactPersons []ContactPerson
-type ContactPerson struct {
-	ContactPersonID   int    `json:"contactPersonID"`
-	FullName          string `json:"fullName"`
-	GroupName         string `json:"groupName"`
-	CountryID         string `json:"countryID"`
-	Phone             string `json:"phone"`
-	Email             string `json:"email"`
-	Fax               string `json:"fax"`
-	Code              string `json:"code"`
-	BankName          string `json:"bankName"`
-	BankAccountNumber string `json:"bankAccountNumber"`
-	BankIBAN          string `json:"bankIBAN"`
-	BankSWIFT         string `json:"bankSWIFT"`
-	Notes             string `json:"notes"`
-}
-
-type CustomerImportReports []CustomerImportReport
-type CustomerImportReport struct {
-	ClientID   int `json:"clientID"`
-	CustomerID int `json:"customerID"`
-}
-
 type PurchaseDocImportReports []PurchaseDocImportReport
 type PurchaseDocImportReport struct {
 	InvoiceID    int    `json:"invoiceID"`
@@ -204,13 +181,6 @@ type GetUserRightsResponse struct {
 type UserRights struct {
 	UserName string `json:"userName"`
 }
-
-type ObjAttribute struct {
-	AttributeName  string `json:"attributeName"`
-	AttributeType  string `json:"attributeType"`
-	AttributeValue string `json:"attributeValue"`
-}
-
 type Country struct {
 	CountryId             uint   `json:"countryID"`
 	CountryName           string `json:"countryName"`

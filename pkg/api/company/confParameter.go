@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
 )
@@ -40,9 +40,5 @@ type (
 	GetConfParametersResponse struct {
 		Status         common.Status   `json:"status"`
 		ConfParameters []ConfParameter `json:"records"`
-	}
-
-	ConfManager interface {
-		GetConfParameters(ctx context.Context) (*ConfParameter, error)
 	}
 )

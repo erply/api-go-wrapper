@@ -2,10 +2,10 @@ package customers
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
+//works
 func TestSupplierManager(t *testing.T) {
 	const (
 		//fill your data here
@@ -37,7 +37,7 @@ func TestSupplierManager(t *testing.T) {
 			"companyName": testingCustomer.CompanyName,
 			"code":        testingCustomer.RegistryCode,
 		}
-		resp, err := cli.PostSupplier(ctx, params)
+		resp, err := cli.SaveSupplier(ctx, params)
 		if err != nil {
 			t.Error(err)
 			return

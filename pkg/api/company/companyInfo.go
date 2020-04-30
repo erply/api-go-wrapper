@@ -3,7 +3,7 @@ package company
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -44,6 +44,7 @@ type (
 
 	Manager interface {
 		GetCompanyInfo(ctx context.Context) (*Info, error)
+		GetConfParameters(ctx context.Context) (*ConfParameter, error)
 	}
 
 	Client struct {

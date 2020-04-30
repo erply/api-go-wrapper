@@ -1,32 +1,32 @@
 package products
 
-/*
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"net/http"
 	"strconv"
 )
 
 type (
 	GetProductsResponse struct {
 		Status   common.Status `json:"status"`
-		Products []Product  `json:"records"`
+		Products []Product     `json:"records"`
 	}
 
 	getProductCategoriesResponse struct {
-		Status            common.Status        `json:"status"`
+		Status            common.Status     `json:"status"`
 		ProductCategories []ProductCategory `json:"records"`
 	}
 
 	getProductBrandsResponse struct {
-		Status        common.Status     `json:"status"`
+		Status        common.Status  `json:"status"`
 		ProductBrands []ProductBrand `json:"records"`
 	}
 
 	getProductGroupsResponse struct {
-		Status        common.Status     `json:"status"`
+		Status        common.Status  `json:"status"`
 		ProductGroups []ProductGroup `json:"records"`
 	}
 
@@ -128,7 +128,7 @@ type (
 
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
-		Status       common.Status    `json:"status"`
+		Status       common.Status `json:"status"`
 		ProductUnits []ProductUnit `json:"records"`
 	}
 
@@ -145,11 +145,22 @@ type (
 		GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
 		GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
 	}
+	Client struct {
+		*common.Client
+	}
 )
+
+func NewClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
+
+	cli := &Client{
+		common.NewClient(sk, cc, partnerKey, httpCli),
+	}
+	return cli
+}
 
 func (cli *Client) GetProductUnits(ctx context.Context, filters map[string]string) ([]ProductUnit, error) {
 
-	resp, err := cli.SendRequest(ctx, api.GetProductUnitsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProductUnits", filters)
 	if err != nil {
 		return nil, erro.NewFromError("GetProductUnits request failed", err)
 	}
@@ -167,7 +178,7 @@ func (cli *Client) GetProductUnits(ctx context.Context, filters map[string]strin
 }
 
 func (cli *Client) GetProducts(ctx context.Context, filters map[string]string) ([]Product, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProductsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProducts", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +193,7 @@ func (cli *Client) GetProducts(ctx context.Context, filters map[string]string) (
 }
 
 func (cli *Client) GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProductCategoriesMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProductCategories", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +208,7 @@ func (cli *Client) GetProductCategories(ctx context.Context, filters map[string]
 }
 
 func (cli *Client) GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProductBrandsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProductBrands", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +223,7 @@ func (cli *Client) GetProductBrands(ctx context.Context, filters map[string]stri
 }
 
 func (cli *Client) GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProductGroupsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProductGroups", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -225,4 +236,3 @@ func (cli *Client) GetProductGroups(ctx context.Context, filters map[string]stri
 	}
 	return res.ProductGroups, nil
 }
-*/

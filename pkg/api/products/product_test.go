@@ -2,11 +2,9 @@ package products
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
-/*
 //works
 func TestProductManager(t *testing.T) {
 	const (
@@ -19,7 +17,7 @@ func TestProductManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 
 	t.Run("test GetProducts", func(t *testing.T) {
 		products, err := cli.GetProducts(ctx, map[string]string{})
@@ -63,4 +61,3 @@ cli := NewClient(sk, cc,"", nil)
 		t.Log(groups)
 	})
 }
-*/

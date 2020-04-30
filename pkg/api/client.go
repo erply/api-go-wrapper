@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
-	"net"
+	"github.com/erply/api-go-wrapper/pkg/api/company"
+	"github.com/erply/api-go-wrapper/pkg/api/customers"
+	"github.com/erply/api-go-wrapper/pkg/api/pos"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
-	"time"
 )
 
 //IClient interface for cached and simple client
@@ -60,7 +61,14 @@ type IPartnerClient interface {
 }
 
 type erplyClient struct {
-	AddressProvider *addresses.Client
+	AddressProvider addresses.Manager
+	//Token requests
+	AuthProvider auth.Provider
+	//Company and Conf parameter requests
+	CompanyManager company.Manager
+	//Customers and suppliers requests
+	CustomerManager customers.Manager
+	PosManager      pos.Manager
 }
 
 //VerifyUser will give you session key
@@ -105,20 +113,21 @@ func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, 
 	if sessionKey == "" || clientCode == "" {
 		return nil, errors.New("sessionKey and clientCode are required")
 	}
-	httpCli := getDefaultHTTPClient()
-	if customCli != nil {
-		httpCli = customCli
-	}
+
 	//declare short getters
 	var (
 		//sessionKey
 		s = sessionKey
 		//clientCode
 		c = clientCode
-		h = httpCli
+		h = customCli
 	)
 	cli := &erplyClient{
 		AddressProvider: addresses.NewClient(s, c, "", h),
+		AuthProvider:    auth.NewClient(s, c, "", h),
+		CompanyManager:  company.NewClient(s, c, "", h),
+		CustomerManager: customers.NewClient(s, c, "", h),
+		PosManager:      pos.NewClient(s, c, "", h),
 	}
 
 	return cli, nil

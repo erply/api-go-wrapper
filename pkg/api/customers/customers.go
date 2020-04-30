@@ -1,14 +1,11 @@
 package customers
 
-/*
 import (
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/addresses"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -16,45 +13,61 @@ import (
 
 type (
 	Customer struct {
-		ID                   int            `json:"id"`
-		CustomerID           int            `json:"customerID"`
-		TypeID               string         `json:"type_id"`
-		FullName             string         `json:"fullName"`
-		CompanyName          string         `json:"companyName"`
-		FirstName            string         `json:"firstName"`
-		LastName             string         `json:"lastName"`
-		GroupID              int            `json:"groupID"`
-		EDI                  string         `json:"EDI"`
-		IsPOSDefaultCustomer int            `json:"isPOSDefaultCustomer"`
-		CountryID            string         `json:"countryID"`
-		Phone                string         `json:"phone"`
-		EInvoiceEmail        string         `json:"eInvoiceEmail"`
-		Email                string         `json:"email"`
-		Fax                  string         `json:"fax"`
-		Code                 string         `json:"code"`
-		ReferenceNumber      string         `json:"referenceNumber"`
-		VatNumber         string              `json:"vatNumber"`
-		BankName          string              `json:"bankName"`
-		BankAccountNumber string              `json:"bankAccountNumber"`
-		BankIBAN          string              `json:"bankIBAN"`
-		BankSWIFT         string              `json:"bankSWIFT"`
-		PaymentDays       int                 `json:"paymentDays"`
-		Notes             string              `json:"notes"`
-		LastModified      int                 `json:"lastModified"`
-		CustomerType      string              `json:"customerType"`
-		Address           string              `json:"address"`
-		CustomerAddresses addresses.Addresses `json:"addresses"`
-		Street            string              `json:"street"`
-		Address2          string              `json:"address2"`
-		City              string              `json:"city"`
-		PostalCode        string              `json:"postalCode"`
-		Country           string              `json:"country"`
-		State             string              `json:"state"`
-		ContactPersons    api.ContactPersons  `json:"contactPersons"`
+		ID                   int              `json:"id"`
+		CustomerID           int              `json:"customerID"`
+		TypeID               string           `json:"type_id"`
+		FullName             string           `json:"fullName"`
+		CompanyName          string           `json:"companyName"`
+		FirstName            string           `json:"firstName"`
+		LastName             string           `json:"lastName"`
+		GroupID              int              `json:"groupID"`
+		EDI                  string           `json:"EDI"`
+		IsPOSDefaultCustomer int              `json:"isPOSDefaultCustomer"`
+		CountryID            string           `json:"countryID"`
+		Phone                string           `json:"phone"`
+		EInvoiceEmail        string           `json:"eInvoiceEmail"`
+		Email                string           `json:"email"`
+		Fax                  string           `json:"fax"`
+		Code                 string           `json:"code"`
+		ReferenceNumber      string           `json:"referenceNumber"`
+		VatNumber            string           `json:"vatNumber"`
+		BankName             string           `json:"bankName"`
+		BankAccountNumber    string           `json:"bankAccountNumber"`
+		BankIBAN             string           `json:"bankIBAN"`
+		BankSWIFT            string           `json:"bankSWIFT"`
+		PaymentDays          int              `json:"paymentDays"`
+		Notes                string           `json:"notes"`
+		LastModified         int              `json:"lastModified"`
+		CustomerType         string           `json:"customerType"`
+		Address              string           `json:"address"`
+		CustomerAddresses    common.Addresses `json:"addresses"`
+		Street               string           `json:"street"`
+		Address2             string           `json:"address2"`
+		City                 string           `json:"city"`
+		PostalCode           string           `json:"postalCode"`
+		Country              string           `json:"country"`
+		State                string           `json:"state"`
+		ContactPersons       ContactPersons   `json:"contactPersons"`
 
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
 		LastLogin string `json:"webshopLastLogin"`
+	}
+	ContactPersons []ContactPerson
+	ContactPerson  struct {
+		ContactPersonID   int    `json:"contactPersonID"`
+		FullName          string `json:"fullName"`
+		GroupName         string `json:"groupName"`
+		CountryID         string `json:"countryID"`
+		Phone             string `json:"phone"`
+		Email             string `json:"email"`
+		Fax               string `json:"fax"`
+		Code              string `json:"code"`
+		BankName          string `json:"bankName"`
+		BankAccountNumber string `json:"bankAccountNumber"`
+		BankIBAN          string `json:"bankIBAN"`
+		BankSWIFT         string `json:"bankSWIFT"`
+		Notes             string `json:"notes"`
 	}
 	Customers []Customer
 
@@ -102,24 +115,41 @@ type (
 	}
 	GetCustomersResponse struct {
 		Status    common.Status `json:"status"`
-		Customers Customers  `json:"records"`
+		Customers Customers     `json:"records"`
 	}
 
 	PostCustomerResponse struct {
-		Status                common.Status                `json:"status"`
-		CustomerImportReports api.CustomerImportReports `json:"records"`
+		Status                common.Status         `json:"status"`
+		CustomerImportReports CustomerImportReports `json:"records"`
 	}
-
-	CustomerManager interface {
-		PostCustomer(ctx context.Context, filters map[string]string) (*api.CustomerImportReport, error)
+	CustomerImportReports []CustomerImportReport
+	CustomerImportReport  struct {
+		ClientID   int `json:"clientID"`
+		CustomerID int `json:"customerID"`
+	}
+	Manager interface {
+		SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
 		GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
 		VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error)
 		ValidateCustomerUsername(ctx context.Context, username string) (bool, error)
+		GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
+		SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
+	}
+	Client struct {
+		*common.Client
 	}
 )
 
-func (cli *Client) PostCustomer(ctx context.Context, filters map[string]string) (*api.CustomerImportReport, error) {
-	resp, err := cli.SendRequest(ctx, api.saveCustomerMethod, filters)
+func NewClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
+
+	cli := &Client{
+		common.NewClient(sk, cc, partnerKey, httpCli),
+	}
+	return cli
+}
+
+func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
+	resp, err := cli.SendRequest(ctx, "saveCustomer", filters)
 	if err != nil {
 		return nil, erro.NewFromError("PostCustomer request failed", err)
 	}
@@ -141,7 +171,7 @@ func (cli *Client) PostCustomer(ctx context.Context, filters map[string]string) 
 
 // GetCustomers will list customers according to specified filters.
 func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error) {
-	resp, err := cli.SendRequest(ctx, api.GetCustomersMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getCustomers", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +191,7 @@ func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password st
 		"username": username,
 		"password": password,
 	}
-	resp, err := cli.SendRequest(ctx, api.VerifyCustomerUserMethod, filters)
+	resp, err := cli.SendRequest(ctx, "verifyCustomerUser", filters)
 	if err != nil {
 		return nil, erro.NewFromError("VerifyCustomerUser: request failed", err)
 	}
@@ -184,25 +214,24 @@ func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password st
 	return &res.Records[0], nil
 }
 func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string) (bool, error) {
-
+	method := "validateCustomerUsername"
 	params := map[string]string{"username": username}
-	resp, err := cli.SendRequest(ctx, api.validateCustomerUsernameMethod, params)
+	resp, err := cli.SendRequest(ctx, method, params)
 	if err != nil {
 		return false, erro.NewFromError("IsCustomerUsernameAvailable: error sending request", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return false, erro.NewFromError(fmt.Sprintf(api.validateCustomerUsernameMethod+": bad response status code: %d", resp.StatusCode), nil)
+		return false, erro.NewFromError(fmt.Sprintf(method+": bad response status code: %d", resp.StatusCode), nil)
 	}
 
 	var respData struct {
 		Status common.Status
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return false, erro.NewFromError(api.validateCustomerUsernameMethod+": unmarshaling response failed", err)
+		return false, erro.NewFromError(method+": unmarshaling response failed", err)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return false, erro.NewFromError(fmt.Sprintf(api.validateCustomerUsernameMethod+": bad response error code: %d", respData.Status.ErrorCode), nil)
+		return false, erro.NewFromError(fmt.Sprintf(method+": bad response error code: %d", respData.Status.ErrorCode), nil)
 	}
 	return true, nil
 }
-*/

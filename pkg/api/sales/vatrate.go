@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
 )

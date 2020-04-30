@@ -3,7 +3,7 @@ package addresses
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -12,30 +12,13 @@ import (
 type (
 	//GetAddressesResponse ..
 	Response struct {
-		Status    common.Status `json:"status"`
-		Addresses Addresses     `json:"records"`
+		Status    common.Status    `json:"status"`
+		Addresses common.Addresses `json:"records"`
 	}
 
-	//Addresses from getAddresses
-	Addresses []Address
-
-	//Address from getAddresses
-	Address struct {
-		AddressID  int         `json:"addressID"`
-		OwnerID    int         `json:"ownerID"`
-		TypeID     interface{} `json:"typeID"`
-		Address2   string      `json:"address2"`
-		Address    string      `json:"address"`
-		Street     string      `json:"street"`
-		PostalCode string      `json:"postalCode"`
-		City       string      `json:"city"`
-		State      string      `json:"state"`
-		Country    string      `json:"country"`
-	}
-
-	AddressManager interface {
-		GetAddresses(ctx context.Context, filters map[string]string) ([]Address, error)
-		SaveAddress(ctx context.Context, filters map[string]string) ([]Address, error)
+	Manager interface {
+		GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error)
+		SaveAddress(ctx context.Context, filters map[string]string) ([]common.Address, error)
 	}
 
 	Client struct {
@@ -50,7 +33,7 @@ func NewClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
 	}
 	return cli
 }
-func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]Address, error) {
+func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error) {
 	resp, err := cli.SendRequest(ctx, "getAddresses", filters)
 	if err != nil {
 		return nil, erro.NewFromError("GetAddresses request failed", err)
@@ -67,7 +50,7 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 
 	return res.Addresses, nil
 }
-func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) ([]Address, error) {
+func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) ([]common.Address, error) {
 	method := "saveAddress"
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {

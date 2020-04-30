@@ -2,11 +2,9 @@ package customers
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
-/*
 //works
 func TestCustomerManager(t *testing.T) {
 	const (
@@ -25,7 +23,7 @@ func TestCustomerManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 	t.Run("test get customers", func(t *testing.T) {
 		resp, err := cli.GetCustomers(ctx, map[string]string{})
 		if err != nil {
@@ -42,7 +40,7 @@ cli := NewClient(sk, cc,"", nil)
 		}
 		params["username"] = testingCustomer.Username
 		params["password"] = testingCustomer.Password
-		report, err := cli.PostCustomer(ctx, testingCustomer)
+		report, err := cli.SaveCustomer(ctx, params)
 		if err != nil {
 			t.Error(err)
 			return
@@ -67,4 +65,3 @@ cli := NewClient(sk, cc,"", nil)
 		t.Log(isAvailable)
 	})
 }
-*/
