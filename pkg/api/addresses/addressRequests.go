@@ -8,30 +8,6 @@ import (
 	"strconv"
 )
 
-type (
-	//GetAddressesResponse ..
-	Response struct {
-		Status    common.Status    `json:"status"`
-		Addresses common.Addresses `json:"records"`
-	}
-
-	Manager interface {
-		GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error)
-		SaveAddress(ctx context.Context, filters map[string]string) ([]common.Address, error)
-	}
-
-	Client struct {
-		*common.Client
-	}
-)
-
-func NewClient(client *common.Client) *Client {
-
-	cli := &Client{
-		client,
-	}
-	return cli
-}
 func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error) {
 	resp, err := cli.SendRequest(ctx, "getAddresses", filters)
 	if err != nil {

@@ -1,15 +1,6 @@
 package customers
 
-import (
-	"context"
-	"encoding/json"
-	"errors"
-	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/common"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
-	"net/http"
-	"strconv"
-)
+import "github.com/erply/api-go-wrapper/pkg/common"
 
 type (
 	Customer struct {
@@ -127,111 +118,56 @@ type (
 		ClientID   int `json:"clientID"`
 		CustomerID int `json:"customerID"`
 	}
-	Manager interface {
-		SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
-		GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
-		VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error)
-		ValidateCustomerUsername(ctx context.Context, username string) (bool, error)
-		GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
-		SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
-	}
-	Client struct {
-		*common.Client
-	}
 )
 
-func NewClient(client *common.Client) *Client {
+type (
+	Supplier struct {
+		SupplierId      uint                  `json:"supplierID"`
+		SupplierType    string                `json:"supplierType"`
+		FullName        string                `json:"fullName"`
+		CompanyName     string                `json:"companyName"`
+		FirstName       string                `json:"firstName"`
+		LstName         string                `json:"lastName"`
+		GroupId         uint                  `json:"groupID"`
+		GroupName       string                `json:"groupName"`
+		Phone           string                `json:"phone"`
+		Mobile          string                `json:"mobile"`
+		Email           string                `json:"email"`
+		Fax             string                `json:"fax"`
+		Code            string                `json:"code"`
+		IntegrationCode string                `json:"integrationCode"`
+		VatrateID       uint                  `json:"vatrateID"`
+		CurrencyCode    string                `json:"currencyCode"`
+		DeliveryTermsID uint                  `json:"deliveryTermsID"`
+		CountryId       uint                  `json:"countryID"`
+		CountryName     string                `json:"countryName"`
+		CountryCode     string                `json:"countryCode"`
+		Address         string                `json:"address"`
+		Gln             string                `json:"GLN"`
+		Attributes      []common.ObjAttribute `json:"attributes"`
 
-	cli := &Client{
-		client,
-	}
-	return cli
-}
-
-func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
-	resp, err := cli.SendRequest(ctx, "saveCustomer", filters)
-	if err != nil {
-		return nil, erro.NewFromError("PostCustomer request failed", err)
-	}
-	res := &PostCustomerResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling CustomerImportReport failed", err)
-	}
-
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
-	}
-
-	if len(res.CustomerImportReports) == 0 {
-		return nil, errors.New("no report found")
-	}
-
-	return &res.CustomerImportReports[0], nil
-}
-
-// GetCustomers will list customers according to specified filters.
-func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error) {
-	resp, err := cli.SendRequest(ctx, "getCustomers", filters)
-	if err != nil {
-		return nil, err
-	}
-	var res GetCustomersResponse
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetCustomersResponse", err)
-	}
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
-	}
-	return res.Customers, nil
-}
-
-//username and password are required fields here
-func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error) {
-	filters := map[string]string{
-		"username": username,
-		"password": password,
-	}
-	resp, err := cli.SendRequest(ctx, "verifyCustomerUser", filters)
-	if err != nil {
-		return nil, erro.NewFromError("VerifyCustomerUser: request failed", err)
+		// Detail fields
+		VatNumber           string `json:"vatNumber"`
+		Skype               string `json:"skype"`
+		Website             string `json:"website"`
+		BankName            string `json:"bankName"`
+		BankAccountNumber   string `json:"bankAccountNumber"`
+		BankIBAN            string `json:"bankIBAN"`
+		BankSWIFT           string `json:"bankSWIFT"`
+		Birthday            string `json:"birthday"`
+		CompanyID           uint   `json:"companyID"`
+		ParentCompanyName   string `json:"parentCompanyName"`
+		SupplierManagerID   uint   `json:"supplierManagerID"`
+		SupplierManagerName string `json:"supplierManagerName"`
+		PaymentDays         uint   `json:"paymentDays"`
+		Notes               string `json:"notes"`
+		LastModified        string `json:"lastModified"`
+		Added               uint64 `json:"added"`
 	}
 
-	var res struct {
-		Status  common.Status
-		Records []WebshopClient
+	//GetSuppliersResponse
+	getSuppliersResponse struct {
+		Status    common.Status `json:"status"`
+		Suppliers []Supplier    `json:"records"`
 	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("VerifyCustomerUser: unmarhsalling response failed", err)
-	}
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
-	}
-	if len(res.Records) != 1 {
-		return nil, erro.NewFromError("VerifyCustomerUser: no records in response", nil)
-	}
-
-	return &res.Records[0], nil
-}
-func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string) (bool, error) {
-	method := "validateCustomerUsername"
-	params := map[string]string{"username": username}
-	resp, err := cli.SendRequest(ctx, method, params)
-	if err != nil {
-		return false, erro.NewFromError("IsCustomerUsernameAvailable: error sending request", err)
-	}
-	if resp.StatusCode != http.StatusOK {
-		return false, erro.NewFromError(fmt.Sprintf(method+": bad response status code: %d", resp.StatusCode), nil)
-	}
-
-	var respData struct {
-		Status common.Status
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return false, erro.NewFromError(method+": unmarshaling response failed", err)
-	}
-	if respData.Status.ErrorCode != 0 {
-		return false, erro.NewFromError(fmt.Sprintf(method+": bad response error code: %d", respData.Status.ErrorCode), nil)
-	}
-	return true, nil
-}
+)

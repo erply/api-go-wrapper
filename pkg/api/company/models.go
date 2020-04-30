@@ -1,12 +1,6 @@
 package company
 
-import (
-	"context"
-	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/common"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
-	"strconv"
-)
+import "github.com/erply/api-go-wrapper/pkg/common"
 
 type (
 	//CompanyInfos ..
@@ -40,43 +34,16 @@ type (
 		Status       common.Status `json:"status"`
 		CompanyInfos Infos         `json:"records"`
 	}
-
-	Manager interface {
-		GetCompanyInfo(ctx context.Context) (*Info, error)
-		GetConfParameters(ctx context.Context) (*ConfParameter, error)
-	}
-
-	Client struct {
-		*common.Client
-	}
 )
 
-func NewClient(client *common.Client) *Client {
-
-	cli := &Client{
-		client,
+type (
+	ConfParameter struct {
+		Announcement         string `json:"invoice_announcement_eng"`
+		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
 	}
-	return cli
-}
-
-//GetCompanyInfo ...
-func (cli *Client) GetCompanyInfo(ctx context.Context) (*Info, error) {
-	resp, err := cli.SendRequest(ctx, "getCompanyInfo", map[string]string{})
-	if err != nil {
-		return nil, erro.NewFromError("GetCompanyInfo request failed", err)
+	//GetConfParametersResponse ...
+	GetConfParametersResponse struct {
+		Status         common.Status   `json:"status"`
+		ConfParameters []ConfParameter `json:"records"`
 	}
-	res := &GetCompanyInfoResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetCompanyInfoResponse failed", err)
-	}
-
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
-	}
-
-	if len(res.CompanyInfos) == 0 {
-		return nil, nil
-	}
-
-	return &res.CompanyInfos[0], nil
-}
+)

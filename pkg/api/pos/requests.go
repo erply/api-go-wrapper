@@ -8,37 +8,6 @@ import (
 	"strconv"
 )
 
-type (
-	PointOfSale struct {
-		PointOfSaleID uint   `json:"pointOfSaleID"`
-		Name          string `json:"name"`
-		WarehouseID   int    `json:"warehouseID"`
-		WarehouseName string `json:"warehouseName"`
-		Added         uint64 `json:"added"`
-		LastModified  uint64 `json:"lastModified"`
-	}
-
-	GetPointsOfSaleResponse struct {
-		Status       common.Status `json:"status"`
-		PointsOfSale []PointOfSale `json:"records"`
-	}
-
-	Manager interface {
-		GetPointsOfSale(ctx context.Context, filters map[string]string) ([]PointOfSale, error)
-	}
-	Client struct {
-		*common.Client
-	}
-)
-
-func NewClient(client *common.Client) *Client {
-
-	cli := &Client{
-		client,
-	}
-	return cli
-}
-
 // GetPointsOfSale will list points of sale according to specified filters.
 func (cli *Client) GetPointsOfSale(ctx context.Context, filters map[string]string) ([]PointOfSale, error) {
 	resp, err := cli.SendRequest(ctx, "getPointsOfSale", filters)

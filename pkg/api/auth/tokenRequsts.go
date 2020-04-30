@@ -9,57 +9,6 @@ import (
 	"strconv"
 )
 
-type (
-	verifyIdentityTokenResponse struct {
-		Status common.Status `json:"status"`
-		Result SessionInfo   `json:"records"`
-	}
-
-	SessionInfo struct {
-		SessionKey string `json:"sessionKey"`
-	}
-
-	getIdentityTokenResponse struct {
-		Status common.Status `json:"status"`
-		Result IdentityToken `json:"records"`
-	}
-	IdentityToken struct {
-		Jwt string `json:"identityToken"`
-	}
-	JwtTokenResponse struct {
-		Status  common.Status `json:"status"`
-		Records JwtToken      `json:"records"`
-	}
-	JwtToken struct {
-		Token string `json:"token"`
-	}
-
-	Provider interface {
-		VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
-		GetIdentityToken(ctx context.Context) (*IdentityToken, error)
-	}
-
-	//interface only for partner tokens
-	PartnerTokenProvider interface {
-		GetJWTToken(ctx context.Context) (*JwtToken, error)
-	}
-
-	Client        struct{ *common.Client }
-	PartnerClient struct{ *common.Client }
-)
-
-func NewClient(client *common.Client) *Client {
-
-	cli := &Client{
-		client,
-	}
-	return cli
-}
-
-func NewPartnerClient(client *common.Client) *PartnerClient {
-	return &PartnerClient{client}
-}
-
 //VerifyIdentityToken ...
 func (cli *Client) VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error) {
 	method := "verifyIdentityToken"

@@ -2,6 +2,7 @@ package pos
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 

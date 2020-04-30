@@ -30,15 +30,3 @@ func (cli *Client) GetConfParameters(ctx context.Context) (*ConfParameter, error
 
 	return &res.ConfParameters[0], nil
 }
-
-type (
-	ConfParameter struct {
-		Announcement         string `json:"invoice_announcement_eng"`
-		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
-	}
-	//GetConfParametersResponse ...
-	GetConfParametersResponse struct {
-		Status         common.Status   `json:"status"`
-		ConfParameters []ConfParameter `json:"records"`
-	}
-)
