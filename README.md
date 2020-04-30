@@ -16,6 +16,7 @@ There are 2 ways of using the API.
 * You can use the simple `Client` that will work without the partner key also.
 
 You can find the example in the `examples` directory for the client initialization process
+
 Example usage as a service
 -------
 ```go
