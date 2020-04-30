@@ -3,21 +3,19 @@ package sales
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
 )
 
-/*
 type (
 	GetProjectsResponse struct {
 		Status   common.Status `json:"status"`
-		Projects []Project  `json:"records"`
+		Projects []Project     `json:"records"`
 	}
 
 	GetProjectStatusesResponse struct {
-		Status          common.Status      `json:"status"`
+		Status          common.Status   `json:"status"`
 		ProjectStatuses []ProjectStatus `json:"records"`
 	}
 
@@ -54,7 +52,7 @@ type (
 
 // GetProjects will list projects according to specified filters.
 func (cli *Client) GetProjects(ctx context.Context, filters map[string]string) ([]Project, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProjectsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProjects", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +68,7 @@ func (cli *Client) GetProjects(ctx context.Context, filters map[string]string) (
 
 // GetProjectStatus will list projects statuses according to specified filters.
 func (cli *Client) GetProjectStatus(ctx context.Context, filters map[string]string) ([]ProjectStatus, error) {
-	resp, err := cli.SendRequest(ctx, api.GetProjectStatusesMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getProjectStatuses", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -83,4 +81,3 @@ func (cli *Client) GetProjectStatus(ctx context.Context, filters map[string]stri
 	}
 	return res.ProjectStatuses, nil
 }
-*/

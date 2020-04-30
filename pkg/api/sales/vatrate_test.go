@@ -2,11 +2,9 @@ package sales
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
-/*
 //works
 func TestVatRateManager(t *testing.T) {
 	const (
@@ -19,7 +17,7 @@ func TestVatRateManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 
 	resp, err := cli.GetVatRates(ctx, map[string]string{
 		"searchAttributeName":  "id",
@@ -33,4 +31,3 @@ cli := NewClient(sk, cc,"", nil)
 	}
 	t.Log(resp)
 }
-*/

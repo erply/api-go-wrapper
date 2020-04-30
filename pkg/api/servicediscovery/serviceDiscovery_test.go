@@ -1,17 +1,17 @@
 package servicediscovery
 
-/*
+import (
+	"context"
+	"testing"
+)
+
 //works
 func TestGetServiceEndpoints(t *testing.T) {
 	const (
 		sk = ""
 		cc = ""
 	)
-	cli, err := api.NewClient(sk, cc, nil)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+	cli := NewClient(sk, cc, "", nil)
 
 	endpoints, err := cli.GetServiceEndpoints(context.Background())
 	if err != nil {
@@ -25,4 +25,3 @@ func TestGetServiceEndpoints(t *testing.T) {
 	}
 	t.Log(endpoints)
 }
-*/

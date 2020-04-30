@@ -138,7 +138,7 @@ type (
 		Name   string `json:"name"`
 	}
 
-	ProductManager interface {
+	Manager interface {
 		GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
 		GetProductUnits(ctx context.Context, filters map[string]string) ([]ProductUnit, error)
 		GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)

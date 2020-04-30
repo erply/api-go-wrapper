@@ -4,13 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
 )
 
-/*
 type (
 	VatRate struct {
 		ID     string `json:"id"`
@@ -24,13 +22,7 @@ type (
 		//ReverseRate int `json:"reverseRate"`
 	}
 
-	VatRates            []VatRate
-	VatTotalsByTaxRates []VatTotalsByTaxRate
-
-	VatTotalsByTaxRate struct {
-		VatrateID int     `json:"vatrateID"`
-		Total     float64 `json:"total"`
-	}
+	VatRates []VatRate
 
 	NetTotalsByTaxRate struct {
 		VatrateID int     `json:"vatrateID"`
@@ -40,7 +32,7 @@ type (
 	//GetVatRatesResponse ...
 	getVatRatesResponse struct {
 		Status   common.Status `json:"status"`
-		VatRates []VatRate  `json:"records"`
+		VatRates []VatRate     `json:"records"`
 	}
 	VatRateManager interface {
 		GetVatRates(ctx context.Context, filters map[string]string) (VatRates, error)
@@ -50,7 +42,7 @@ type (
 //GetVatRatesByVatRateID ...
 func (cli *Client) GetVatRates(ctx context.Context, filters map[string]string) (VatRates, error) {
 
-	resp, err := cli.SendRequest(ctx, api.GetVatRatesMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getVatRates", filters)
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +59,3 @@ func (cli *Client) GetVatRates(ctx context.Context, filters map[string]string) (
 	}
 	return res.VatRates, nil
 }
-*/

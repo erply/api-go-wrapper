@@ -139,27 +139,6 @@ type PurchaseDocImportReport struct {
 	Total        int    `json:"total"`
 }
 
-type InvoiceRow struct {
-	RowID             string `json:"rowID"`
-	ProductID         string `json:"productID"`
-	Product           *products.Product
-	ItemName          string  `json:"itemName"`
-	Barcode           string  `json:"barcode"`
-	VatrateID         string  `json:"vatrateID"`
-	Amount            string  `json:"amount"`
-	Price             string  `json:"price"`
-	Discount          string  `json:"discount"`
-	BillingStartDate  string  `json:"billingStartDate"`
-	BillingEndDate    string  `json:"billingEndDate"`
-	Code              string  `json:"code"`
-	FinalNetPrice     float64 `json:"finalNetPrice"`
-	FinalPriceWithVAT float64 `json:"finalPriceWithVAT"`
-	RowNetTotal       float64 `json:"rowNetTotal"`
-	RowVAT            float64 `json:"rowVAT"`
-	RowTotal          float64 `json:"rowTotal"`
-	CampaignIDs       string  `json:"campaignIDs"`
-}
-
 type UserCredentials struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`

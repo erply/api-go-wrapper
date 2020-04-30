@@ -9,6 +9,10 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/company"
 	"github.com/erply/api-go-wrapper/pkg/api/customers"
 	"github.com/erply/api-go-wrapper/pkg/api/pos"
+	"github.com/erply/api-go-wrapper/pkg/api/products"
+	"github.com/erply/api-go-wrapper/pkg/api/sales"
+	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
+	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
@@ -69,6 +73,13 @@ type erplyClient struct {
 	//Customers and suppliers requests
 	CustomerManager customers.Manager
 	PosManager      pos.Manager
+	ProductManager  products.Manager
+
+	//SalesDocuments, Payments, Projects, ShoppingCart, VatRates
+	SalesManager sales.Manager
+
+	WarehouseManager  warehouse.Manager
+	ServiceDiscoverer servicediscovery.ServiceDiscoverer
 }
 
 //VerifyUser will give you session key
@@ -123,11 +134,15 @@ func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, 
 		h = customCli
 	)
 	cli := &erplyClient{
-		AddressProvider: addresses.NewClient(s, c, "", h),
-		AuthProvider:    auth.NewClient(s, c, "", h),
-		CompanyManager:  company.NewClient(s, c, "", h),
-		CustomerManager: customers.NewClient(s, c, "", h),
-		PosManager:      pos.NewClient(s, c, "", h),
+		AddressProvider:   addresses.NewClient(s, c, "", h),
+		AuthProvider:      auth.NewClient(s, c, "", h),
+		CompanyManager:    company.NewClient(s, c, "", h),
+		CustomerManager:   customers.NewClient(s, c, "", h),
+		PosManager:        pos.NewClient(s, c, "", h),
+		ProductManager:    products.NewClient(s, c, "", h),
+		SalesManager:      sales.NewClient(s, c, "", h),
+		WarehouseManager:  warehouse.NewClient(s, c, "", h),
+		ServiceDiscoverer: servicediscovery.NewClient(s, c, "", h),
 	}
 
 	return cli, nil

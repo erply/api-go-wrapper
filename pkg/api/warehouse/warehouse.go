@@ -3,16 +3,15 @@ package warehouse
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"strconv"
 )
 
-/*
 type (
 	GetWarehousesResponse struct {
 		Status     common.Status `json:"status"`
-		Warehouses Warehouses `json:"records"`
+		Warehouses Warehouses    `json:"records"`
 	}
 
 	Warehouse struct {
@@ -56,16 +55,12 @@ type (
 	}
 
 	Warehouses []Warehouse
-
-	WarehouseManager interface {
-		GetWarehouses(ctx context.Context) (Warehouses, error)
-	}
 )
 
 //GetWarehouses ...
 func (cli *Client) GetWarehouses(ctx context.Context) (Warehouses, error) {
 
-	resp, err := cli.SendRequest(ctx, api.GetWarehousesMethod, map[string]string{"warehouseID": "0"})
+	resp, err := cli.SendRequest(ctx, "getWarehouses", map[string]string{"warehouseID": "0"})
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +80,3 @@ func (cli *Client) GetWarehouses(ctx context.Context) (Warehouses, error) {
 
 	return res.Warehouses, nil
 }
-*/

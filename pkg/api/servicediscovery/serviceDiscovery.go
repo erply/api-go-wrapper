@@ -1,6 +1,15 @@
 package servicediscovery
 
-/*
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/erply/api-go-wrapper/pkg/common"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"github.com/pkg/errors"
+	"strconv"
+)
+
 type ServiceDiscoverer interface {
 	GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, error)
 }
@@ -43,4 +52,3 @@ func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, 
 	}
 	return &res.Records[0], nil
 }
-*/

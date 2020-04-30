@@ -106,7 +106,7 @@ type (
 		Total        float64 `json:"total"`
 	}
 
-	SalesDocumentManager interface {
+	DocumentManager interface {
 		SaveSalesDocument(ctx context.Context, filters map[string]string) (SaleDocImportReports, error)
 		GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error)
 		DeleteDocument(ctx context.Context, filters map[string]string) error

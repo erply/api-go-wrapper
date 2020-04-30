@@ -2,11 +2,9 @@ package sales
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/api"
 	"testing"
 )
 
-/*
 func TestProjectManager(t *testing.T) {
 	const (
 		//fill your data here
@@ -14,7 +12,7 @@ func TestProjectManager(t *testing.T) {
 		cc = ""
 	)
 
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 	//test this
 	t.Run("test GetProjects", func(t *testing.T) {
 		resp, err := cli.GetProjects(context.Background(), map[string]string{})
@@ -34,4 +32,3 @@ cli := NewClient(sk, cc,"", nil)
 		t.Log(resp)
 	})
 }
-*/

@@ -1,6 +1,15 @@
 package sales
 
-/*
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/erply/api-go-wrapper/pkg/common"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"net/http"
+	"strconv"
+)
+
 type ShoppingCartTotals struct {
 	Rows     []ShoppingCartProduct `json:"rows"`
 	NetTotal float64               `json:"netTotal"`
@@ -22,7 +31,7 @@ type ShoppingCartProduct struct {
 
 func (cli *Client) CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error) {
 
-	resp, err := cli.SendRequest(ctx, api.calculateShoppingCartMethod, filters)
+	resp, err := cli.SendRequest(ctx, "calculateShoppingCart", filters)
 	if err != nil {
 		return nil, erro.NewFromError("CalculateShoppingCart: error sending request", err)
 	}
@@ -47,4 +56,3 @@ func (cli *Client) CalculateShoppingCart(ctx context.Context, filters map[string
 
 	return respData.Records[0], nil
 }
-*/

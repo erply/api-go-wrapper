@@ -1,6 +1,10 @@
 package warehouse
 
-/*
+import (
+	"context"
+	"testing"
+)
+
 //works
 func TestErplyClient_GetWarehouses(t *testing.T) {
 	const (
@@ -9,7 +13,7 @@ func TestErplyClient_GetWarehouses(t *testing.T) {
 		cc = ""
 	)
 
-cli := NewClient(sk, cc,"", nil)
+	cli := NewClient(sk, cc, "", nil)
 	resp, err := cli.GetWarehouses(context.Background())
 	if err != nil {
 		t.Error(err)
@@ -17,4 +21,3 @@ cli := NewClient(sk, cc,"", nil)
 	}
 	t.Log(resp)
 }
-*/

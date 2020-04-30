@@ -1,12 +1,11 @@
 package sales
 
-/*
 import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
+	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 )
 
@@ -28,23 +27,10 @@ type (
 		Info         string `json:"info"`         // Information about the payer or payment transaction
 		Added        uint64 `json:"added"`
 	}
-	PaymentManager interface {
-		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
-		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
-	}
 )
 
 func (cli *Client) SavePayment(ctx context.Context, filters map[string]string) (int64, error) {
-
-		params.Add("documentID", strconv.Itoa(in.DocumentID))
-		params.Add("type", in.Type)
-		params.Add("currencyCode", in.CurrencyCode)
-		params.Add("date", in.Date)
-		params.Add("sum", in.Sum)
-		params.Add("info", in.Info)
-
-
-	resp, err := cli.SendRequest(ctx, api.savePaymentMethod, filters)
+	resp, err := cli.SendRequest(ctx, "savePayment", filters)
 	if err != nil {
 		return 0, erro.NewFromError("SavePayment: error sending POST request", err)
 	}
@@ -75,7 +61,7 @@ func (cli *Client) SavePayment(ctx context.Context, filters map[string]string) (
 }
 
 func (cli *Client) GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error) {
-	resp, err := cli.SendRequest(ctx, api.GetPaymentsMethod, filters)
+	resp, err := cli.SendRequest(ctx, "getPayments", filters)
 	if err != nil {
 		return nil, erro.NewFromError("GetPayments: error sending request", err)
 	}
@@ -99,4 +85,3 @@ func (cli *Client) GetPayments(ctx context.Context, filters map[string]string) (
 
 	return respData.Records, nil
 }
-*/
