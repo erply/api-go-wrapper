@@ -17,7 +17,7 @@ func TestTokenRequests(t *testing.T) {
 	var (
 		ctx = context.Background()
 	)
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 
 	t.Run("test VerifyIdentityToken", func(t *testing.T) {
 		resp, err := cli.VerifyIdentityToken(ctx, jwt)

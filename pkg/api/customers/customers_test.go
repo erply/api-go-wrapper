@@ -23,7 +23,7 @@ func TestCustomerManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	t.Run("test get customers", func(t *testing.T) {
 		resp, err := cli.GetCustomers(ctx, map[string]string{})
 		if err != nil {

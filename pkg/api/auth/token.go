@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
-	"net/http"
 	"strconv"
 )
 
@@ -45,15 +44,20 @@ type (
 		GetJWTToken(ctx context.Context) (*JwtToken, error)
 	}
 
-	Client struct{ *common.Client }
+	Client        struct{ *common.Client }
+	PartnerClient struct{ *common.Client }
 )
 
-func NewClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
+func NewClient(client *common.Client) *Client {
 
 	cli := &Client{
-		common.NewClient(sk, cc, partnerKey, httpCli),
+		client,
 	}
 	return cli
+}
+
+func NewPartnerClient(client *common.Client) *PartnerClient {
+	return &PartnerClient{client}
 }
 
 //VerifyIdentityToken ...
@@ -102,7 +106,7 @@ func (cli *Client) GetIdentityToken(ctx context.Context) (*IdentityToken, error)
 }
 
 //only for partnerClient
-func (cli *Client) GetJWTToken(ctx context.Context) (*JwtToken, error) {
+func (cli *PartnerClient) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 
 	resp, err := cli.SendRequest(ctx, "getJwtToken", map[string]string{})
 	if err != nil {

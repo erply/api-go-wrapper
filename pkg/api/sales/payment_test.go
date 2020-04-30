@@ -2,6 +2,7 @@ package sales
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 
@@ -18,7 +19,7 @@ func TestPaymentManager(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	t.Run("test save payment", func(t *testing.T) {
 		params := map[string]string{
 			"documentID":   documentID,

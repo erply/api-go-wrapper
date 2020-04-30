@@ -23,7 +23,7 @@ func TestSupplierManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	t.Run("test get suppliers", func(t *testing.T) {
 		suppliers, err := cli.GetSuppliers(ctx, map[string]string{})
 		if err != nil {

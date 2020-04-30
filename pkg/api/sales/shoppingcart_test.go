@@ -2,6 +2,7 @@ package sales
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestShoppingCart(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	t.Run("test shopping cart", func(t *testing.T) {
 
 		paymentID, err := cli.CalculateShoppingCart(ctx, map[string]string{})

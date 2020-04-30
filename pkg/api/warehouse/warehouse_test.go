@@ -2,6 +2,7 @@ package warehouse
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 
@@ -13,7 +14,7 @@ func TestErplyClient_GetWarehouses(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	resp, err := cli.GetWarehouses(context.Background())
 	if err != nil {
 		t.Error(err)

@@ -2,6 +2,7 @@ package products
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestProductManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 
 	t.Run("test GetProducts", func(t *testing.T) {
 		products, err := cli.GetProducts(ctx, map[string]string{})

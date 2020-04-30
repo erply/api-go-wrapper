@@ -1,15 +1,8 @@
 package api
 
 import (
-	"github.com/erply/api-go-wrapper/pkg/api/customers"
-	"github.com/erply/api-go-wrapper/pkg/api/sales"
 	"github.com/erply/api-go-wrapper/pkg/common"
 )
-
-type PostPurchaseDocumentResponse struct {
-	Status        common.Status            `json:"status"`
-	ImportReports PurchaseDocImportReports `json:"records"`
-}
 
 type GetCountriesResponse struct {
 	Status    common.Status `json:"status"`
@@ -36,66 +29,6 @@ type CustomerDataProcessingLog struct {
 	fields       []string
 	customerIds  []int
 }
-type DocumentDatas []DocumentData
-
-type DocumentData struct {
-	//Document type
-	Type string
-	//Currency code: "EUR", "USD" etc. Currency must be defined in your Erply account.
-	CurrencyCode string
-	//eg. 2010-01-29
-	//Each sales document must have a date. If omitted, API applies current date.
-	Date string
-	//eg. 14:59:00
-	//If omitted, API applies current time.
-	Time string
-	//Assign a custom number to this sales document. As opposed to invoiceNo, this field may contain letters, spacing and punctuation.
-	CustomNumber string
-	// number of invoice document in provider system
-	InvoiceNumber string
-	// Invoice content text
-	InvoiceContentText string
-	///Sales document's custom reference number. This field must be used only if you want to override default reference numbers.
-	CustomReferenceNumber string
-	//Notes printed on the invoice
-	Notes string
-	//Additional text
-	Text string
-	//Status of the document itself.
-	//For invoices, possible values: PENDING, READY, MAILED, PRINTED. For orders, possible values are: PENDING, READY, SHIPPED, FULFILLED, CANCELLED
-	InvoiceState InvoiceState
-	//Expected invoice payment method: eg. CASH, CARD, TRANSFER, CHECK, GIFTCARD.
-	PaymentType sales.PaymentType
-	// DEB for debit and CRED for credit
-	PaymentMethod string
-	//By default: system-specific, usually 14.
-	//In how many days the invoice is due.
-	PaymentDays string
-	//Invoice payment status.
-	//Possible values: PAID, UNPAID.
-	PaymentStatus sales.PaymentStatus
-	//Invoice payment information, who paid, when, how.
-	//Max 255 characters
-	PaymentInfo string
-	//Payment reference number
-	PaymentReferenceNumber string
-	//ISO date (yyyy-mm-dd)
-	// Customer requested delivery date (for the whole document). You may also set requested delivery dates for each line individually, see deliveryDate#
-	DeliveryDate string
-	//ISO date (yyyy-mm-dd)
-	ShippingDate string
-	//Search by exact warehouse code.
-	WarehouseCode string
-	//seller company registry code
-	Seller   customers.CustomerRequest
-	Payer    customers.CustomerRequest
-	Buyer    customers.CustomerRequest
-	Delivery customers.CustomerRequest
-
-	ProductRows ProductRows
-	CustomerId  uint
-}
-
 type ProductRows []ProductRow
 
 type ProductRow struct {
@@ -120,14 +53,6 @@ type ProductRow struct {
 
 type InvoiceState string
 
-type PurchaseDocImportReports []PurchaseDocImportReport
-type PurchaseDocImportReport struct {
-	InvoiceID    int    `json:"invoiceID"`
-	CustomNumber string `json:"customNumber"`
-	Rounding     int    `json:"rounding"`
-	Total        int    `json:"total"`
-}
-
 type UserCredentials struct {
 	UserName string `json:"username"`
 	Password string `json:"password"`
@@ -142,8 +67,8 @@ type Records struct {
 }
 
 type GetUserRightsResponse struct {
-	Status  Status       `json:"status"`
-	Records []UserRights `json:"records"`
+	Status  common.Status `json:"status"`
+	Records []UserRights  `json:"records"`
 }
 
 type UserRights struct {
@@ -154,7 +79,7 @@ type Country struct {
 	CountryName           string `json:"countryName"`
 	CountryCode           string `json:"countryCode"`
 	MemberOfEuropeanUnion byte   `json:"memberOfEuropeanUnion"`
-	LastModified          string `json:"lastModified"`
+	LastModified          int    `json:"lastModified"`
 	Added                 uint64 `json:"added"`
 }
 

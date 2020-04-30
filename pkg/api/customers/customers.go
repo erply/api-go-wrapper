@@ -140,10 +140,10 @@ type (
 	}
 )
 
-func NewClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
+func NewClient(client *common.Client) *Client {
 
 	cli := &Client{
-		common.NewClient(sk, cc, partnerKey, httpCli),
+		client,
 	}
 	return cli
 }

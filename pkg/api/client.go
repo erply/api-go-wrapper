@@ -19,54 +19,10 @@ import (
 	"net/url"
 )
 
-//IClient interface for cached and simple client
-type IClient interface {
-	/*	servicediscovery.ServiceDiscoverer
-		auth.TokenProvider
-		configuration.ConfManager
-		warehouse.WarehouseManager
+type Client struct {
+	commonClient *common.Client
 
-		GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
-
-		//sales document requests
-		sales.SalesDocumentManager
-
-		//customer requests
-		customers.CustomerManager
-
-		//supplier requests
-		customers.SupplierManager
-
-		sales.VatRateManager
-		company.CompanyManager
-
-		products.ProductManager
-
-		GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
-		GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
-		GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
-
-		//project requests
-		sales.ProjectManager
-
-		GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
-		SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
-
-		pos.PointOfSaleManager
-		sales.PaymentManager*/
-
-	//CalculateShoppingCart(in *DocumentData) (*sales.ShoppingCartTotals, error)
-	//
-	//Close()
-}
-
-type IPartnerClient interface {
-	IClient
-	auth.PartnerTokenProvider
-}
-
-type erplyClient struct {
-	*common.Client
+	//Address requests
 	AddressProvider addresses.Manager
 	//Token requests
 	AuthProvider auth.Provider
@@ -74,13 +30,18 @@ type erplyClient struct {
 	CompanyManager company.Manager
 	//Customers and suppliers requests
 	CustomerManager customers.Manager
-	PosManager      pos.Manager
-	ProductManager  products.Manager
+	//POS related requests
+	PosManager pos.Manager
+	//Products related requests
+	ProductManager products.Manager
 
 	//SalesDocuments, Payments, Projects, ShoppingCart, VatRates
 	SalesManager sales.Manager
 
-	WarehouseManager  warehouse.Manager
+	//Warehouse requests
+	WarehouseManager warehouse.Manager
+
+	//Service Discovery
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
 }
 
@@ -121,7 +82,7 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 // clientCode erply customer identification number
 // and a custom http Client if needs to be overwritten. if nil will use default http client provided by the SDK
 
-func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, error) {
+func NewClient(sessionKey, clientCode string, customCli *http.Client) (*Client, error) {
 
 	if sessionKey == "" || clientCode == "" {
 		return nil, errors.New("sessionKey and clientCode are required")
@@ -135,17 +96,22 @@ func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, 
 		c = clientCode
 		h = customCli
 	)
-	cli := &erplyClient{
-		AddressProvider:   addresses.NewClient(s, c, "", h),
-		AuthProvider:      auth.NewClient(s, c, "", h),
-		CompanyManager:    company.NewClient(s, c, "", h),
-		CustomerManager:   customers.NewClient(s, c, "", h),
-		PosManager:        pos.NewClient(s, c, "", h),
-		ProductManager:    products.NewClient(s, c, "", h),
-		SalesManager:      sales.NewClient(s, c, "", h),
-		WarehouseManager:  warehouse.NewClient(s, c, "", h),
-		ServiceDiscoverer: servicediscovery.NewClient(s, c, "", h),
-	}
+	comCli := common.NewClient(s, c, "", h)
 
-	return cli, nil
+	return newErplyClient(comCli), nil
+}
+
+func newErplyClient(c *common.Client) *Client {
+	return &Client{
+		commonClient:      c,
+		AddressProvider:   addresses.NewClient(c),
+		AuthProvider:      auth.NewClient(c),
+		CompanyManager:    company.NewClient(c),
+		CustomerManager:   customers.NewClient(c),
+		PosManager:        pos.NewClient(c),
+		ProductManager:    products.NewClient(c),
+		SalesManager:      sales.NewClient(c),
+		WarehouseManager:  warehouse.NewClient(c),
+		ServiceDiscoverer: servicediscovery.NewClient(c),
+	}
 }

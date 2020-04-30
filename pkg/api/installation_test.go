@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-/*
 //works
 func TestCreateInstallation(t *testing.T) {
 	const (
@@ -15,11 +14,11 @@ func TestCreateInstallation(t *testing.T) {
 	)
 	var (
 		req = &InstallationRequest{
-			CompanyName: "aaa",
-			FirstName:   "aasd",
-			LastName:    "asdasd",
-			Phone:       "asd",
-			Email:       "asd@asd.ee",
+			CompanyName: "",
+			FirstName:   "",
+			LastName:    "",
+			Phone:       "",
+			Email:       "",
 			SendEmail:   0,
 		}
 		cli = &http.Client{Timeout: 10 * time.Second}
@@ -32,4 +31,3 @@ func TestCreateInstallation(t *testing.T) {
 	}
 	t.Log(resp)
 }
-*/

@@ -105,11 +105,23 @@ type (
 		Rounding     float64 `json:"rounding"`
 		Total        float64 `json:"total"`
 	}
+	PurchaseDocImportReports []PurchaseDocImportReport
+	PurchaseDocImportReport  struct {
+		InvoiceID    int    `json:"invoiceID"`
+		CustomNumber string `json:"customNumber"`
+		Rounding     int    `json:"rounding"`
+		Total        int    `json:"total"`
+	}
 
+	SavePurchaseDocumentResponse struct {
+		Status        common.Status            `json:"status"`
+		ImportReports PurchaseDocImportReports `json:"records"`
+	}
 	DocumentManager interface {
 		SaveSalesDocument(ctx context.Context, filters map[string]string) (SaleDocImportReports, error)
 		GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error)
 		DeleteDocument(ctx context.Context, filters map[string]string) error
+		SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
 	}
 )
 
@@ -125,6 +137,27 @@ func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]str
 
 	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.ImportReports) == 0 {
+		return nil, nil
+	}
+
+	return res.ImportReports, nil
+}
+
+func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error) {
+	resp, err := cli.SendRequest(ctx, "savePurchaseDocument", filters)
+	if err != nil {
+		return nil, erro.NewFromError("savePurchaseDocument"+" request failed", err)
+	}
+	res := &SavePurchaseDocumentResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("unmarshaling savePurchaseDocumentResponse failed", err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+res.Status.ErrorField+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.ImportReports) == 0 {

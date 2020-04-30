@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 type InstallationRequest struct {
@@ -26,29 +25,29 @@ type InstallationResponse struct {
 	Password   string `json:"password"`
 }
 
-func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli *http.Client) (*InstallationResponse, error) {
+func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, httpCli *http.Client) (*InstallationResponse, error) {
 
-	if cli == nil {
+	if httpCli == nil {
 		return nil, errors.New("no http cli provided")
 	}
-	/*
-		params := url.Values{}
-		params.Add("request", createInstallationMethod)
-		params.Add("partnerKey", partnerKey)
-		params.Add("companyName", in.CompanyName)
-		params.Add("firstName", in.FirstName)
-		params.Add("lastName", in.LastName)
-		params.Add("phone", in.Phone)
-		params.Add("email", in.Email)
-		params.Add("sendEmail", strconv.Itoa(in.SendEmail))
-	*/
-	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(params.Encode()))
+
+	params := url.Values{}
+	params.Add("request", createInstallationMethod)
+	params.Add("partnerKey", partnerKey)
+	params.Add("companyName", in.CompanyName)
+	params.Add("firstName", in.FirstName)
+	params.Add("lastName", in.LastName)
+	params.Add("phone", in.Phone)
+	params.Add("email", in.Email)
+	params.Add("sendEmail", strconv.Itoa(in.SendEmail))
+
+	req, err := http.NewRequest("POST", baseUrl, nil)
 	if err != nil {
 		return nil, erro.NewFromError("failed to build HTTP request", err)
 
 	}
 	req.URL.RawQuery = params.Encode()
-	resp, err := cli.Do(req, &erplyClient{httpClient: cli})
+	resp, err := httpCli.Do(req)
 	if err != nil {
 		return nil, erro.NewFromError("CreateInstallation: error sending POST request", err)
 	}
@@ -58,7 +57,7 @@ func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli
 	}
 
 	var respData struct {
-		Status  Status
+		Status  common.Status
 		Records []InstallationResponse
 	}
 

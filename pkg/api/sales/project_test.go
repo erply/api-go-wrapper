@@ -2,6 +2,7 @@ package sales
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/pkg/common"
 	"testing"
 )
 
@@ -12,7 +13,7 @@ func TestProjectManager(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(sk, cc, "", nil)
+	cli := NewClient(common.NewClient(sk, cc, "", nil))
 	//test this
 	t.Run("test GetProjects", func(t *testing.T) {
 		resp, err := cli.GetProjects(context.Background(), map[string]string{})
