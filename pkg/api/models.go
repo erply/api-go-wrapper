@@ -1,5 +1,11 @@
 package api
 
+import (
+	"github.com/erply/api-go-wrapper/pkg/api/customers"
+	"github.com/erply/api-go-wrapper/pkg/api/products"
+	"github.com/erply/api-go-wrapper/pkg/api/sales"
+)
+
 type Status struct {
 	Request           string  `json:"request"`
 	RequestUnixTime   int     `json:"requestUnixTime"`
@@ -70,7 +76,7 @@ type DocumentData struct {
 	//For invoices, possible values: PENDING, READY, MAILED, PRINTED. For orders, possible values are: PENDING, READY, SHIPPED, FULFILLED, CANCELLED
 	InvoiceState InvoiceState
 	//Expected invoice payment method: eg. CASH, CARD, TRANSFER, CHECK, GIFTCARD.
-	PaymentType PaymentType
+	PaymentType sales.PaymentType
 	// DEB for debit and CRED for credit
 	PaymentMethod string
 	//By default: system-specific, usually 14.
@@ -78,7 +84,7 @@ type DocumentData struct {
 	PaymentDays string
 	//Invoice payment status.
 	//Possible values: PAID, UNPAID.
-	PaymentStatus PaymentStatus
+	PaymentStatus sales.PaymentStatus
 	//Invoice payment information, who paid, when, how.
 	//Max 255 characters
 	PaymentInfo string
@@ -92,10 +98,10 @@ type DocumentData struct {
 	//Search by exact warehouse code.
 	WarehouseCode string
 	//seller company registry code
-	Seller   CustomerRequest
-	Payer    CustomerRequest
-	Buyer    CustomerRequest
-	Delivery CustomerRequest
+	Seller   customers.CustomerRequest
+	Payer    customers.CustomerRequest
+	Buyer    customers.CustomerRequest
+	Delivery customers.CustomerRequest
 
 	ProductRows ProductRows
 	CustomerId  uint
@@ -159,7 +165,7 @@ type PurchaseDocImportReport struct {
 type InvoiceRow struct {
 	RowID             string `json:"rowID"`
 	ProductID         string `json:"productID"`
-	Product           *Product
+	Product           *products.Product
 	ItemName          string  `json:"itemName"`
 	Barcode           string  `json:"barcode"`
 	VatrateID         string  `json:"vatrateID"`

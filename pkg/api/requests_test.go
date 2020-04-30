@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+/*
 //here the "works" indicator will be under each test separately
 func TestApiRequests(t *testing.T) {
 	const (
@@ -30,3 +31,4 @@ func TestApiRequests(t *testing.T) {
 		t.Log(resp)
 	})
 }
+*/

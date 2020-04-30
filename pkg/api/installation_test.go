@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+/*
 //works
 func TestCreateInstallation(t *testing.T) {
 	const (
@@ -31,3 +32,4 @@ func TestCreateInstallation(t *testing.T) {
 	}
 	t.Log(resp)
 }
+*/

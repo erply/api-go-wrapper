@@ -1,10 +1,12 @@
 package api
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/erply/api-go-wrapper/pkg/api/addresses"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"net"
 	"net/http"
 	"net/url"
@@ -13,57 +15,52 @@ import (
 
 //IClient interface for cached and simple client
 type IClient interface {
-	ServiceDiscoverer
-	TokenProvider
-	ConfManager
-	WarehouseManager
+	/*	servicediscovery.ServiceDiscoverer
+		auth.TokenProvider
+		configuration.ConfManager
+		warehouse.WarehouseManager
 
-	GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
+		GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
 
-	//sales document requests
-	SalesDocumentManager
+		//sales document requests
+		sales.SalesDocumentManager
 
-	//customer requests
-	CustomerManager
+		//customer requests
+		customers.CustomerManager
 
-	//supplier requests
-	SupplierManager
+		//supplier requests
+		customers.SupplierManager
 
-	VatRateManager
-	CompanyManager
+		sales.VatRateManager
+		company.CompanyManager
 
-	ProductManager
+		products.ProductManager
 
-	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
-	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
-	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
+		GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
+		GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
+		GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 
-	//project requests
-	ProjectManager
+		//project requests
+		sales.ProjectManager
 
-	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
-	SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
+		GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
+		SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
 
-	PointOfSaleManager
-	PaymentManager
-	AddressManager
+		pos.PointOfSaleManager
+		sales.PaymentManager*/
 
-	CalculateShoppingCart(in *DocumentData) (*ShoppingCartTotals, error)
-
-	Close()
+	//CalculateShoppingCart(in *DocumentData) (*sales.ShoppingCartTotals, error)
+	//
+	//Close()
 }
 
 type IPartnerClient interface {
 	IClient
-	PartnerTokenProvider
+	auth.PartnerTokenProvider
 }
 
 type erplyClient struct {
-	sessionKey string
-	clientCode string
-	partnerKey string
-	url        string
-	httpClient *http.Client
+	AddressProvider *addresses.Client
 }
 
 //VerifyUser will give you session key
@@ -77,7 +74,7 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 
 	req, err := http.NewRequest("POST", requestUrl, nil)
 	if err != nil {
-		return "", erplyerr("failed to build HTTP request", err)
+		return "", erro.NewFromError("failed to build HTTP request", err)
 	}
 
 	req.URL.RawQuery = params.Encode()
@@ -85,15 +82,15 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return "", erplyerr("failed to build VerifyUser request", err)
+		return "", erro.NewFromError("failed to build VerifyUser request", err)
 	}
 
 	res := &VerifyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", erplyerr("failed to decode VerifyUserResponse", err)
+		return "", erro.NewFromError("failed to decode VerifyUserResponse", err)
 	}
 	if len(res.Records) < 1 {
-		return "", erplyerr("VerifyUser: no records in response", nil)
+		return "", erro.NewFromError("VerifyUser: no records in response", nil)
 	}
 	return res.Records[0].SessionKey, nil
 }
@@ -102,61 +99,27 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
 // and a custom http Client if needs to be overwritten. if nil will use default http client provided by the SDK
+
 func NewClient(sessionKey, clientCode string, customCli *http.Client) (IClient, error) {
 
 	if sessionKey == "" || clientCode == "" {
 		return nil, errors.New("sessionKey and clientCode are required")
 	}
-
-	cli := erplyClient{
-		sessionKey: sessionKey,
-		clientCode: clientCode,
-		url:        fmt.Sprintf(baseURL, clientCode),
-		httpClient: getDefaultHTTPClient(),
-	}
+	httpCli := getDefaultHTTPClient()
 	if customCli != nil {
-		cli.httpClient = customCli
+		httpCli = customCli
 	}
-	return &cli, nil
-}
-
-func NewPartnerClient(sessionKey, clientCode, partnerKey string, customCli *http.Client) (IPartnerClient, error) {
-	if sessionKey == "" || clientCode == "" || partnerKey == "" {
-		return nil, errors.New("sessionKey, clientCode and partnerKey are required")
+	//declare short getters
+	var (
+		//sessionKey
+		s = sessionKey
+		//clientCode
+		c = clientCode
+		h = httpCli
+	)
+	cli := &erplyClient{
+		AddressProvider: addresses.NewClient(s, c, "", h),
 	}
 
-	cli := erplyClient{
-		sessionKey: sessionKey,
-		clientCode: clientCode,
-		partnerKey: partnerKey,
-		url:        fmt.Sprintf(baseURL, clientCode),
-		httpClient: getDefaultHTTPClient(),
-	}
-	if customCli != nil {
-		cli.httpClient = customCli
-	}
-	return &cli, nil
-}
-
-func (cli *erplyClient) Close() {
-	cli.httpClient.CloseIdleConnections()
-}
-
-func getDefaultHTTPClient() *http.Client {
-	return &http.Client{
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout:   10 * time.Second,
-				KeepAlive: 10 * time.Second,
-			}).DialContext,
-			TLSHandshakeTimeout: 10 * time.Second,
-
-			ExpectContinueTimeout: 4 * time.Second,
-			ResponseHeaderTimeout: 3 * time.Second,
-
-			MaxIdleConns:    MaxIdleConns,
-			MaxConnsPerHost: MaxConnsPerHost,
-		},
-		Timeout: 5 * time.Second,
-	}
+	return cli, nil
 }

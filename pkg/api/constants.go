@@ -39,12 +39,4 @@ const (
 	VerifyCustomerUserMethod          = "verifyCustomerUser"
 	calculateShoppingCartMethod       = "calculateShoppingCart"
 	validateCustomerUsernameMethod    = "validateCustomerUsername"
-	clientCode                        = "clientCode"
-	sessionKey                        = "sessionKey"
-	responseStatusOK                  = "ok"
-	//MaxIdleConns for Erply API
-	MaxIdleConns = 25
-
-	//MaxConnsPerHost for Erply API
-	MaxConnsPerHost = 25
 )

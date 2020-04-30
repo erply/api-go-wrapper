@@ -1,8 +1,10 @@
 package api
 
+/*
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -37,17 +39,17 @@ func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli
 
 	req, err := http.NewRequest("POST", baseUrl, strings.NewReader(params.Encode()))
 	if err != nil {
-		return nil, erplyerr("failed to build HTTP request", err)
+		return nil, erro.NewFromError("failed to build HTTP request", err)
 
 	}
 	req.URL.RawQuery = params.Encode()
-	resp, err := doRequest(req, &erplyClient{httpClient: cli})
+	resp, err := common.doRequest(req, &erplyClient{httpClient: cli})
 	if err != nil {
-		return nil, erplyerr("CreateInstallation: error sending POST request", err)
+		return nil, erro.NewFromError("CreateInstallation: error sending POST request", err)
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return nil, erplyerr(fmt.Sprintf("CreateInstallation: bad response status code: %d", resp.StatusCode), nil)
+		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: bad response status code: %d", resp.StatusCode), nil)
 	}
 
 	var respData struct {
@@ -57,15 +59,16 @@ func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, cli
 
 	err = json.NewDecoder(resp.Body).Decode(&respData)
 	if err != nil {
-		return nil, erplyerr("CreateInstallation: error decoding JSON response body", err)
+		return nil, erro.NewFromError("CreateInstallation: error decoding JSON response body", err)
 	}
 	if respData.Status.ErrorCode != 0 {
 		fmt.Println(respData.Status.ErrorField)
-		return nil, erplyerr(fmt.Sprintf("CreateInstallation: API error %d", respData.Status.ErrorCode), nil)
+		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: API error %d", respData.Status.ErrorCode), nil)
 	}
 	if len(respData.Records) < 1 {
-		return nil, erplyerr("CreateInstallation: no records in response", nil)
+		return nil, erro.NewFromError("CreateInstallation: no records in response", nil)
 	}
 
 	return &respData.Records[0], nil
 }
+*/

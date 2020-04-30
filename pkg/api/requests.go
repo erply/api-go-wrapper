@@ -1,10 +1,12 @@
 package api
 
+/*
 import (
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	erro "github.com/erply/api-go-wrapper/pkg/errors"
 	"net/http"
 	"strconv"
@@ -12,15 +14,15 @@ import (
 
 // GetCountries will list countries according to specified filters.
 func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]string) ([]Country, error) {
-	resp, err := cli.sendRequest(ctx, GetCountriesMethod, filters)
+	resp, err := cli.SendRequest(ctx, GetCountriesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
 	var res GetCountriesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("failed to unmarshal GetCountriesResponse", err)
+		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Countries, nil
@@ -29,16 +31,16 @@ func (cli *erplyClient) GetCountries(ctx context.Context, filters map[string]str
 //GetUserName from GetUserRights erply API request
 func (cli *erplyClient) GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error) {
 
-	resp, err := cli.sendRequest(ctx, GetUserRightsMethod, filters)
+	resp, err := cli.SendRequest(ctx, GetUserRightsMethod, filters)
 	if err != nil {
-		return nil, erplyerr(GetUserRightsMethod+" request failed", err)
+		return nil, erro.NewFromError(GetUserRightsMethod+" request failed", err)
 	}
 	res := &GetUserRightsResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("unmarshaling GetUserRightsResponse failed", err)
+		return nil, erro.NewFromError("unmarshaling GetUserRightsResponse failed", err)
 	}
 
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
@@ -51,15 +53,15 @@ func (cli *erplyClient) GetUserRights(ctx context.Context, filters map[string]st
 
 // GetEmployees will list employees according to specified filters.
 func (cli *erplyClient) GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error) {
-	resp, err := cli.sendRequest(ctx, GetEmployeesMethod, filters)
+	resp, err := cli.SendRequest(ctx, GetEmployeesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
 	var res GetEmployeesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("failed to unmarshal GetEmployeesResponse", err)
+		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
 	}
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Employees, nil
@@ -67,15 +69,15 @@ func (cli *erplyClient) GetEmployees(ctx context.Context, filters map[string]str
 
 // GetBusinessAreas will list business areas according to specified filters.
 func (cli *erplyClient) GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error) {
-	resp, err := cli.sendRequest(ctx, GetBusinessAreasMethod, filters)
+	resp, err := cli.SendRequest(ctx, GetBusinessAreasMethod, filters)
 	if err != nil {
 		return nil, err
 	}
 	var res GetBusinessAreasResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("failed to unmarshal GetBusinessAreasResponse", err)
+		return nil, erro.NewFromError("failed to unmarshal GetBusinessAreasResponse", err)
 	}
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.BusinessAreas, nil
@@ -83,31 +85,31 @@ func (cli *erplyClient) GetBusinessAreas(ctx context.Context, filters map[string
 
 // GetCurrencies will list currencies according to specified filters.
 func (cli *erplyClient) GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error) {
-	resp, err := cli.sendRequest(ctx, GetCurrenciesMethod, filters)
+	resp, err := cli.SendRequest(ctx, GetCurrenciesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
 	var res GetCurrenciesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("failed to unmarshal GetCurrenciesResponse", err)
+		return nil, erro.NewFromError("failed to unmarshal GetCurrenciesResponse", err)
 	}
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Currencies, nil
 }
 
 func (cli *erplyClient) SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error) {
-	resp, err := cli.sendRequest(ctx, savePurchaseDocumentMethod, filters)
+	resp, err := cli.SendRequest(ctx, savePurchaseDocumentMethod, filters)
 	if err != nil {
-		return nil, erplyerr(savePurchaseDocumentMethod+" request failed", err)
+		return nil, erro.NewFromError(savePurchaseDocumentMethod+" request failed", err)
 	}
 	res := &PostPurchaseDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erplyerr("unmarshaling savePurchaseDocumentResponse failed", err)
+		return nil, erro.NewFromError("unmarshaling savePurchaseDocumentResponse failed", err)
 	}
 
-	if !isJSONResponseOK(&res.Status) {
+	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
@@ -119,14 +121,15 @@ func (cli *erplyClient) SavePurchaseDocument(ctx context.Context, filters map[st
 }
 
 func (cli *erplyClient) logProcessingOfCustomerData(ctx context.Context, filters map[string]string) error {
-	resp, err := cli.sendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
+	resp, err := cli.SendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
 	if err != nil {
-		return erplyerr("logProcessingOfCustomerData request failed", err)
+		return erro.NewFromError("logProcessingOfCustomerData request failed", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return erplyerr(fmt.Sprintf("Logging response HTTP status is %d", resp.StatusCode), nil)
+		return erro.NewFromError(fmt.Sprintf("Logging response HTTP status is %d", resp.StatusCode), nil)
 	}
 
 	return nil
 }
+*/
