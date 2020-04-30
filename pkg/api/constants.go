@@ -3,19 +3,18 @@ package api
 const (
 	baseURL = "https://%s.erply.com/api/"
 
-	GetSalesDocumentsMethod  = "getSalesDocuments"
-	GetCustomersMethod       = "getCustomers"
-	getSuppliersMethod       = "getSuppliers"
-	GetCountriesMethod       = "getCountries"
-	GetEmployeesMethod       = "getEmployees"
-	GetBusinessAreasMethod   = "getBusinessAreas"
-	GetProjectsMethod        = "getProjects"
-	GetProjectStatusesMethod = "getProjectStatuses"
-	GetCurrenciesMethod      = "getCurrencies"
-	GetVatRatesMethod        = "getVatRates"
-	GetPaymentsMethod        = "getPayments"
-	GetUserRightsMethod      = "getUserRights"
-	//GetCompanyInfoMethod ...
+	GetSalesDocumentsMethod           = "getSalesDocuments"
+	GetCustomersMethod                = "getCustomers"
+	getSuppliersMethod                = "getSuppliers"
+	GetCountriesMethod                = "getCountries"
+	GetEmployeesMethod                = "getEmployees"
+	GetBusinessAreasMethod            = "getBusinessAreas"
+	GetProjectsMethod                 = "getProjects"
+	GetProjectStatusesMethod          = "getProjectStatuses"
+	GetCurrenciesMethod               = "getCurrencies"
+	GetVatRatesMethod                 = "getVatRates"
+	GetPaymentsMethod                 = "getPayments"
+	GetUserRightsMethod               = "getUserRights"
 	GetCompanyInfoMethod              = "getCompanyInfo"
 	VerifyIdentityTokenMethod         = "verifyIdentityToken"
 	GetPointsOfSaleMethod             = "getPointsOfSale"
@@ -40,23 +39,4 @@ const (
 	VerifyCustomerUserMethod          = "verifyCustomerUser"
 	calculateShoppingCartMethod       = "calculateShoppingCart"
 	validateCustomerUsernameMethod    = "validateCustomerUsername"
-	clientCode                        = "clientCode"
-	sessionKey                        = "sessionKey"
-	applicationKey                    = "applicationKey"
-	responseStatusOK                  = "ok"
-	Cash                              = "CASH"
-	Card                              = "CARD"
-	Transfer                          = "TRANSFER"
-	Check                             = "CHECK"
-	Paid                              = "PAID"
-	Unpaid                            = "UNPAID"
-	BankTransfer                      = "Direct bank transfer"
-	CheckPayment                      = "Check payments"
-	PayPal                            = "PayPal"
-	CashOnDelivery                    = "Cash on delivery"
-	//MaxIdleConns for Erply API
-	MaxIdleConns = 25
-
-	//MaxConnsPerHost for Erply API
-	MaxConnsPerHost = 25
 )

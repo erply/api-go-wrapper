@@ -1,6 +1,9 @@
 package errors
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/pkg/errors"
+)
 
 type ErplyError struct {
 	error
@@ -14,4 +17,11 @@ func (e *ErplyError) Error() string {
 
 func NewErplyError(status string, msg string) *ErplyError {
 	return &ErplyError{Status: status, Message: msg}
+}
+
+func NewFromError(msg string, err error) *ErplyError {
+	if err != nil {
+		return NewErplyError("Error", errors.Wrap(err, msg).Error())
+	}
+	return NewErplyError("Error", msg)
 }
