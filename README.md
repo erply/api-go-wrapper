@@ -8,13 +8,15 @@ This SDK covers the [ERPLY API](https://erply.com/erply-api/) requests.
 Client Structure
 ------
 Majority of the request wrappers are available through the client.
-The client is described in `GoDoc` type `Client` and in `pkg/api/client.go`. It is divided into sub-clients for each topic that the underlying API covers. 
-For now not all the requests are mapped to topics. Such request wrappers are in `pkg/api/` directory. 
-Some of the requests are accessible not from the client, but from the `auth` package of this SDK. They are covered in the example in `examples/` directory.
+The client is described in `GoDoc` type `Client` and in `/pkg/api/client.go`. It is divided into sub-clients for each topic that the underlying API covers. 
+For now not all the requests are mapped to topics. Such request wrappers are in `/pkg/api` directory. 
+Some of the requests are accessible not from the client, but from the `auth` package of this SDK. They are covered in the example in `/examples` directory.
 
 Install
 -------
-   `go get github.com/erply/api-go-wrapper`
+   `go get github.com/erply/api-go-wrapper@X.Y.Z`
+   
+   where X.Y.Z is your desired version.
    
 Clients
 --------
@@ -22,7 +24,7 @@ There are 2 ways of using the API.
 * One is you create a `Partner Client` that will always use the partner key with requests and will have access to the requests that require the partner key.
 * You can use the simple `Client` that will work without the partner key also.
 
-You can find the example in the `examples` directory for the client initialization process
+You can find the example in the `/examples` directory for the client initialization process
 
 Contributing
 -------
