@@ -24,56 +24,6 @@ There are 2 ways of using the API.
 
 You can find the example in the `examples` directory for the client initialization process
 
-Example usage as a service
--------
-```go
-import (
-	"github.com/pkg/errors"
-	"github.com/erply/api-go-wrapper/pkg/api"
-	"strconv"
-	"strings"
-)
-
-type erplyApiService struct {
-	api.IClient
-}
-
-func NewErplyApiService(sessionKey, clientCode string) *erplyApiService {
-	return &erplyApiService{api.NewClient(sessionKey, clientCode, nil)}
-}
-
-//getPointsOfSale erply API request
-func (s *erplyApiService) getPointsOfSale(posID string) (string, error) {
-	res, err := s.GetPointsOfSaleByID(posID)
-	if err != nil {
-		return "", err
-	}
-	return strconv.Itoa(res.WarehouseID), nil
-}
-
-//verifyIdentityToken erply API request
-func (s *erplyApiService) verifyIdentityToken(jwt string) (string, error) {
-	res, err := s.VerifyIdentityToken(jwt)
-	if err != nil {
-		if strings.Contains(err.Error(), "1000") {
-			return "", errors.New("jwt expired")
-		}
-	}
-	return res.SessionKey, nil
-}
-
-//getIdentityToken erply API request
-func (s *erplyApiService) getIdentityToken() (string, error) {
-	res, err := s.GetIdentityToken()
-	if err != nil {
-		if strings.Contains(err.Error(), "1054") {
-			return "", errors.New("API session key expired")
-		}
-	}
-	return res.Jwt, nil
-}
-```
-
 Contributing
 -------
 This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
