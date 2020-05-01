@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
-	"github.com/erply/api-go-wrapper/pkg/common"
 )
 
 func main() {

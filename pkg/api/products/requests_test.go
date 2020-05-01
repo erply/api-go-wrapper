@@ -2,7 +2,7 @@ package products
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/pkg/common"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"testing"
 )
 

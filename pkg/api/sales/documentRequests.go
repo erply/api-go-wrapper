@@ -3,8 +3,8 @@ package sales
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/pkg/common"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	"github.com/erply/api-go-wrapper/internal/common"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
 )
 

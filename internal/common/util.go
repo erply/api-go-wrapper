@@ -3,7 +3,7 @@ package common
 import (
 	"context"
 	"fmt"
-	erro "github.com/erply/api-go-wrapper/pkg/errors"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
 	"net/url"
 	"strings"
