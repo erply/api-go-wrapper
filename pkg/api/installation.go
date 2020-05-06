@@ -8,7 +8,6 @@ import (
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
 	"net/url"
-	"strconv"
 )
 
 type InstallationRequest struct {
@@ -25,21 +24,18 @@ type InstallationResponse struct {
 	Password   string `json:"password"`
 }
 
-func CreateInstallation(baseUrl, partnerKey string, in *InstallationRequest, httpCli *http.Client) (*InstallationResponse, error) {
+func CreateInstallation(baseUrl, partnerKey string, filters map[string]string, httpCli *http.Client) (*InstallationResponse, error) {
 
 	if httpCli == nil {
 		return nil, errors.New("no http cli provided")
 	}
 
 	params := url.Values{}
+	for k, v := range filters {
+		params.Add(k, v)
+	}
 	params.Add("request", createInstallationMethod)
 	params.Add("partnerKey", partnerKey)
-	params.Add("companyName", in.CompanyName)
-	params.Add("firstName", in.FirstName)
-	params.Add("lastName", in.LastName)
-	params.Add("phone", in.Phone)
-	params.Add("email", in.Email)
-	params.Add("sendEmail", strconv.Itoa(in.SendEmail))
 
 	req, err := http.NewRequest("POST", baseUrl, nil)
 	if err != nil {
