@@ -13,18 +13,18 @@ func TestCreateInstallation(t *testing.T) {
 		partnerKey = ""
 	)
 	var (
-		req = &InstallationRequest{
-			CompanyName: "",
-			FirstName:   "",
-			LastName:    "",
-			Phone:       "",
-			Email:       "",
-			SendEmail:   0,
+		filters = map[string]string{
+			"companyName": "",
+			"firstName":   "",
+			"lastName":    "",
+			"phone":       "",
+			"email":       "@.",
+			"sendEmail":   "0",
 		}
 		cli = &http.Client{Timeout: 10 * time.Second}
 	)
 
-	resp, err := CreateInstallation(baseUrl, partnerKey, req, cli)
+	resp, err := CreateInstallation(baseUrl, partnerKey, filters, cli)
 	if err != nil {
 		t.Error(err)
 		return
