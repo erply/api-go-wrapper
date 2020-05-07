@@ -44,34 +44,37 @@ type (
 	//Product ...
 	Product struct {
 		ProductID          int                `json:"productID"`
-		ParentProductID    int                `json:"parentProductID"`
-		Type               string             `json:"type"`
 		Name               string             `json:"name"`
 		NameEng            string             `json:"nameENG"`
-		Description        string             `json:"description"`
-		DescriptionEng     string             `json:"descriptionENG"`
-		DescriptionLong    string             `json:"longdesc"`
-		DescriptionLongEng string             `json:"longdescENG"`
-		Status             string             `json:"status"`
 		Code               string             `json:"code"`
 		Code2              string             `json:"code2"`
 		Code3              *string            `json:"code3"`
+		GroupID            uint               `json:"groupID"`
 		Price              float64            `json:"price"`
+		DisplayedInWebshop byte               `json:"displayedInWebshop"`
+		BrandID            uint               `json:"brandID"`
+		Description        string             `json:"description"`
+		DescriptionLong    string             `json:"longdesc"`
+		DescriptionEng     string             `json:"descriptionENG"`
+		DescriptionLongEng string             `json:"longdescENG"`
+		Added              uint64             `json:"added"`
+		LastModified       uint64             `json:"lastModified"`
+		Vatrate            float64            `json:"vatrate"`
 		PriceWithVat       float32            `json:"priceWithVat"`
 		UnitName           *string            `json:"unitName"`
-		Images             []ProductImage     `json:"images"`
-		DisplayedInWebshop byte               `json:"displayedInWebshop"`
+		BrandName          string             `json:"brandName"`
+		GroupName          string             `json:"groupName"`
 		CategoryId         uint               `json:"categoryID"`
 		CategoryName       string             `json:"categoryName"`
-		BrandID            uint               `json:"brandID"`
-		BrandName          string             `json:"brandName"`
-		GroupID            uint               `json:"groupID"`
-		GroupName          string             `json:"groupName"`
-		Warehouses         map[uint]StockInfo `json:"warehouses"`
-		RelatedProducts    []string           `json:"relatedProducts"`
-		Vatrate            float64            `json:"vatrate"`
+		Status             string             `json:"status"`
+		Images             []ProductImage     `json:"images"`
 		ProductVariations  []string           `json:"productVariations"` // Variations of matrix product
-		VariationList      []ProductVariaton  `json:"variationList"`
+		ParentProductID    int                `json:"parentProductID"`
+		Type               string             `json:"type"`
+		Warehouses         map[uint]StockInfo `json:"warehouses"`
+
+		RelatedProducts []string          `json:"relatedProducts"`
+		VariationList   []ProductVariaton `json:"variationList"`
 	}
 
 	StockInfo struct {
