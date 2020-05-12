@@ -1,4 +1,4 @@
-module github.com/erply/api-go-wrapper
+module github.com/tarmo-randma/api-go-wrapper
 
 go 1.13
 
