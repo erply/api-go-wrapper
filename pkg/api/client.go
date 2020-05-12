@@ -2,6 +2,8 @@ package api
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
@@ -12,7 +14,6 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/sales"
 	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
 	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
-	"net/http"
 )
 
 type Client struct {
@@ -36,6 +37,13 @@ type Client struct {
 
 	//Service Discovery
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
+}
+
+//NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
+//developer more flexibility
+func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
+	comCli := common.NewClient(sk, cc, partnerKey, httpCli)
+	return newErplyClient(comCli)
 }
 
 // NewClient Takes three params:
