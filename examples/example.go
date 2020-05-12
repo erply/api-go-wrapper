@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/auth"
 )
 
 func main() {

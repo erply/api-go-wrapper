@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 func (cli *Client) SavePayment(ctx context.Context, filters map[string]string) (int64, error) {

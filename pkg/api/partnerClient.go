@@ -2,9 +2,10 @@ package api
 
 import (
 	"errors"
-	"github.com/erply/api-go-wrapper/internal/common"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	"net/http"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/auth"
 )
 
 type PartnerClient struct {

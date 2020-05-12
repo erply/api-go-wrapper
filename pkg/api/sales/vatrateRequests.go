@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 //GetVatRatesByVatRateID ...

@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 func (cli *Client) CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error) {

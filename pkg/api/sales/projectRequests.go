@@ -3,9 +3,10 @@ package sales
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 // GetProjects will list projects according to specified filters.

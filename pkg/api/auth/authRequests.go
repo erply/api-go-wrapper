@@ -3,11 +3,12 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 //VerifyUser will give you session key

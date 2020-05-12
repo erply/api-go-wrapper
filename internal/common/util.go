@@ -3,10 +3,11 @@ package common
 import (
 	"context"
 	"fmt"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
 	"net/url"
 	"strings"
+
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 func IsJSONResponseOK(responseStatus *Status) bool {

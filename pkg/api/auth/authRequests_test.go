@@ -2,11 +2,12 @@ package auth
 
 import (
 	"errors"
-	"github.com/erply/api-go-wrapper/internal/common"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"sync"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
 )
 
 func TestGetSessionKeyUserSuccess(t *testing.T) {

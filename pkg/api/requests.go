@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 //this interface sums up the general requests here

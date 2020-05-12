@@ -1,6 +1,6 @@
 package api
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import "github.com/tarmo-randma/api-go-wrapper/internal/common"
 
 type UserRights struct {
 	UserName string `json:"userName"`

@@ -4,16 +4,16 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/erply/api-go-wrapper/internal/common"
-	"github.com/erply/api-go-wrapper/pkg/api/addresses"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
-	"github.com/erply/api-go-wrapper/pkg/api/company"
-	"github.com/erply/api-go-wrapper/pkg/api/customers"
-	"github.com/erply/api-go-wrapper/pkg/api/pos"
-	"github.com/erply/api-go-wrapper/pkg/api/products"
-	"github.com/erply/api-go-wrapper/pkg/api/sales"
-	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
-	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/addresses"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/auth"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/company"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/customers"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/pos"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/products"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/sales"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/servicediscovery"
+	"github.com/tarmo-randma/api-go-wrapper/pkg/api/warehouse"
 )
 
 type Client struct {

@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"github.com/pkg/errors"
 	"strconv"
+
+	"github.com/pkg/errors"
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, error) {

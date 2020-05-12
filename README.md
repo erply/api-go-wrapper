@@ -1,6 +1,6 @@
 ERPLY API Go SDK
 --------
-[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc)
+[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/tarmo-randma/api-go-wrapper/pkg/api?tab=doc)
 [![API Reference](https://img.shields.io/badge/api-reference-blue.svg)](https://learn-api.erply.com/)
 
 This SDK covers the [ERPLY API](https://erply.com/erply-api/) requests. 
@@ -14,7 +14,7 @@ Some of the requests are accessible not from the client, but from the `auth` pac
 
 Install
 -------
-   `go get github.com/erply/api-go-wrapper@X.Y.Z`
+   `go get github.com/tarmo-randma/api-go-wrapper@X.Y.Z`
    
    where X.Y.Z is your desired version.
    

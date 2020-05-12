@@ -3,9 +3,10 @@ package pos
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 // GetPointsOfSale will list points of sale according to specified filters.

@@ -2,8 +2,9 @@ package sales
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/internal/common"
 	"testing"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
 )
 
 func TestProjectManager(t *testing.T) {

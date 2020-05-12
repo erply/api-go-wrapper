@@ -2,8 +2,9 @@ package servicediscovery
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/internal/common"
 	"testing"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
 )
 
 //works

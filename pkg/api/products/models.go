@@ -1,7 +1,7 @@
 package products
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
 )
 
 type (

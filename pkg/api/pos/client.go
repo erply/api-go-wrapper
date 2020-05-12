@@ -1,6 +1,6 @@
 package pos
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import "github.com/tarmo-randma/api-go-wrapper/internal/common"
 
 type (
 	Client struct {

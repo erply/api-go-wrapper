@@ -3,9 +3,10 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
+
+	"github.com/tarmo-randma/api-go-wrapper/internal/common"
+	erro "github.com/tarmo-randma/api-go-wrapper/internal/errors"
 )
 
 // GetSuppliers will list suppliers according to specified filters.
