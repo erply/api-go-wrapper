@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
@@ -41,8 +42,8 @@ type Client struct {
 
 //NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
 //developer more flexibility
-func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
-	comCli := common.NewClient(sk, cc, partnerKey, httpCli)
+func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client, headersSetToEveryRequest func(string) url.Values) *Client {
+	comCli := common.NewClient(sk, cc, partnerKey, httpCli, headersSetToEveryRequest)
 	return newErplyClient(comCli)
 }
 
@@ -50,12 +51,13 @@ func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Clie
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
 // and a custom http Client if needs to be overwritten. if nil will use default http client provided by the SDK
-func NewClient(sessionKey string, clientCode string, customCli *http.Client) (*Client, error) {
+//The headersSetToEveryRequest function will be executed on every request and supplied with the request name. There is an example in the /examples of you to use it
+func NewClient(sessionKey string, clientCode string, customCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) (*Client, error) {
 
 	if sessionKey == "" || clientCode == "" {
 		return nil, errors.New("sessionKey and clientCode are required")
 	}
-	comCli := common.NewClient(sessionKey, clientCode, "", customCli)
+	comCli := common.NewClient(sessionKey, clientCode, "", customCli, headersSetToEveryRequest)
 	return newErplyClient(comCli), nil
 }
 

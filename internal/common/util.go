@@ -31,7 +31,7 @@ const (
 	sessionKey = "sessionKey"
 )
 
-func getMandatoryParameters(cli *Client, request string) url.Values {
+func (cli *Client) getDefaultMandatoryHeaders(request string) url.Values {
 	params := url.Values{}
 	params.Add("request", request)
 	params.Add("setContentType", "1")
@@ -40,6 +40,7 @@ func getMandatoryParameters(cli *Client, request string) url.Values {
 	if cli.partnerKey != "" {
 		params.Add("partnerKey", cli.partnerKey)
 	}
+
 	return params
 }
 
@@ -55,7 +56,7 @@ func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters ma
 		return nil, erro.NewFromError("failed to build http request", err)
 	}
 	req = req.WithContext(ctx)
-	params := getMandatoryParameters(cli, apiMethod)
+	params := cli.headersFunc(apiMethod)
 	setParams(params, filters)
 	req.URL.RawQuery = params.Encode()
 	resp, err := doRequest(req, cli)
