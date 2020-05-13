@@ -6,6 +6,7 @@ type (
 	Provider interface {
 		VerifyIdentityToken(ctx context.Context, jwt string) (*SessionInfo, error)
 		GetIdentityToken(ctx context.Context) (*IdentityToken, error)
+		GetJWTToken(ctx context.Context) (*JwtToken, error)
 	}
 
 	//interface only for partner tokens
