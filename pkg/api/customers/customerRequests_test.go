@@ -2,6 +2,7 @@ package customers
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"testing"
 )
 
@@ -23,7 +24,7 @@ func TestCustomerManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test get customers", func(t *testing.T) {
 		resp, err := cli.GetCustomers(ctx, map[string]string{})
 		if err != nil {

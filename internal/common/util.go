@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"net/http"
@@ -9,12 +10,17 @@ import (
 	"strings"
 )
 
+type BulkInput struct {
+	MethodName string
+	Filters    map[string]string
+}
+
 func IsJSONResponseOK(responseStatus *Status) bool {
 	return strings.EqualFold(responseStatus.ResponseStatus, "ok")
 }
 
 func getHTTPRequest(cli *Client) (*http.Request, error) {
-	req, err := http.NewRequest("POST", cli.url, nil)
+	req, err := http.NewRequest("POST", cli.Url, nil)
 	if err != nil {
 		return nil, erro.NewFromError("failed to build HTTP request", err)
 
@@ -65,6 +71,41 @@ func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters ma
 	}
 	return resp, nil
 }
+
+func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filters map[string]string) (*http.Response, error) {
+	req, err := getHTTPRequest(cli)
+	if err != nil {
+		return nil, erro.NewFromError("failed to build http request", err)
+	}
+
+	bulkRequest := make([]map[string]string, 0, len(inputs))
+	for _, input := range inputs {
+		bulkItemFilters := input.Filters
+		bulkItemFilters["requestName"] = input.MethodName
+
+		bulkRequest = append(bulkRequest, bulkItemFilters)
+	}
+
+	jsonRequests, err := json.Marshal(bulkRequest)
+	if err != nil {
+		return nil, erro.NewFromError("failed to build requests payload", err)
+	}
+
+	filters["requests"] = string(jsonRequests)
+
+	req = req.WithContext(ctx)
+	params := cli.headersFunc("")
+	params.Del("request")
+	setParams(params, filters)
+
+	req.URL.RawQuery = params.Encode()
+	resp, err := doRequest(req, cli)
+	if err != nil {
+		return nil, erro.NewFromError("Bulk request failed", err)
+	}
+	return resp, nil
+}
+
 func doRequest(req *http.Request, cli *Client) (*http.Response, error) {
 	resp, err := cli.httpClient.Do(req)
 	return resp, err
