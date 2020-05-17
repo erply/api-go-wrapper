@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"strconv"
 )
@@ -31,7 +32,7 @@ func (cli *Client) GetCountries(ctx context.Context, filters map[string]string) 
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
-	if !common.IsJSONResponseOK((*common.Status)(&res.Status)) {
+	if !common.IsJSONResponseOK((*common2.Status)(&res.Status)) {
 		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Countries, nil

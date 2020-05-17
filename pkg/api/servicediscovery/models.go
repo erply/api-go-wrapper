@@ -1,9 +1,11 @@
 package servicediscovery
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type getServiceEndpointsResponse struct {
-	Status  common.Status
+	Status  common2.Status
 	Records []ServiceEndpoints `json:"records"`
 }
 

@@ -1,30 +1,32 @@
 package api
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type UserRights struct {
 	UserName string `json:"userName"`
 }
 
 type GetCountriesResponse struct {
-	Status    common.Status `json:"status"`
-	Countries []Country     `json:"records"`
+	Status    common2.Status `json:"status"`
+	Countries []Country      `json:"records"`
 }
 type GetEmployeesResponse struct {
-	Status    common.Status `json:"status"`
-	Employees []Employee    `json:"records"`
+	Status    common2.Status `json:"status"`
+	Employees []Employee     `json:"records"`
 }
 type GetBusinessAreasResponse struct {
-	Status        common.Status  `json:"status"`
+	Status        common2.Status `json:"status"`
 	BusinessAreas []BusinessArea `json:"records"`
 }
 type GetCurrenciesResponse struct {
-	Status     common.Status `json:"status"`
-	Currencies []Currency    `json:"records"`
+	Status     common2.Status `json:"status"`
+	Currencies []Currency     `json:"records"`
 }
 type GetUserRightsResponse struct {
-	Status  common.Status `json:"status"`
-	Records []UserRights  `json:"records"`
+	Status  common2.Status `json:"status"`
+	Records []UserRights   `json:"records"`
 }
 
 type ObjAttribute struct {

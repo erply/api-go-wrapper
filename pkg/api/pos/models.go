@@ -1,6 +1,8 @@
 package pos
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	PointOfSale struct {
@@ -13,7 +15,7 @@ type (
 	}
 
 	GetPointsOfSaleResponse struct {
-		Status       common.Status `json:"status"`
-		PointsOfSale []PointOfSale `json:"records"`
+		Status       common2.Status `json:"status"`
+		PointsOfSale []PointOfSale  `json:"records"`
 	}
 )

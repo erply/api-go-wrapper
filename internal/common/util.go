@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"net/url"
 	"strings"
@@ -15,7 +16,7 @@ type BulkInput struct {
 	Filters    map[string]string
 }
 
-func IsJSONResponseOK(responseStatus *Status) bool {
+func IsJSONResponseOK(responseStatus *common.Status) bool {
 	return strings.EqualFold(responseStatus.ResponseStatus, "ok")
 }
 

@@ -1,15 +1,17 @@
 package sales
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	GetProjectsResponse struct {
-		Status   common.Status `json:"status"`
-		Projects []Project     `json:"records"`
+		Status   common2.Status `json:"status"`
+		Projects []Project      `json:"records"`
 	}
 
 	GetProjectStatusesResponse struct {
-		Status          common.Status   `json:"status"`
+		Status          common2.Status  `json:"status"`
 		ProjectStatuses []ProjectStatus `json:"records"`
 	}
 

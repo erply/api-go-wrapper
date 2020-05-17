@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 )
 
@@ -20,7 +20,7 @@ func (cli *Client) SavePayment(ctx context.Context, filters map[string]string) (
 	}
 
 	var respData struct {
-		Status  common.Status
+		Status  common2.Status
 		Records []struct {
 			PaymentID int64 `json:"paymentID"`
 		} `json:"records"`
@@ -51,7 +51,7 @@ func (cli *Client) GetPayments(ctx context.Context, filters map[string]string) (
 	}
 
 	var respData struct {
-		Status  common.Status
+		Status  common2.Status
 		Records []PaymentInfo
 	}
 

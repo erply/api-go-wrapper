@@ -1,11 +1,13 @@
 package warehouse
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	GetWarehousesResponse struct {
-		Status     common.Status `json:"status"`
-		Warehouses Warehouses    `json:"records"`
+		Status     common2.Status `json:"status"`
+		Warehouses Warehouses     `json:"records"`
 	}
 
 	Warehouse struct {

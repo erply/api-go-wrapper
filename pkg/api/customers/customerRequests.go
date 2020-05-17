@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"strconv"
 )
@@ -60,7 +61,7 @@ func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password st
 	}
 
 	var res struct {
-		Status  common.Status
+		Status  common2.Status
 		Records []WebshopClient
 	}
 
@@ -88,7 +89,7 @@ func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string
 	}
 
 	var respData struct {
-		Status common.Status
+		Status common2.Status
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return false, erro.NewFromError(method+": unmarshaling response failed", err)

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"strconv"
 )
@@ -21,7 +22,7 @@ func (cli *Client) CalculateShoppingCart(ctx context.Context, filters map[string
 	}
 
 	var respData struct {
-		Status  common.Status
+		Status  common2.Status
 		Records []*ShoppingCartTotals
 	}
 

@@ -1,6 +1,8 @@
 package sales
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	SaleDocument struct {
@@ -83,12 +85,12 @@ type (
 	}
 
 	PostSalesDocumentResponse struct {
-		Status        common.Status        `json:"status"`
+		Status        common2.Status       `json:"status"`
 		ImportReports SaleDocImportReports `json:"records"`
 	}
 
 	GetSalesDocumentResponse struct {
-		Status         common.Status  `json:"status"`
+		Status         common2.Status `json:"status"`
 		SalesDocuments []SaleDocument `json:"records"`
 	}
 	SaleDocImportReports []SaleDocImportReport
@@ -107,7 +109,7 @@ type (
 	}
 
 	SavePurchaseDocumentResponse struct {
-		Status        common.Status            `json:"status"`
+		Status        common2.Status           `json:"status"`
 		ImportReports PurchaseDocImportReports `json:"records"`
 	}
 )
