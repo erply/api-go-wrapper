@@ -3,7 +3,7 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -30,11 +30,9 @@ func TestSupplierManager(t *testing.T) {
 
 	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test get suppliers", func(t *testing.T) {
-		suppliers, err := cli.GetSuppliers(ctx, map[string]string{})
-		if err != nil {
-			t.Error(err)
-			return
-		}
+		suppliers, status, err := cli.GetSuppliers(ctx, map[string]string{})
+		assert.NoError(t, err)
+		assert.Equal(t, "ok", status.ResponseStatus)
 		t.Log(suppliers)
 	})
 	t.Run("test post supplier", func(t *testing.T) {
@@ -55,28 +53,28 @@ func TestGetSuppliersBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := common.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
-		supplierResp := getSuppliersResponseBulk{
-			Status: common.Status{ResponseStatus:    "ok"},
-			BulkItems: []getSuppliersResponseBulkItem{
+		supplierResp := GetSuppliersResponseBulk{
+			Status: common.Status{ResponseStatus: "ok"},
+			BulkItems: []GetSuppliersResponseBulkItem{
 				{
-					Status:    statusBulk,
+					Status: statusBulk,
 					Suppliers: []Supplier{
 						{
-							SupplierId:          123,
-							FullName:            "Some Supplier123",
+							SupplierId: 123,
+							FullName:   "Some Supplier123",
 						},
 						{
-							SupplierId:          124,
-							FullName:            "Some Supplier124",
+							SupplierId: 124,
+							FullName:   "Some Supplier124",
 						},
 					},
 				},
 				{
-					Status:    statusBulk,
+					Status: statusBulk,
 					Suppliers: []Supplier{
 						{
-							SupplierId:          125,
-							FullName:            "Some Supplier125",
+							SupplierId: 125,
+							FullName:   "Some Supplier125",
 						},
 					},
 				},
@@ -93,34 +91,43 @@ func TestGetSuppliersBulk(t *testing.T) {
 	cli.Url = srv.URL
 
 	suppliersClient := NewClient(cli)
-	ctx := context.WithValue(context.Background(), "bulk", []map[string]string{
+	bulkFilters := []map[string]string{
 		{
 			"recordsOnPage": "2",
-			"pageNo":"1",
+			"pageNo":        "1",
 		},
 		{
 			"recordsOnPage": "2",
-			"pageNo":"2",
+			"pageNo":        "2",
 		},
-	})
-	suppliers, err := suppliersClient.GetSuppliers(ctx, map[string]string{})
+	}
+	bulkResp, err := suppliersClient.GetSuppliersBulk(context.Background(), bulkFilters, map[string]string{})
 	assert.NoError(t, err)
 	if err != nil {
 		return
 	}
 
+	expectedStatusBulk := common.StatusBulk{}
+	expectedStatusBulk.ResponseStatus = "ok"
+
 	assert.Equal(t, []Supplier{
 		{
-			SupplierId:          123,
-			FullName:            "Some Supplier123",
+			SupplierId: 123,
+			FullName:   "Some Supplier123",
 		},
 		{
-			SupplierId:          124,
-			FullName:            "Some Supplier124",
+			SupplierId: 124,
+			FullName:   "Some Supplier124",
 		},
+	}, bulkResp.BulkItems[0].Suppliers)
+
+	assert.Equal(t, []Supplier{
 		{
-			SupplierId:          125,
-			FullName:            "Some Supplier125",
+			SupplierId: 125,
+			FullName:   "Some Supplier125",
 		},
-	}, suppliers)
+	}, bulkResp.BulkItems[1].Suppliers)
+
+	assert.Equal(t, expectedStatusBulk, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatusBulk, bulkResp.BulkItems[1].Status)
 }

@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import "github.com/erply/api-go-wrapper/pkg/api/common"
 
 type (
 	VerifyUserResponse struct {

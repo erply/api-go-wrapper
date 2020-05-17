@@ -1,6 +1,6 @@
 package customers
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import "github.com/erply/api-go-wrapper/pkg/api/common"
 
 type (
 	Customer struct {
@@ -21,24 +21,24 @@ type (
 		Fax                  string           `json:"fax"`
 		Code                 string           `json:"code"`
 		ReferenceNumber      string           `json:"referenceNumber"`
-		VatNumber            string           `json:"vatNumber"`
-		BankName             string           `json:"bankName"`
-		BankAccountNumber    string           `json:"bankAccountNumber"`
-		BankIBAN             string           `json:"bankIBAN"`
-		BankSWIFT            string           `json:"bankSWIFT"`
-		PaymentDays          int              `json:"paymentDays"`
-		Notes                string           `json:"notes"`
-		LastModified         int              `json:"lastModified"`
-		CustomerType         string           `json:"customerType"`
-		Address              string           `json:"address"`
-		CustomerAddresses    common.Addresses `json:"addresses"`
-		Street               string           `json:"street"`
-		Address2             string           `json:"address2"`
-		City                 string           `json:"city"`
-		PostalCode           string           `json:"postalCode"`
-		Country              string           `json:"country"`
-		State                string           `json:"state"`
-		ContactPersons       ContactPersons   `json:"contactPersons"`
+		VatNumber         string           `json:"vatNumber"`
+		BankName          string           `json:"bankName"`
+		BankAccountNumber string           `json:"bankAccountNumber"`
+		BankIBAN          string           `json:"bankIBAN"`
+		BankSWIFT         string           `json:"bankSWIFT"`
+		PaymentDays       int              `json:"paymentDays"`
+		Notes             string           `json:"notes"`
+		LastModified      int              `json:"lastModified"`
+		CustomerType      string           `json:"customerType"`
+		Address           string           `json:"address"`
+		CustomerAddresses common.Addresses `json:"addresses"`
+		Street            string           `json:"street"`
+		Address2          string           `json:"address2"`
+		City              string           `json:"city"`
+		PostalCode        string           `json:"postalCode"`
+		Country           string           `json:"country"`
+		State             string           `json:"state"`
+		ContactPersons    ContactPersons   `json:"contactPersons"`
 
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
@@ -166,18 +166,18 @@ type (
 	}
 
 	//GetSuppliersResponse
-	getSuppliersResponse struct {
+	GetSuppliersResponse struct {
 		Status    common.Status `json:"status"`
 		Suppliers []Supplier    `json:"records"`
 	}
 
-	getSuppliersResponseBulkItem struct {
+	GetSuppliersResponseBulkItem struct {
 		Status    common.StatusBulk `json:"status"`
 		Suppliers []Supplier        `json:"records"`
 	}
 
-	getSuppliersResponseBulk struct {
+	GetSuppliersResponseBulk struct {
 		Status    common.Status                  `json:"status"`
-		BulkItems []getSuppliersResponseBulkItem `json:"requests"`
+		BulkItems []GetSuppliersResponseBulkItem `json:"requests"`
 	}
 )
