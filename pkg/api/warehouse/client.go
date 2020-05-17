@@ -1,7 +1,7 @@
 package warehouse
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/breathbath/api-go-wrapper/internal/common"
 )
 
 type (

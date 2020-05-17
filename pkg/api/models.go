@@ -1,7 +1,7 @@
 package api
 
 import (
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
 )
 
 type UserRights struct {
