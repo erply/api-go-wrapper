@@ -10,7 +10,7 @@ func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryR
 		httpCli = GetDefaultHTTPClient()
 	}
 	cli := &Client{
-		url:         GetBaseURL(cc),
+		Url:         GetBaseURL(cc),
 		httpClient:  httpCli,
 		sessionKey:  sk,
 		clientCode:  cc,
@@ -25,7 +25,7 @@ func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryR
 }
 
 type Client struct {
-	url         string
+	Url         string
 	httpClient  *http.Client
 	sessionKey  string
 	clientCode  string

@@ -170,4 +170,14 @@ type (
 		Status    common.Status `json:"status"`
 		Suppliers []Supplier    `json:"records"`
 	}
+
+	getSuppliersResponseBulkItem struct {
+		Status    common.StatusBulk `json:"status"`
+		Suppliers []Supplier        `json:"records"`
+	}
+
+	getSuppliersResponseBulk struct {
+		Status    common.Status                  `json:"status"`
+		BulkItems []getSuppliersResponseBulkItem `json:"requests"`
+	}
 )

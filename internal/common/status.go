@@ -10,3 +10,9 @@ type Status struct {
 	RecordsTotal      int     `json:"recordsTotal"`
 	RecordsInResponse int     `json:"recordsInResponse"`
 }
+
+type StatusBulk struct {
+	RequestName string `json:"requestName"`
+	RequestID   string `json:"requestID"`
+	Status
+}
