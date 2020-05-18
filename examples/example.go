@@ -22,7 +22,7 @@ func main() {
 	}
 
 	info, err := auth.GetSessionKeyUser(sessionKey, clientCode, httpCli)
-	cli, err := api.NewClient(sessionKey, clientCode, nil, nil)
+	cli, err := api.NewClient(sessionKey, clientCode, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 
 	fmt.Println(endpoints)
 
-	partnerCli, err := api.NewPartnerClient(sessionKey, clientCode, partnerKey, nil, nil)
+	partnerCli, err := api.NewPartnerClient(sessionKey, clientCode, partnerKey, nil)
 	if err != nil {
 		panic(err)
 	}

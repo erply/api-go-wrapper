@@ -29,10 +29,6 @@ func getHTTPRequest(cli *Client) (*http.Request, error) {
 	return req, err
 }
 
-func GetBaseURL(cc string) string {
-	return fmt.Sprintf(BaseUrl, cc)
-}
-
 const (
 	clientCode = "clientCode"
 	sessionKey = "sessionKey"
