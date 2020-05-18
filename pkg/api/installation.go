@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	erro "github.com/breathbath/api-go-wrapper/internal/errors"
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"net/url"
 )
@@ -53,7 +53,7 @@ func CreateInstallation(baseUrl, partnerKey string, filters map[string]string, h
 	}
 
 	var respData struct {
-		Status  common.Status
+		Status  common2.Status
 		Records []InstallationResponse
 	}
 

@@ -1,6 +1,8 @@
 package company
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	//CompanyInfos ..
@@ -31,8 +33,8 @@ type (
 		ConfParameters ConfParameter
 	} //GetCompanyInfoResponse ...
 	GetCompanyInfoResponse struct {
-		Status       common.Status `json:"status"`
-		CompanyInfos Infos         `json:"records"`
+		Status       common2.Status `json:"status"`
+		CompanyInfos Infos          `json:"records"`
 	}
 )
 
@@ -43,7 +45,7 @@ type (
 	}
 	//GetConfParametersResponse ...
 	GetConfParametersResponse struct {
-		Status         common.Status   `json:"status"`
+		Status         common2.Status  `json:"status"`
 		ConfParameters []ConfParameter `json:"records"`
 	}
 )

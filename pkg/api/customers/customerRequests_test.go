@@ -2,7 +2,7 @@ package customers
 
 import (
 	"context"
-	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/breathbath/api-go-wrapper/internal/common"
 	"testing"
 )
 

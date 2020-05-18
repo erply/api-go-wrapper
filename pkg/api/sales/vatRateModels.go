@@ -1,7 +1,7 @@
 package sales
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
 )
 
 type (
@@ -26,7 +26,7 @@ type (
 
 	//GetVatRatesResponse ...
 	getVatRatesResponse struct {
-		Status   common.Status `json:"status"`
-		VatRates []VatRate     `json:"records"`
+		Status   common2.Status `json:"status"`
+		VatRates []VatRate      `json:"records"`
 	}
 )

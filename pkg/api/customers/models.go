@@ -1,6 +1,9 @@
 package customers
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	"github.com/breathbath/api-go-wrapper/internal/common"
+	localCommon "github.com/breathbath/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	Customer struct {
@@ -105,12 +108,12 @@ type (
 		CompanyName     string `json:"companyName"`
 	}
 	GetCustomersResponse struct {
-		Status    common.Status `json:"status"`
-		Customers Customers     `json:"records"`
+		Status    localCommon.Status `json:"status"`
+		Customers Customers          `json:"records"`
 	}
 
 	PostCustomerResponse struct {
-		Status                common.Status         `json:"status"`
+		Status                localCommon.Status    `json:"status"`
 		CustomerImportReports CustomerImportReports `json:"records"`
 	}
 	CustomerImportReports []CustomerImportReport
@@ -166,18 +169,18 @@ type (
 	}
 
 	//GetSuppliersResponse
-	getSuppliersResponse struct {
-		Status    common.Status `json:"status"`
-		Suppliers []Supplier    `json:"records"`
+	GetSuppliersResponse struct {
+		Status    localCommon.Status `json:"status"`
+		Suppliers []Supplier         `json:"records"`
 	}
 
-	getSuppliersResponseBulkItem struct {
-		Status    common.StatusBulk `json:"status"`
-		Suppliers []Supplier        `json:"records"`
+	GetSuppliersResponseBulkItem struct {
+		Status    localCommon.StatusBulk `json:"status"`
+		Suppliers []Supplier             `json:"records"`
 	}
 
-	getSuppliersResponseBulk struct {
-		Status    common.Status                  `json:"status"`
-		BulkItems []getSuppliersResponseBulkItem `json:"requests"`
+	GetSuppliersResponseBulk struct {
+		Status    localCommon.Status             `json:"status"`
+		BulkItems []GetSuppliersResponseBulkItem `json:"requests"`
 	}
 )

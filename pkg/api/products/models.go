@@ -1,27 +1,27 @@
 package products
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
 )
 
 type (
 	GetProductsResponse struct {
-		Status   common.Status `json:"status"`
-		Products []Product     `json:"records"`
+		Status   common2.Status `json:"status"`
+		Products []Product      `json:"records"`
 	}
 
 	getProductCategoriesResponse struct {
-		Status            common.Status     `json:"status"`
+		Status            common2.Status    `json:"status"`
 		ProductCategories []ProductCategory `json:"records"`
 	}
 
 	getProductBrandsResponse struct {
-		Status        common.Status  `json:"status"`
+		Status        common2.Status `json:"status"`
 		ProductBrands []ProductBrand `json:"records"`
 	}
 
 	getProductGroupsResponse struct {
-		Status        common.Status  `json:"status"`
+		Status        common2.Status `json:"status"`
 		ProductGroups []ProductGroup `json:"records"`
 	}
 
@@ -129,8 +129,8 @@ type (
 
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
-		Status       common.Status `json:"status"`
-		ProductUnits []ProductUnit `json:"records"`
+		Status       common2.Status `json:"status"`
+		ProductUnits []ProductUnit  `json:"records"`
 	}
 
 	//ProductUnit ...

@@ -3,7 +3,8 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/breathbath/api-go-wrapper/internal/common"
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -53,30 +54,30 @@ func TestSupplierManager(t *testing.T) {
 
 func TestGetSuppliersBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusBulk := common.StatusBulk{}
+		statusBulk := common2.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
-		supplierResp := getSuppliersResponseBulk{
-			Status: common.Status{ResponseStatus:    "ok"},
-			BulkItems: []getSuppliersResponseBulkItem{
+		supplierResp := GetSuppliersResponseBulk{
+			Status: common2.Status{ResponseStatus: "ok"},
+			BulkItems: []GetSuppliersResponseBulkItem{
 				{
-					Status:    statusBulk,
+					Status: statusBulk,
 					Suppliers: []Supplier{
 						{
-							SupplierId:          123,
-							FullName:            "Some Supplier123",
+							SupplierId: 123,
+							FullName:   "Some Supplier123",
 						},
 						{
-							SupplierId:          124,
-							FullName:            "Some Supplier124",
+							SupplierId: 124,
+							FullName:   "Some Supplier124",
 						},
 					},
 				},
 				{
-					Status:    statusBulk,
+					Status: statusBulk,
 					Suppliers: []Supplier{
 						{
-							SupplierId:          125,
-							FullName:            "Some Supplier125",
+							SupplierId: 125,
+							FullName:   "Some Supplier125",
 						},
 					},
 				},
@@ -93,34 +94,47 @@ func TestGetSuppliersBulk(t *testing.T) {
 	cli.Url = srv.URL
 
 	suppliersClient := NewClient(cli)
-	ctx := context.WithValue(context.Background(), "bulk", []map[string]string{
-		{
-			"recordsOnPage": "2",
-			"pageNo":"1",
+
+	suppliersBulk, err := suppliersClient.GetSuppliersBulk(
+		context.Background(),
+		[]map[string]string{
+			{
+				"recordsOnPage": "2",
+				"pageNo":        "1",
+			},
+			{
+				"recordsOnPage": "2",
+				"pageNo":        "2",
+			},
 		},
-		{
-			"recordsOnPage": "2",
-			"pageNo":"2",
-		},
-	})
-	suppliers, err := suppliersClient.GetSuppliers(ctx, map[string]string{})
+		map[string]string{},
+	)
 	assert.NoError(t, err)
 	if err != nil {
 		return
 	}
 
+	expectedStatus := common2.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
 	assert.Equal(t, []Supplier{
 		{
-			SupplierId:          123,
-			FullName:            "Some Supplier123",
+			SupplierId: 123,
+			FullName:   "Some Supplier123",
 		},
 		{
-			SupplierId:          124,
-			FullName:            "Some Supplier124",
+			SupplierId: 124,
+			FullName:   "Some Supplier124",
 		},
+	}, suppliersBulk.BulkItems[0].Suppliers)
+
+	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[0].Status)
+
+	assert.Equal(t, []Supplier{
 		{
-			SupplierId:          125,
-			FullName:            "Some Supplier125",
+			SupplierId: 125,
+			FullName:   "Some Supplier125",
 		},
-	}, suppliers)
+	}, suppliersBulk.BulkItems[1].Suppliers)
+	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
 }

@@ -1,6 +1,8 @@
 package auth
 
-import "github.com/erply/api-go-wrapper/internal/common"
+import (
+	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
+)
 
 type (
 	VerifyUserResponse struct {
@@ -11,8 +13,8 @@ type (
 		SessionKey string `json:"sessionKey"`
 	}
 	verifyIdentityTokenResponse struct {
-		Status common.Status `json:"status"`
-		Result SessionInfo   `json:"records"`
+		Status common2.Status `json:"status"`
+		Result SessionInfo    `json:"records"`
 	}
 
 	SessionInfo struct {
@@ -20,15 +22,15 @@ type (
 	}
 
 	getIdentityTokenResponse struct {
-		Status common.Status `json:"status"`
-		Result IdentityToken `json:"records"`
+		Status common2.Status `json:"status"`
+		Result IdentityToken  `json:"records"`
 	}
 	IdentityToken struct {
 		Jwt string `json:"identityToken"`
 	}
 	JwtTokenResponse struct {
-		Status  common.Status `json:"status"`
-		Records JwtToken      `json:"records"`
+		Status  common2.Status `json:"status"`
+		Records JwtToken       `json:"records"`
 	}
 	JwtToken struct {
 		Token string `json:"token"`
