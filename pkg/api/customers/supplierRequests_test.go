@@ -3,8 +3,8 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/internal/common"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"

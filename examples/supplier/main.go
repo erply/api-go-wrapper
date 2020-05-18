@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	"github.com/breathbath/api-go-wrapper/pkg/api"
-	"github.com/breathbath/api-go-wrapper/pkg/api/auth"
-	"github.com/breathbath/api-go-wrapper/pkg/api/customers"
+	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/pkg/api/customers"
 	"time"
 )
 

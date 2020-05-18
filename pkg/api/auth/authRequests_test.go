@@ -2,7 +2,7 @@ package auth
 
 import (
 	"errors"
-	"github.com/breathbath/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"sync"
