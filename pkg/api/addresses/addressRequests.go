@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"strconv"
 )
 
 func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error) {
@@ -20,7 +19,7 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return res.Addresses, nil
@@ -37,7 +36,7 @@ func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) (
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.Addresses) == 0 {

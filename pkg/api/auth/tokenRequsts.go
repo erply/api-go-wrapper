@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
-
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 )
@@ -29,7 +27,7 @@ func (cli *Client) VerifyIdentityToken(ctx context.Context, jwt string) (*Sessio
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return &res.Result, nil
@@ -49,7 +47,7 @@ func (cli *Client) GetIdentityToken(ctx context.Context) (*IdentityToken, error)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return &res.Result, nil
@@ -69,7 +67,7 @@ func (cli *Client) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 		return nil, erro.NewFromError("error decoding GetJWTToken response", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return &res.Records, nil
@@ -89,7 +87,7 @@ func (cli *PartnerClient) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 		return nil, erro.NewFromError("error decoding GetJWTToken response", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return &res.Records, nil

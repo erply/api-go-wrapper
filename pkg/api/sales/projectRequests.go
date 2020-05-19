@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"strconv"
 )
 
 // GetProjects will list projects according to specified filters.
@@ -19,7 +18,7 @@ func (cli *Client) GetProjects(ctx context.Context, filters map[string]string) (
 		return nil, erro.NewFromError("failed to unmarshal GetProjectsResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Projects, nil
 }
@@ -35,7 +34,7 @@ func (cli *Client) GetProjectStatus(ctx context.Context, filters map[string]stri
 		return nil, erro.NewFromError("failed to unmarshal GetProjectStatusesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.ProjectStatuses, nil
 }

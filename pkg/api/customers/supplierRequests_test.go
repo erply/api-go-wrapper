@@ -97,14 +97,14 @@ func TestGetSuppliersBulk(t *testing.T) {
 
 	suppliersBulk, err := suppliersClient.GetSuppliersBulk(
 		context.Background(),
-		[]map[string]string{
+		[]map[string]interface{}{
 			{
-				"recordsOnPage": "2",
-				"pageNo":        "1",
+				"recordsOnPage": 2,
+				"pageNo":        1,
 			},
 			{
-				"recordsOnPage": "2",
-				"pageNo":        "2",
+				"recordsOnPage": 2,
+				"pageNo":        2,
 			},
 		},
 		map[string]string{},
@@ -154,7 +154,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 					Records: []SaveSupplierResp{
 						{
 							SupplierID: 123,
-							AlreadyExists: 0,
+							AlreadyExists: false,
 						},
 					},
 				},
@@ -163,7 +163,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 					Records: []SaveSupplierResp{
 						{
 							SupplierID: 124,
-							AlreadyExists: 1,
+							AlreadyExists: true,
 						},
 					},
 				},
@@ -183,13 +183,13 @@ func TestSaveSupplierBulk(t *testing.T) {
 
 	saveResp, err := suppliersClient.SaveSupplierBulk(
 		context.Background(),
-		[]Supplier{
+		[]map[string]interface{}{
 			{
-				SupplierId: 123,
-				FullName:  "Some name",
+				"supplierID": 123,
+				"fullName":  "Some name",
 			},
 			{
-				FullName:  "Some other name",
+				"fullName":  "Some other name",
 			},
 		},
 		map[string]string{},
@@ -209,7 +209,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 	assert.Equal(t, []SaveSupplierResp{
 		{
 			SupplierID: 123,
-			AlreadyExists: 0,
+			AlreadyExists: false,
 		},
 	}, saveResp.BulkItems[0].Records)
 
@@ -218,7 +218,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 	assert.Equal(t, []SaveSupplierResp{
 		{
 			SupplierID: 124,
-			AlreadyExists: 1,
+			AlreadyExists: true,
 		},
 	}, saveResp.BulkItems[1].Records)
 

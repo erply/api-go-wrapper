@@ -62,8 +62,7 @@ func CreateInstallation(baseUrl, partnerKey string, filters map[string]string, h
 		return nil, erro.NewFromError("CreateInstallation: error decoding JSON response body", err)
 	}
 	if respData.Status.ErrorCode != 0 {
-		fmt.Println(respData.Status.ErrorField)
-		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: API error %d", respData.Status.ErrorCode), nil)
+		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: API error %s", respData.Status.ErrorCode), nil)
 	}
 	if len(respData.Records) < 1 {
 		return nil, erro.NewFromError("CreateInstallation: no records in response", nil)

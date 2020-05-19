@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"strconv"
 )
 
 //GetCompanyInfo ...
@@ -20,7 +19,7 @@ func (cli *Client) GetCompanyInfo(ctx context.Context) (*Info, error) {
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.CompanyInfos) == 0 {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"strconv"
 )
 
 func (cli *Client) GetConfParameters(ctx context.Context) (*ConfParameter, error) {
@@ -21,7 +20,7 @@ func (cli *Client) GetConfParameters(ctx context.Context) (*ConfParameter, error
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.ConfParameters) == 0 {

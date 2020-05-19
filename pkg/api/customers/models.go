@@ -171,7 +171,7 @@ type (
 	//SaveSupplierResp
 	SaveSupplierResp struct {
 		SupplierID    int `json:"supplierID"`
-		AlreadyExists int `json:"alreadyExists"`
+		AlreadyExists bool `json:"alreadyExists"`
 	}
 
 	//GetSuppliersResponse

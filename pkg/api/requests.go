@@ -9,7 +9,6 @@ import (
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
-	"strconv"
 )
 
 //this interface sums up the general requests here
@@ -33,7 +32,7 @@ func (cli *Client) GetCountries(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
 	if !common.IsJSONResponseOK((*common2.Status)(&res.Status)) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Countries, nil
 }
@@ -51,7 +50,7 @@ func (cli *Client) GetUserRights(ctx context.Context, filters map[string]string)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.Records) == 0 {
@@ -72,7 +71,7 @@ func (cli *Client) GetEmployees(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Employees, nil
 }
@@ -88,7 +87,7 @@ func (cli *Client) GetBusinessAreas(ctx context.Context, filters map[string]stri
 		return nil, erro.NewFromError("failed to unmarshal GetBusinessAreasResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.BusinessAreas, nil
 }
@@ -104,7 +103,7 @@ func (cli *Client) GetCurrencies(ctx context.Context, filters map[string]string)
 		return nil, erro.NewFromError("failed to unmarshal GetCurrenciesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Currencies, nil
 }

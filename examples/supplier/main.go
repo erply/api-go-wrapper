@@ -40,20 +40,20 @@ func main() {
 	}
 }
 
-func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error){
+func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error) {
 	supplierCli := cl.CustomerManager
 
-	bulkFilters := []map[string]string{
+	bulkFilters := []map[string]interface{}{
 		{
-			"recordsOnPage": "2",
-			"pageNo":"1",
+			"recordsOnPage": 2,
+			"pageNo":        1,
 		},
 		{
-			"recordsOnPage": "2",
-			"pageNo":"2",
+			"recordsOnPage": 2,
+			"pageNo":        2,
 		},
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
 	defer cancel()
 
 	bulkResp, err := supplierCli.GetSuppliersBulk(ctx, bulkFilters, map[string]string{})
@@ -70,18 +70,20 @@ func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error)
 	return
 }
 
-func SaveSupplierBulk(cl *api.Client) (err error){
+func SaveSupplierBulk(cl *api.Client) (err error) {
 	supplierCli := cl.CustomerManager
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
 	defer cancel()
 
-	sup := customers.Supplier{
-		CompanyName: "Some Test Company",
-		VatNumber:  "Some VAT",
-		Code:  "34132434134",
+	sup := []map[string]interface{}{
+		{
+			"phone": "+1919-820-1136",
+			"fullname": "Max Mustermann",
+			"supplierID": 12355,
+		},
 	}
-	bulkResponse, err := supplierCli.SaveSupplierBulk(ctx, []customers.Supplier{sup}, map[string]string{})
+	bulkResponse, err := supplierCli.SaveSupplierBulk(ctx, sup, map[string]string{})
 	if err != nil {
 		return
 	}
