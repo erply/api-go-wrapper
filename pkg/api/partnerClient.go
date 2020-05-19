@@ -2,10 +2,9 @@ package api
 
 import (
 	"errors"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	"github.com/breathbath/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	"net/http"
-	"net/url"
 )
 
 type PartnerClient struct {
@@ -13,11 +12,11 @@ type PartnerClient struct {
 	PartnerTokenProvider auth.PartnerTokenProvider
 }
 
-func NewPartnerClient(sessionKey, clientCode, partnerKey string, customCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) (*PartnerClient, error) {
+func NewPartnerClient(sessionKey, clientCode, partnerKey string, customCli *http.Client) (*PartnerClient, error) {
 	if sessionKey == "" || clientCode == "" || partnerKey == "" {
 		return nil, errors.New("sessionKey, clientCode and partnerKey are required")
 	}
-	comCli := common.NewClient(sessionKey, clientCode, partnerKey, customCli, headersSetToEveryRequest)
+	comCli := common.NewClient(sessionKey, clientCode, partnerKey, customCli, nil)
 
 	return &PartnerClient{
 		Client:               newErplyClient(comCli),

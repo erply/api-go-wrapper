@@ -1,6 +1,6 @@
 ERPLY API Go SDK
 --------
-[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/breathbath/api-go-wrapper/pkg/api?tab=doc)
+[![GoDoc](https://img.shields.io/static/v1?label=godoc&message=reference&color=blue)](https://pkg.go.dev/github.com/erply/api-go-wrapper/pkg/api?tab=doc)
 [![API Reference](https://img.shields.io/badge/api-reference-blue.svg)](https://learn-api.erply.com/)
 
 This SDK covers the [ERPLY API](https://erply.com/erply-api/) requests. 
@@ -14,15 +14,16 @@ Some of the requests are accessible not from the client, but from the `auth` pac
 
 Install
 -------
-   `go get github.com/breathbath/api-go-wrapper@X.Y.Z`
+   `go get github.com/erply/api-go-wrapper@X.Y.Z`
    
    where X.Y.Z is your desired version.
    
 Clients
 --------
-There are 2 ways of using the API. 
+Ways of using the API: 
 * One is you create a `Partner Client` that will always use the partner key with requests and will have access to the requests that require the partner key.
 * You can use the simple `Client` that will work without the partner key also.
+* You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor
 
 You can find the example in the `/examples` directory for the client initialization process
 

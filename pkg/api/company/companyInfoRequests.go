@@ -3,8 +3,8 @@ package company
 import (
 	"context"
 	"encoding/json"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	erro "github.com/breathbath/api-go-wrapper/internal/errors"
+	"github.com/erply/api-go-wrapper/internal/common"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
 )
 

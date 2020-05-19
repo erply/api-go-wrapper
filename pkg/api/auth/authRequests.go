@@ -3,8 +3,8 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	erro "github.com/breathbath/api-go-wrapper/internal/errors"
+	"github.com/erply/api-go-wrapper/internal/common"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"

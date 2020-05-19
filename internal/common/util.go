@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	erro "github.com/breathbath/api-go-wrapper/internal/errors"
-	"github.com/breathbath/api-go-wrapper/pkg/api/common"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"net/url"
 	"strings"
@@ -27,10 +27,6 @@ func getHTTPRequest(cli *Client) (*http.Request, error) {
 
 	}
 	return req, err
-}
-
-func GetBaseURL(cc string) string {
-	return fmt.Sprintf(BaseUrl, cc)
 }
 
 const (

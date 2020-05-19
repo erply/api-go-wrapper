@@ -4,9 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	"github.com/breathbath/api-go-wrapper/pkg/api/auth"
-	"github.com/breathbath/api-go-wrapper/pkg/api/customers"
+	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/pkg/api/customers"
 	"time"
 )
 
@@ -24,24 +25,24 @@ func main() {
 	fmt.Println(suppliers)
 }
 
-func GetSupplierBulk(username, password, clientCode string) ([]customers.Supplier, error){
+func GetSupplierBulk(username, password, clientCode string) ([]customers.Supplier, error) {
 	httpCli := common.GetDefaultHTTPClient()
 	sessionKey, err := auth.VerifyUser(username, password, clientCode, httpCli)
 	if err != nil {
 		return []customers.Supplier{}, err
 	}
 
-	commonClient := common.NewClient(sessionKey, clientCode, "", nil, nil)
-	supplierCli := customers.NewClient(commonClient)
+	commonClient, _ := api.NewClient(sessionKey, clientCode, nil)
+	supplierCli := commonClient.CustomerManager
 
 	ctx := context.WithValue(context.Background(), "bulk", []map[string]string{
 		{
 			"recordsOnPage": "2",
-			"pageNo":"1",
+			"pageNo":        "1",
 		},
 		{
 			"recordsOnPage": "2",
-			"pageNo":"2",
+			"pageNo":        "2",
 		},
 	})
 	ctx, cancel := context.WithTimeout(ctx, time.Second)

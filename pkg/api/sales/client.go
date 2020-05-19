@@ -1,7 +1,7 @@
 package sales
 
 import (
-	"github.com/breathbath/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/internal/common"
 )
 
 type (

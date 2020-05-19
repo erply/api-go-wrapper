@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	"github.com/breathbath/api-go-wrapper/pkg/api"
-	"github.com/breathbath/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	info, err := auth.GetSessionKeyUser(sessionKey, clientCode, httpCli)
-	cli, err := api.NewClient(sessionKey, clientCode, nil, nil)
+	cli, err := api.NewClient(sessionKey, clientCode, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +35,7 @@ func main() {
 
 	fmt.Println(endpoints)
 
-	partnerCli, err := api.NewPartnerClient(sessionKey, clientCode, partnerKey, nil, nil)
+	partnerCli, err := api.NewPartnerClient(sessionKey, clientCode, partnerKey, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -5,12 +5,13 @@ import (
 	"net/url"
 )
 
-func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryRequestFunc func(string) url.Values) *Client {
+type AuthFunc func(string) url.Values
+
+func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
 	if httpCli == nil {
 		httpCli = GetDefaultHTTPClient()
 	}
 	cli := &Client{
-		Url:         GetBaseURL(cc),
 		httpClient:  httpCli,
 		sessionKey:  sk,
 		clientCode:  cc,
@@ -20,6 +21,11 @@ func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryR
 
 	if cli.headersFunc == nil {
 		cli.headersFunc = cli.getDefaultMandatoryHeaders
+	}
+	if cc != "" {
+		cli.Url = GetBaseURL(cc)
+	} else {
+		cli.Url = GetBaseURLFromAuthFunc(cli.headersFunc)
 	}
 	return cli
 }
