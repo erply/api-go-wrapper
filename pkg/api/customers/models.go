@@ -168,6 +168,12 @@ type (
 		Added               uint64 `json:"added"`
 	}
 
+	//SaveSupplierResp
+	SaveSupplierResp struct {
+		SupplierID    int `json:"supplierID"`
+		AlreadyExists int `json:"alreadyExists"`
+	}
+
 	//GetSuppliersResponse
 	GetSuppliersResponse struct {
 		Status    localCommon.Status `json:"status"`
@@ -182,5 +188,15 @@ type (
 	GetSuppliersResponseBulk struct {
 		Status    localCommon.Status             `json:"status"`
 		BulkItems []GetSuppliersResponseBulkItem `json:"requests"`
+	}
+
+	SaveSuppliersResponseBulkItem struct {
+		Status  localCommon.StatusBulk `json:"status"`
+		Records []SaveSupplierResp     `json:"records"`
+	}
+
+	SaveSuppliersResponseBulk struct {
+		Status    localCommon.Status              `json:"status"`
+		BulkItems []SaveSuppliersResponseBulkItem `json:"requests"`
 	}
 )

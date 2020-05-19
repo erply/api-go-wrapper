@@ -3,6 +3,7 @@ package customers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"strconv"
@@ -46,12 +47,10 @@ func (cli *Client) GetSuppliersBulk(ctx context.Context, bulkFilters []map[strin
 		return suppliersResp, erro.NewErplyError(strconv.Itoa(suppliersResp.Status.ErrorCode), suppliersResp.Status.Request+": "+suppliersResp.Status.ResponseStatus)
 	}
 
-	suppliers := make([]Supplier, 0)
 	for _, supplierBulkItem := range suppliersResp.BulkItems {
 		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
 			return suppliersResp, erro.NewErplyError(strconv.Itoa(supplierBulkItem.Status.ErrorCode), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus)
 		}
-		suppliers = append(suppliers, supplierBulkItem.Suppliers...)
 	}
 
 	return suppliersResp, nil
@@ -76,4 +75,44 @@ func (cli *Client) SaveSupplier(ctx context.Context, filters map[string]string) 
 	}
 
 	return &res.CustomerImportReports[0], nil
+}
+
+func (cli *Client) SaveSupplierBulk(ctx context.Context, suppliers []Supplier, attrs map[string]string) (SaveSuppliersResponseBulk, error) {
+	var saveSuppliersResponseBulk SaveSuppliersResponseBulk
+
+	if len(suppliers) > common.MaxBulkRequestsCount {
+		return saveSuppliersResponseBulk, fmt.Errorf("cannot save more than %d suppliers in one request", common.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(suppliers))
+	for _, supplier := range suppliers {
+		supplierMap, err := common.ConvertStructToMap(supplier)
+		if err != nil {
+			return saveSuppliersResponseBulk, err
+		}
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveSupplier",
+			Filters:    supplierMap,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, attrs)
+	if err != nil {
+		return saveSuppliersResponseBulk, err
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&saveSuppliersResponseBulk); err != nil {
+		return saveSuppliersResponseBulk, erro.NewFromError("failed to unmarshal SaveSuppliersResponseBulk ", err)
+	}
+	if !common.IsJSONResponseOK(&saveSuppliersResponseBulk.Status) {
+		return saveSuppliersResponseBulk, erro.NewErplyError(strconv.Itoa(saveSuppliersResponseBulk.Status.ErrorCode), saveSuppliersResponseBulk.Status.Request+": "+saveSuppliersResponseBulk.Status.ResponseStatus)
+	}
+
+	for _, supplierBulkItem := range saveSuppliersResponseBulk.BulkItems {
+		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
+			return saveSuppliersResponseBulk, erro.NewErplyError(strconv.Itoa(supplierBulkItem.Status.ErrorCode), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return saveSuppliersResponseBulk, nil
 }

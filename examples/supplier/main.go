@@ -4,10 +4,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	"github.com/erply/api-go-wrapper/pkg/api/customers"
+	"net/http"
 	"time"
 )
 
@@ -17,36 +17,76 @@ func main() {
 	clientCode := flag.String("cc", "", "client code")
 	flag.Parse()
 
-	suppliers, err := GetSupplierBulk(*username, *password, *clientCode)
+	sessionKey, err := auth.VerifyUser(*username, *password, *clientCode, http.DefaultClient)
+	if err != nil {
+		panic(err)
+	}
+
+	apiClient, err := api.NewClient(sessionKey, *clientCode, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	suppliers, err := GetSupplierBulk(apiClient)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(suppliers)
+
+	err = SaveSupplierBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
 }
 
-func GetSupplierBulk(username, password, clientCode string) ([]customers.Supplier, error) {
-	httpCli := common.GetDefaultHTTPClient()
-	sessionKey, err := auth.VerifyUser(username, password, clientCode, httpCli)
-	if err != nil {
-		return []customers.Supplier{}, err
+func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error){
+	supplierCli := cl.CustomerManager
+
+	bulkFilters := []map[string]string{
+		{
+			"recordsOnPage": "2",
+			"pageNo":"1",
+		},
+		{
+			"recordsOnPage": "2",
+			"pageNo":"2",
+		},
 	}
-
-	commonClient, _ := api.NewClient(sessionKey, clientCode, nil)
-	supplierCli := commonClient.CustomerManager
-
-	ctx := context.WithValue(context.Background(), "bulk", []map[string]string{
-		{
-			"recordsOnPage": "2",
-			"pageNo":        "1",
-		},
-		{
-			"recordsOnPage": "2",
-			"pageNo":        "2",
-		},
-	})
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	return supplierCli.GetSuppliers(ctx, map[string]string{})
+	bulkResp, err := supplierCli.GetSuppliersBulk(ctx, bulkFilters, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	for _, bulkItem := range bulkResp.BulkItems {
+		for _, supplier := range bulkItem.Suppliers {
+			suppliers = append(suppliers, supplier)
+		}
+	}
+
+	return
+}
+
+func SaveSupplierBulk(cl *api.Client) (err error){
+	supplierCli := cl.CustomerManager
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	sup := customers.Supplier{
+		CompanyName: "Some Test Company",
+		VatNumber:  "Some VAT",
+		Code:  "34132434134",
+	}
+	bulkResponse, err := supplierCli.SaveSupplierBulk(ctx, []customers.Supplier{sup}, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	fmt.Printf("%+v", bulkResponse)
+
+	return
 }

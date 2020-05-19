@@ -10,4 +10,5 @@ type Manager interface {
 	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
 	GetSuppliersBulk(ctx context.Context, bulkFilters []map[string]string, baseFilters map[string]string) (GetSuppliersResponseBulk, error)
 	SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
+	SaveSupplierBulk(ctx context.Context, suppliers []Supplier, attrs map[string]string) (SaveSuppliersResponseBulk, error)
 }
