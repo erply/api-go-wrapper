@@ -2,7 +2,6 @@ package errors
 
 import (
 	"fmt"
-	"github.com/breathbath/go_utils/utils/types"
 )
 
 type ApiError int
@@ -330,5 +329,11 @@ func init() {
 }
 
 func (s ApiError) String() string {
-	return fmt.Sprintf("[%d] %s", int(s), types.ConvertEnumToString(errorsMap, int(s)))
+	strVal, ok := errorsMap[int(s)]
+
+	if !ok {
+		strVal = ""
+	}
+
+	return fmt.Sprintf("[%d] %s", int(s), strVal)
 }
