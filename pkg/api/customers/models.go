@@ -1,7 +1,7 @@
 package customers
 
 import (
-	localCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 type (
@@ -23,24 +23,24 @@ type (
 		Fax                  string           `json:"fax"`
 		Code                 string           `json:"code"`
 		ReferenceNumber      string           `json:"referenceNumber"`
-		VatNumber         string                `json:"vatNumber"`
-		BankName          string                `json:"bankName"`
-		BankAccountNumber string                `json:"bankAccountNumber"`
-		BankIBAN          string                `json:"bankIBAN"`
-		BankSWIFT         string                `json:"bankSWIFT"`
-		PaymentDays       int                   `json:"paymentDays"`
-		Notes             string                `json:"notes"`
-		LastModified      int                   `json:"lastModified"`
-		CustomerType      string                `json:"customerType"`
-		Address           string                `json:"address"`
-		CustomerAddresses localCommon.Addresses `json:"addresses"`
-		Street            string                `json:"street"`
-		Address2          string                `json:"address2"`
-		City              string                `json:"city"`
-		PostalCode        string                `json:"postalCode"`
-		Country           string                `json:"country"`
-		State             string                `json:"state"`
-		ContactPersons    ContactPersons        `json:"contactPersons"`
+		VatNumber         string                 `json:"vatNumber"`
+		BankName          string                 `json:"bankName"`
+		BankAccountNumber string                 `json:"bankAccountNumber"`
+		BankIBAN          string                 `json:"bankIBAN"`
+		BankSWIFT         string                 `json:"bankSWIFT"`
+		PaymentDays       int                    `json:"paymentDays"`
+		Notes             string                 `json:"notes"`
+		LastModified      int                    `json:"lastModified"`
+		CustomerType      string                 `json:"customerType"`
+		Address           string                 `json:"address"`
+		CustomerAddresses sharedCommon.Addresses `json:"addresses"`
+		Street            string                 `json:"street"`
+		Address2          string                 `json:"address2"`
+		City              string                 `json:"city"`
+		PostalCode        string                 `json:"postalCode"`
+		Country           string                 `json:"country"`
+		State             string                 `json:"state"`
+		ContactPersons    ContactPersons         `json:"contactPersons"`
 
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
@@ -107,12 +107,12 @@ type (
 		CompanyName     string `json:"companyName"`
 	}
 	GetCustomersResponse struct {
-		Status    localCommon.Status `json:"status"`
-		Customers Customers          `json:"records"`
+		Status    sharedCommon.Status `json:"status"`
+		Customers Customers           `json:"records"`
 	}
 
 	PostCustomerResponse struct {
-		Status                localCommon.Status    `json:"status"`
+		Status                sharedCommon.Status   `json:"status"`
 		CustomerImportReports CustomerImportReports `json:"records"`
 	}
 	CustomerImportReports []CustomerImportReport
@@ -136,17 +136,17 @@ type (
 		Mobile          string                `json:"mobile"`
 		Email           string                `json:"email"`
 		Fax             string                `json:"fax"`
-		Code            string                     `json:"code"`
-		IntegrationCode string                     `json:"integrationCode"`
-		VatrateID       uint                       `json:"vatrateID"`
-		CurrencyCode    string                     `json:"currencyCode"`
-		DeliveryTermsID uint                       `json:"deliveryTermsID"`
-		CountryId       uint                       `json:"countryID"`
-		CountryName     string                     `json:"countryName"`
-		CountryCode     string                     `json:"countryCode"`
-		Address         string                     `json:"address"`
-		Gln             string                     `json:"GLN"`
-		Attributes      []localCommon.ObjAttribute `json:"attributes"`
+		Code            string                      `json:"code"`
+		IntegrationCode string                      `json:"integrationCode"`
+		VatrateID       uint                        `json:"vatrateID"`
+		CurrencyCode    string                      `json:"currencyCode"`
+		DeliveryTermsID uint                        `json:"deliveryTermsID"`
+		CountryId       uint                        `json:"countryID"`
+		CountryName     string                      `json:"countryName"`
+		CountryCode     string                      `json:"countryCode"`
+		Address         string                      `json:"address"`
+		Gln             string                      `json:"GLN"`
+		Attributes      []sharedCommon.ObjAttribute `json:"attributes"`
 
 		// Detail fields
 		VatNumber           string `json:"vatNumber"`
@@ -175,27 +175,27 @@ type (
 
 	//GetSuppliersResponse
 	GetSuppliersResponse struct {
-		Status    localCommon.Status `json:"status"`
-		Suppliers []Supplier         `json:"records"`
+		Status    sharedCommon.Status `json:"status"`
+		Suppliers []Supplier          `json:"records"`
 	}
 
 	GetSuppliersResponseBulkItem struct {
-		Status    localCommon.StatusBulk `json:"status"`
-		Suppliers []Supplier             `json:"records"`
+		Status    sharedCommon.StatusBulk `json:"status"`
+		Suppliers []Supplier              `json:"records"`
 	}
 
 	GetSuppliersResponseBulk struct {
-		Status    localCommon.Status             `json:"status"`
+		Status    sharedCommon.Status            `json:"status"`
 		BulkItems []GetSuppliersResponseBulkItem `json:"requests"`
 	}
 
 	SaveSuppliersResponseBulkItem struct {
-		Status  localCommon.StatusBulk `json:"status"`
-		Records []SaveSupplierResp     `json:"records"`
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []SaveSupplierResp      `json:"records"`
 	}
 
 	SaveSuppliersResponseBulk struct {
-		Status    localCommon.Status              `json:"status"`
+		Status    sharedCommon.Status             `json:"status"`
 		BulkItems []SaveSuppliersResponseBulkItem `json:"requests"`
 	}
 )
