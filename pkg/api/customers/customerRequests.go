@@ -9,7 +9,6 @@ import (
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
-	"strconv"
 )
 
 func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
@@ -23,7 +22,7 @@ func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) 
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.CustomerImportReports) == 0 {
@@ -44,7 +43,7 @@ func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetCustomersResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Customers, nil
 }
@@ -69,7 +68,7 @@ func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password st
 		return nil, erro.NewFromError("VerifyCustomerUser: unmarhsalling response failed", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	if len(res.Records) != 1 {
 		return nil, erro.NewFromError("VerifyCustomerUser: no records in response", nil)
@@ -95,7 +94,7 @@ func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string
 		return false, erro.NewFromError(method+": unmarshaling response failed", err)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return false, erro.NewFromError(fmt.Sprintf(method+": bad response error code: %d", respData.Status.ErrorCode), nil)
+		return false, erro.NewFromError(fmt.Sprintf(method+": bad response error code: %s", respData.Status.ErrorCode), nil)
 	}
 	return true, nil
 }

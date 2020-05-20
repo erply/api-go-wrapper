@@ -97,14 +97,14 @@ func TestGetSuppliersBulk(t *testing.T) {
 
 	suppliersBulk, err := suppliersClient.GetSuppliersBulk(
 		context.Background(),
-		[]map[string]string{
+		[]map[string]interface{}{
 			{
-				"recordsOnPage": "2",
-				"pageNo":        "1",
+				"recordsOnPage": 2,
+				"pageNo":        1,
 			},
 			{
-				"recordsOnPage": "2",
-				"pageNo":        "2",
+				"recordsOnPage": 2,
+				"pageNo":        2,
 			},
 		},
 		map[string]string{},
@@ -113,6 +113,8 @@ func TestGetSuppliersBulk(t *testing.T) {
 	if err != nil {
 		return
 	}
+
+	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, suppliersBulk.Status)
 
 	expectedStatus := common2.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
@@ -137,4 +139,88 @@ func TestGetSuppliersBulk(t *testing.T) {
 		},
 	}, suppliersBulk.BulkItems[1].Suppliers)
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
+}
+
+
+func TestSaveSupplierBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := common2.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := SaveSuppliersResponseBulk{
+			Status: common2.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveSuppliersResponseBulkItem{
+				{
+					Status: statusBulk,
+					Records: []SaveSupplierResp{
+						{
+							SupplierID: 123,
+							AlreadyExists: false,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SaveSupplierResp{
+						{
+							SupplierID: 124,
+							AlreadyExists: true,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	saveResp, err := suppliersClient.SaveSupplierBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"supplierID": 123,
+				"fullName":  "Some name",
+			},
+			{
+				"fullName":  "Some other name",
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, saveResp.Status)
+
+	expectedStatus := common2.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, saveResp.BulkItems, 2)
+
+	assert.Equal(t, []SaveSupplierResp{
+		{
+			SupplierID: 123,
+			AlreadyExists: false,
+		},
+	}, saveResp.BulkItems[0].Records)
+
+	assert.Equal(t, expectedStatus, saveResp.BulkItems[0].Status)
+
+	assert.Equal(t, []SaveSupplierResp{
+		{
+			SupplierID: 124,
+			AlreadyExists: true,
+		},
+	}, saveResp.BulkItems[1].Records)
+
+	assert.Equal(t, expectedStatus, saveResp.BulkItems[1].Status)
 }

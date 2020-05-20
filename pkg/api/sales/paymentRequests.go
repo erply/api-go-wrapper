@@ -31,7 +31,7 @@ func (cli *Client) SavePayment(ctx context.Context, filters map[string]string) (
 		return 0, erro.NewFromError("SavePayment: error decoding JSON response body", err)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return 0, erro.NewFromError(fmt.Sprintf("SavePayment: API error %d", respData.Status.ErrorCode), nil)
+		return 0, erro.NewFromError(fmt.Sprintf("SavePayment: API error %s", respData.Status.ErrorCode), nil)
 	}
 	if len(respData.Records) < 1 {
 		return 0, erro.NewFromError("SavePayment: no records in response", nil)
@@ -60,7 +60,7 @@ func (cli *Client) GetPayments(ctx context.Context, filters map[string]string) (
 		return nil, erro.NewFromError("GetPayments: error decoding JSON response body", err)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return nil, erro.NewFromError(fmt.Sprintf("GetPayments: API error %d", respData.Status.ErrorCode), nil)
+		return nil, erro.NewFromError(fmt.Sprintf("GetPayments: API error %s", respData.Status.ErrorCode), nil)
 	}
 
 	return respData.Records, nil

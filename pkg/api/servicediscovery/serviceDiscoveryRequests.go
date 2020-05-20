@@ -7,7 +7,6 @@ import (
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, error) {
@@ -22,7 +21,7 @@ func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, 
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode %s response", method))
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	if len(res.Records) < 1 {
 		return nil, errors.New("no records in response")

@@ -13,7 +13,7 @@ import (
 
 type BulkInput struct {
 	MethodName string
-	Filters    map[string]string
+	Filters    map[string]interface{}
 }
 
 func IsJSONResponseOK(responseStatus *common.Status) bool {
@@ -75,7 +75,7 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 		return nil, erro.NewFromError("failed to build http request", err)
 	}
 
-	bulkRequest := make([]map[string]string, 0, len(inputs))
+	bulkRequest := make([]map[string]interface{}, 0, len(inputs))
 	for _, input := range inputs {
 		bulkItemFilters := input.Filters
 		bulkItemFilters["requestName"] = input.MethodName

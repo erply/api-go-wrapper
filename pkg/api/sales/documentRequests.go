@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
-	"strconv"
 )
 
 func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]string) (SaleDocImportReports, error) {
@@ -19,7 +18,7 @@ func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]str
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.ImportReports) == 0 {
@@ -40,7 +39,7 @@ func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+res.Status.ErrorField+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+res.Status.ErrorField+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.ImportReports) == 0 {
@@ -61,7 +60,7 @@ func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]str
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	if len(res.SalesDocuments) == 0 {
@@ -83,7 +82,7 @@ func (cli *Client) DeleteDocument(ctx context.Context, filters map[string]string
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return nil
