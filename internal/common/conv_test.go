@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -18,17 +19,17 @@ type structToConvert struct {
 	Mobile          string         `json:"mobile"`
 	Email           string         `json:"email"`
 	Fax             string         `json:"fax"`
-	Code            string         `json:"code"`
-	IntegrationCode string         `json:"integrationCode"`
-	VatrateID       uint           `json:"vatrateID"`
-	CurrencyCode    string         `json:"currencyCode"`
-	DeliveryTermsID uint           `json:"deliveryTermsID"`
-	CountryId       uint           `json:"countryID"`
-	CountryName     string         `json:"countryName"`
-	CountryCode     string         `json:"countryCode"`
-	Address         string         `json:"address"`
-	Gln             string         `json:"GLN"`
-	Attributes      []ObjAttribute `json:"attributes"`
+	Code            string                `json:"code"`
+	IntegrationCode string                `json:"integrationCode"`
+	VatrateID       uint                  `json:"vatrateID"`
+	CurrencyCode    string                `json:"currencyCode"`
+	DeliveryTermsID uint                  `json:"deliveryTermsID"`
+	CountryId       uint                  `json:"countryID"`
+	CountryName     string                `json:"countryName"`
+	CountryCode     string                `json:"countryCode"`
+	Address         string                `json:"address"`
+	Gln             string                `json:"GLN"`
+	Attributes      []common.ObjAttribute `json:"attributes"`
 
 	// Detail fields
 	VatNumber           string `json:"vatNumber"`
@@ -73,7 +74,7 @@ func TestConvertingStructToMap(t *testing.T) {
 		CountryCode:         "DE",
 		Address:             "Elm Str 11",
 		Gln:                 "gln222",
-		Attributes:          []ObjAttribute{},
+		Attributes:          []common.ObjAttribute{},
 		VatNumber:           "3431241",
 		Skype:               "nono",
 		Website:             "ya.ru",

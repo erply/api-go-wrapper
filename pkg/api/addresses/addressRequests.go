@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
-func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]common.Address, error) {
+func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]sharedCommon.Address, error) {
 	resp, err := cli.SendRequest(ctx, "getAddresses", filters)
 	if err != nil {
 		return nil, erro.NewFromError("GetAddresses request failed", err)
@@ -24,7 +25,7 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 
 	return res.Addresses, nil
 }
-func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) ([]common.Address, error) {
+func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) ([]sharedCommon.Address, error) {
 	method := "saveAddress"
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {

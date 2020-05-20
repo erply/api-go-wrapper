@@ -1,7 +1,6 @@
 package customers
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
 	localCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
@@ -24,24 +23,24 @@ type (
 		Fax                  string           `json:"fax"`
 		Code                 string           `json:"code"`
 		ReferenceNumber      string           `json:"referenceNumber"`
-		VatNumber            string           `json:"vatNumber"`
-		BankName             string           `json:"bankName"`
-		BankAccountNumber    string           `json:"bankAccountNumber"`
-		BankIBAN             string           `json:"bankIBAN"`
-		BankSWIFT            string           `json:"bankSWIFT"`
-		PaymentDays          int              `json:"paymentDays"`
-		Notes                string           `json:"notes"`
-		LastModified         int              `json:"lastModified"`
-		CustomerType         string           `json:"customerType"`
-		Address              string           `json:"address"`
-		CustomerAddresses    common.Addresses `json:"addresses"`
-		Street               string           `json:"street"`
-		Address2             string           `json:"address2"`
-		City                 string           `json:"city"`
-		PostalCode           string           `json:"postalCode"`
-		Country              string           `json:"country"`
-		State                string           `json:"state"`
-		ContactPersons       ContactPersons   `json:"contactPersons"`
+		VatNumber         string                `json:"vatNumber"`
+		BankName          string                `json:"bankName"`
+		BankAccountNumber string                `json:"bankAccountNumber"`
+		BankIBAN          string                `json:"bankIBAN"`
+		BankSWIFT         string                `json:"bankSWIFT"`
+		PaymentDays       int                   `json:"paymentDays"`
+		Notes             string                `json:"notes"`
+		LastModified      int                   `json:"lastModified"`
+		CustomerType      string                `json:"customerType"`
+		Address           string                `json:"address"`
+		CustomerAddresses localCommon.Addresses `json:"addresses"`
+		Street            string                `json:"street"`
+		Address2          string                `json:"address2"`
+		City              string                `json:"city"`
+		PostalCode        string                `json:"postalCode"`
+		Country           string                `json:"country"`
+		State             string                `json:"state"`
+		ContactPersons    ContactPersons        `json:"contactPersons"`
 
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
@@ -137,17 +136,17 @@ type (
 		Mobile          string                `json:"mobile"`
 		Email           string                `json:"email"`
 		Fax             string                `json:"fax"`
-		Code            string                `json:"code"`
-		IntegrationCode string                `json:"integrationCode"`
-		VatrateID       uint                  `json:"vatrateID"`
-		CurrencyCode    string                `json:"currencyCode"`
-		DeliveryTermsID uint                  `json:"deliveryTermsID"`
-		CountryId       uint                  `json:"countryID"`
-		CountryName     string                `json:"countryName"`
-		CountryCode     string                `json:"countryCode"`
-		Address         string                `json:"address"`
-		Gln             string                `json:"GLN"`
-		Attributes      []common.ObjAttribute `json:"attributes"`
+		Code            string                     `json:"code"`
+		IntegrationCode string                     `json:"integrationCode"`
+		VatrateID       uint                       `json:"vatrateID"`
+		CurrencyCode    string                     `json:"currencyCode"`
+		DeliveryTermsID uint                       `json:"deliveryTermsID"`
+		CountryId       uint                       `json:"countryID"`
+		CountryName     string                     `json:"countryName"`
+		CountryCode     string                     `json:"countryCode"`
+		Address         string                     `json:"address"`
+		Gln             string                     `json:"GLN"`
+		Attributes      []localCommon.ObjAttribute `json:"attributes"`
 
 		// Detail fields
 		VatNumber           string `json:"vatNumber"`
