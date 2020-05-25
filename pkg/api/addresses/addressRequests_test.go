@@ -14,7 +14,7 @@ func TestAddressManager(t *testing.T) {
 		ownerID = ""
 	)
 	ctx := context.Background()
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	resp, err := cli.GetAddresses(ctx, map[string]string{
 		"ownerID": ownerID,
 	})

@@ -13,7 +13,7 @@ func TestProjectManager(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	//test this
 	t.Run("test GetProjects", func(t *testing.T) {
 		resp, err := cli.GetProjects(context.Background(), map[string]string{})

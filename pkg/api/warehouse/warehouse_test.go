@@ -14,7 +14,7 @@ func TestErplyClient_GetWarehouses(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	resp, err := cli.GetWarehouses(context.Background())
 	if err != nil {
 		t.Error(err)

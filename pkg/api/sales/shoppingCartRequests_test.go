@@ -15,7 +15,7 @@ func TestShoppingCart(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test shopping cart", func(t *testing.T) {
 
 		paymentID, err := cli.CalculateShoppingCart(ctx, map[string]string{})

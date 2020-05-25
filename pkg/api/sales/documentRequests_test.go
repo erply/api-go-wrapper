@@ -20,7 +20,7 @@ func TestSalesDocuments(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test get sales doc", func(t *testing.T) {
 		paymentID, err := cli.GetSalesDocuments(ctx, map[string]string{})
 		if err != nil {
@@ -46,11 +46,19 @@ func TestSalesDocuments(t *testing.T) {
 		t.Log(resp)
 	})
 	t.Run("test save sales doc", func(t *testing.T) {
-		resp, err := cli.SaveSalesDocument(ctx, map[string]string{})
+		reports, err := cli.SaveSalesDocument(ctx, map[string]string{
+			"id":         "57",
+			"productID1": "4",
+			"amount1":    "2",
+			"price1":     "20",
+		})
 		if err != nil {
 			t.Error(err)
 			return
 		}
-		t.Log(resp)
+		for _, r := range reports {
+			t.Log(r.InvoiceID)
+			t.Log(r.InvoiceIDStr)
+		}
 	})
 }

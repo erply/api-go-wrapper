@@ -12,7 +12,7 @@ func TestGetServiceEndpoints(t *testing.T) {
 		sk = ""
 		cc = ""
 	)
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 
 	endpoints, err := cli.GetServiceEndpoints(context.Background())
 	if err != nil {
