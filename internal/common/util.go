@@ -6,6 +6,7 @@ import (
 	"fmt"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -20,8 +21,8 @@ func IsJSONResponseOK(responseStatus *common.Status) bool {
 	return strings.EqualFold(responseStatus.ResponseStatus, "ok")
 }
 
-func getHTTPRequest(cli *Client) (*http.Request, error) {
-	req, err := http.NewRequest("POST", cli.Url, nil)
+func getHTTPRequest(cli *Client, body io.Reader) (*http.Request, error) {
+	req, err := http.NewRequest("POST", cli.Url, body)
 	if err != nil {
 		return nil, erro.NewFromError("failed to build HTTP request", err)
 
@@ -54,7 +55,7 @@ func setParams(params url.Values, filters map[string]string) {
 }
 
 func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters map[string]string) (*http.Response, error) {
-	req, err := getHTTPRequest(cli)
+	req, err := getHTTPRequest(cli, nil)
 	if err != nil {
 		return nil, erro.NewFromError("failed to build http request", err)
 	}
@@ -70,11 +71,6 @@ func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters ma
 }
 
 func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filters map[string]string) (*http.Response, error) {
-	req, err := getHTTPRequest(cli)
-	if err != nil {
-		return nil, erro.NewFromError("failed to build http request", err)
-	}
-
 	bulkRequest := make([]map[string]interface{}, 0, len(inputs))
 	for _, input := range inputs {
 		bulkItemFilters := input.Filters
@@ -90,12 +86,18 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 
 	filters["requests"] = string(jsonRequests)
 
-	req = req.WithContext(ctx)
 	params := cli.headersFunc("")
 	params.Del("request")
 	setParams(params, filters)
 
-	req.URL.RawQuery = params.Encode()
+	req, err := getHTTPRequest(cli, strings.NewReader(params.Encode()))
+	if err != nil {
+		return nil, erro.NewFromError("failed to build http request", err)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req = req.WithContext(ctx)
+
 	resp, err := doRequest(req, cli)
 	if err != nil {
 		return nil, erro.NewFromError("Bulk request failed", err)
