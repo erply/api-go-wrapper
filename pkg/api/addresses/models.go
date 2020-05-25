@@ -1,14 +1,37 @@
 package addresses
 
 import (
-	"github.com/erply/api-go-wrapper/internal/common"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 type (
 	//GetAddressesResponse ..
 	Response struct {
-		Status    common2.Status   `json:"status"`
-		Addresses common.Addresses `json:"records"`
+		Status    sharedCommon.Status    `json:"status"`
+		Addresses sharedCommon.Addresses `json:"records"`
+	}
+
+	GetAddressesResponseBulkItem struct {
+		Status    sharedCommon.StatusBulk `json:"status"`
+		Addresses sharedCommon.Addresses  `json:"records"`
+	}
+
+	GetAddressesResponseBulk struct {
+		Status    sharedCommon.Status            `json:"status"`
+		BulkItems []GetAddressesResponseBulkItem `json:"requests"`
+	}
+
+	SaveAddressResp struct {
+		AddressID    int `json:"addressID"`
+	}
+
+	SaveAddressesResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []SaveAddressResp      `json:"records"`
+	}
+
+	SaveAddressesResponseBulk struct {
+		Status    sharedCommon.Status             `json:"status"`
+		BulkItems []SaveAddressesResponseBulkItem `json:"requests"`
 	}
 )

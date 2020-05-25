@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	"io/ioutil"
 )
 
 // GetSuppliers will list suppliers according to specified filters.
@@ -39,8 +40,13 @@ func (cli *Client) GetSuppliersBulk(ctx context.Context, bulkFilters []map[strin
 		return suppliersResp, err
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&suppliersResp); err != nil {
-		return suppliersResp, erro.NewFromError("failed to unmarshal GetSuppliersResponseBulk ", err)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return suppliersResp, err
+	}
+
+	if err := json.Unmarshal(body, &suppliersResp); err != nil {
+		return suppliersResp, fmt.Errorf("ERPLY API: failed to unmarshal GetSuppliersResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&suppliersResp.Status) {
 		return suppliersResp, erro.NewErplyError(suppliersResp.Status.ErrorCode.String(), suppliersResp.Status.Request+": "+suppliersResp.Status.ResponseStatus)
@@ -96,9 +102,15 @@ func (cli *Client) SaveSupplierBulk(ctx context.Context, supplierMap []map[strin
 		return saveSuppliersResponseBulk, err
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&saveSuppliersResponseBulk); err != nil {
-		return saveSuppliersResponseBulk, erro.NewFromError("failed to unmarshal SaveSuppliersResponseBulk ", err)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return saveSuppliersResponseBulk, err
 	}
+
+	if err := json.Unmarshal(body, &saveSuppliersResponseBulk); err != nil {
+		return saveSuppliersResponseBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveSuppliersResponseBulk from '%s': %v", string(body), err)
+	}
+
 	if !common.IsJSONResponseOK(&saveSuppliersResponseBulk.Status) {
 		return saveSuppliersResponseBulk, erro.NewErplyError(saveSuppliersResponseBulk.Status.ErrorCode.String(), saveSuppliersResponseBulk.Status.Request+": "+saveSuppliersResponseBulk.Status.ResponseStatus)
 	}
