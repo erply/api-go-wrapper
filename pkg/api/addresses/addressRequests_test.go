@@ -43,7 +43,6 @@ func TestAddressManager(t *testing.T) {
 	})
 }
 
-
 func TestGetAddressesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := common2.StatusBulk{}
@@ -133,6 +132,32 @@ func TestGetAddressesBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
 }
 
+func TestGetAddressesBulkResponseFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`some junk`))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	addressClient := NewClient(cli)
+
+	_, err := addressClient.GetAddressesBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 1,
+				"pageNo":        1,
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetAddressesResponseBulk from 'some junk': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
+}
 
 func TestSaveAddressesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -213,3 +238,29 @@ func TestSaveAddressesBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, saveResp.BulkItems[1].Status)
 }
 
+func TestSaveAddressesBulkResponseFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`some junk`))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	addressesClient := NewClient(cli)
+
+	_, err := addressesClient.SaveAddressesBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"addressID": 123,
+				"street":  "Some street 123",
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal SaveAddressesResponseBulk from 'some junk': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
+}
