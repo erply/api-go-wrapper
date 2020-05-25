@@ -7,6 +7,7 @@ import (
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	"io/ioutil"
 )
 
 func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]sharedCommon.Address, error) {
@@ -42,9 +43,15 @@ func (cli *Client) GetAddressesBulk(ctx context.Context, bulkFilters []map[strin
 		return addrResp, err
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&addrResp); err != nil {
-		return addrResp, erro.NewFromError("failed to unmarshal GetAddressesResponseBulk ", err)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return addrResp, err
 	}
+
+	if err := json.Unmarshal(body, &addrResp); err != nil {
+		return addrResp, fmt.Errorf("ERPLY API: failed to unmarshal GetAddressesResponseBulk from '%s': %v", string(body), err)
+	}
+
 	if !common.IsJSONResponseOK(&addrResp.Status) {
 		return addrResp, erro.NewErplyError(addrResp.Status.ErrorCode.String(), addrResp.Status.Request+": "+addrResp.Status.ResponseStatus)
 	}
@@ -100,9 +107,15 @@ func (cli *Client) SaveAddressesBulk(ctx context.Context, addrMap []map[string]i
 		return saveAddressesResponseBulk, err
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(&saveAddressesResponseBulk); err != nil {
-		return saveAddressesResponseBulk, erro.NewFromError("failed to unmarshal SaveAddressesResponseBulk ", err)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return saveAddressesResponseBulk, err
 	}
+
+	if err := json.Unmarshal(body, &saveAddressesResponseBulk); err != nil {
+		return saveAddressesResponseBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveAddressesResponseBulk from '%s': %v", string(body), err)
+	}
+
 	if !common.IsJSONResponseOK(&saveAddressesResponseBulk.Status) {
 		return saveAddressesResponseBulk, erro.NewErplyError(saveAddressesResponseBulk.Status.ErrorCode.String(), saveAddressesResponseBulk.Status.Request+": "+saveAddressesResponseBulk.Status.ResponseStatus)
 	}

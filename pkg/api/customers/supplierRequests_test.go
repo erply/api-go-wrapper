@@ -141,6 +141,33 @@ func TestGetSuppliersBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
 }
 
+func TestGetSuppliersBulkResponseFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`some junk value`))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	_, err := suppliersClient.GetSuppliersBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 1,
+				"pageNo":        1,
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetSuppliersResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
+}
+
 
 func TestSaveSupplierBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -223,4 +250,31 @@ func TestSaveSupplierBulk(t *testing.T) {
 	}, saveResp.BulkItems[1].Records)
 
 	assert.Equal(t, expectedStatus, saveResp.BulkItems[1].Status)
+}
+
+func TestSaveSupplierBulkResponseFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("some junk value"))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	_, err := suppliersClient.SaveSupplierBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"supplierID": 123,
+				"fullName":  "Some name",
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal SaveSuppliersResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
 }
