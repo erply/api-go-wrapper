@@ -39,6 +39,18 @@ func main() {
 
 	fmt.Printf("BulkPrices:\n%+v\n", bulkPrices)
 	fmt.Printf("SupplierPrices:\n%+v\n", supplierPrices)
+
+	bulkProductPrices, err := GetProductPricesBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("BulkProductPrices:\n%+v\n", bulkProductPrices)
+
+	productPrices, err := GetProductPrices(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
 }
 
 func GetPricesBulk(cl *api.Client) (prics []prices.PriceList, err error) {
@@ -63,6 +75,43 @@ func GetPricesBulk(cl *api.Client) (prics []prices.PriceList, err error) {
 			prics = append(prics, pr)
 		}
 	}
+	return
+}
+
+func GetProductPricesBulk(cl *api.Client) (prodPrices []prices.ProductPriceList, err error) {
+	cli := cl.PricesManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"supplierPriceListID": "3",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := cli.GetProductPriceListsBulk(ctx, bulkFilters, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	for _, bulkItem := range bulkResp.BulkItems {
+		for _, pr := range bulkItem.ProductPriceList {
+			prodPrices = append(prodPrices, pr)
+		}
+	}
+	return
+}
+
+func GetProductPrices(cl *api.Client) (prodPrices []prices.ProductPriceList, err error) {
+	cli := cl.PricesManager
+
+	filters := map[string]string{
+			"supplierPriceListID": "3",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	prodPrices, err = cli.GetProductPriceLists(ctx, filters)
 
 	return
 }

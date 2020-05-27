@@ -11,7 +11,6 @@ type (
 )
 
 func NewClient(client *common.Client) *Client {
-
 	cli := &Client{
 		client,
 	}

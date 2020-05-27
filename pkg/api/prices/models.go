@@ -26,6 +26,18 @@ type PriceList struct {
 	Attributes             []sharedCommon.ObjAttribute `json:"attributes"`
 }
 
+type ProductPriceList struct {
+	PriceID              int     `json:"supplierPriceListProductID"`
+	ProductID            int     `json:"productID"`
+	Price                float32 `json:"price"`
+	Amount               int     `json:"amount"`
+	CountryID            int     `json:"countryID"`
+	ProductSupplierCode  string  `json:"supplierCode"`
+	ImportCode           string  `json:"importCode"`
+	MasterPackQuantity   int     `json:"masterPackQuantity"`
+	MinimumOrderQuantity int     `json:"minimumOrderQuantity"`
+}
+
 type GetPriceListsResponseBulkItem struct {
 	Status     sharedCommon.StatusBulk `json:"status"`
 	PriceLists []PriceList             `json:"records"`
@@ -39,4 +51,19 @@ type GetPriceListsResponseBulk struct {
 type GetPriceListsResponse struct {
 	Status     sharedCommon.Status `json:"status"`
 	PriceLists []PriceList         `json:"records"`
+}
+
+type GetProductPriceListResponseBulkItem struct {
+	Status           sharedCommon.StatusBulk `json:"status"`
+	ProductPriceList []ProductPriceList      `json:"records"`
+}
+
+type GetProductPriceListResponseBulk struct {
+	Status    sharedCommon.Status                   `json:"status"`
+	BulkItems []GetProductPriceListResponseBulkItem `json:"requests"`
+}
+
+type GetProductPriceListResponse struct {
+	Status            sharedCommon.Status `json:"status"`
+	ProductPriceLists []ProductPriceList  `json:"records"`
 }
