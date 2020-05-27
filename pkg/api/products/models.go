@@ -1,28 +1,28 @@
 package products
 
 import (
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 type (
 	GetProductsResponse struct {
-		Status   common2.Status `json:"status"`
-		Products []Product      `json:"records"`
+		Status   sharedCommon.Status `json:"status"`
+		Products []Product           `json:"records"`
 	}
 
 	getProductCategoriesResponse struct {
-		Status            common2.Status    `json:"status"`
-		ProductCategories []ProductCategory `json:"records"`
+		Status            sharedCommon.Status `json:"status"`
+		ProductCategories []ProductCategory   `json:"records"`
 	}
 
 	getProductBrandsResponse struct {
-		Status        common2.Status `json:"status"`
-		ProductBrands []ProductBrand `json:"records"`
+		Status        sharedCommon.Status `json:"status"`
+		ProductBrands []ProductBrand      `json:"records"`
 	}
 
 	getProductGroupsResponse struct {
-		Status        common2.Status `json:"status"`
-		ProductGroups []ProductGroup `json:"records"`
+		Status        sharedCommon.Status `json:"status"`
+		ProductGroups []ProductGroup      `json:"records"`
 	}
 
 	ProductDimensions struct {
@@ -129,13 +129,23 @@ type (
 
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
-		Status       common2.Status `json:"status"`
-		ProductUnits []ProductUnit  `json:"records"`
+		Status       sharedCommon.Status `json:"status"`
+		ProductUnits []ProductUnit       `json:"records"`
 	}
 
 	//ProductUnit ...
 	ProductUnit struct {
 		UnitID string `json:"unitID"`
 		Name   string `json:"name"`
+	}
+
+	GetProductsResponseBulkItem struct {
+		Status   sharedCommon.StatusBulk `json:"status"`
+		Products []Product               `json:"records"`
+	}
+
+	GetProductsResponseBulk struct {
+		Status    sharedCommon.Status           `json:"status"`
+		BulkItems []GetProductsResponseBulkItem `json:"requests"`
 	}
 )
