@@ -18,7 +18,7 @@ func TestProductManager(t *testing.T) {
 		ctx = context.Background()
 	)
 
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 
 	t.Run("test GetProducts", func(t *testing.T) {
 		products, err := cli.GetProducts(ctx, map[string]string{})

@@ -19,7 +19,7 @@ func TestPaymentManager(t *testing.T) {
 	)
 
 	ctx := context.Background()
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test save payment", func(t *testing.T) {
 		params := map[string]string{
 			"documentID":   documentID,

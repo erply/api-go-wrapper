@@ -17,7 +17,7 @@ func TestVatRateManager(t *testing.T) {
 	var (
 		ctx = context.Background()
 	)
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 
 	resp, err := cli.GetVatRates(ctx, map[string]string{
 		"searchAttributeName":  "id",

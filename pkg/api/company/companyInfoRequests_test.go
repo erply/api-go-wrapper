@@ -14,7 +14,7 @@ func TestErplyClient_GetCompanyInfo(t *testing.T) {
 		cc = ""
 	)
 
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	resp, err := cli.GetCompanyInfo(context.Background())
 	if err != nil {
 		t.Error(err)

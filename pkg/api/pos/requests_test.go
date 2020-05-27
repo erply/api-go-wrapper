@@ -14,7 +14,7 @@ func TestPOSRequests(t *testing.T) {
 		cc          = ""
 		warehouseID = ""
 	)
-	cli := NewClient(common.NewClient(sk, cc, "", nil))
+	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 	t.Run("test by ID", func(t *testing.T) {
 
 		t.Run("test general request", func(t *testing.T) {
