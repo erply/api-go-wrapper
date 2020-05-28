@@ -31,34 +31,43 @@ func (cli *Client) GetSupplierPriceLists(ctx context.Context, filters map[string
 	return res.PriceLists, nil
 }
 
-func (cli *Client) AddProductToSupplierPriceList(ctx context.Context, filters map[string]string) (*AddProductToSupplierPriceListResult, error) {
-	resp, err := cli.SendRequest(ctx, "addProductToSupplierPriceList", filters)
+func (cli *Client) AddProductToSupplierPriceList(ctx context.Context, filters map[string]string) (*ChangeProductToSupplierPriceListResult, error) {
+	return cli.persistProductToSupplierPriceList(ctx, "addProductToSupplierPriceList", filters)
+}
+
+func (cli *Client) EditProductToSupplierPriceList(ctx context.Context, filters map[string]string) (*ChangeProductToSupplierPriceListResult, error) {
+	return cli.persistProductToSupplierPriceList(ctx, "editProductInSupplierPriceList", filters)
+}
+
+func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method string, filters map[string]string) (*ChangeProductToSupplierPriceListResult, error) {
+	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return nil, erro.NewFromError("addProductToSupplierPriceList request failed", err)
+		return nil, erro.NewFromError(method + " request failed", err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	res := &AddProductToSupplierPriceListResponse{}
+	res := &ChangeProductToSupplierPriceListResponse{}
 	if err := json.Unmarshal(body, &res); err != nil {
-		return nil, fmt.Errorf("ERPLY API: failed to unmarshal AddProductToSupplierPriceListResponse from '%s': %v", string(body), err)
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal ChangeProductToSupplierPriceListResponse from '%s': %v", string(body), err)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
-	if len(res.AddProductToSupplierPriceListResult) == 0 {
+	if len(res.ChangeProductToSupplierPriceListResult) == 0 {
 		return nil, nil
 	}
 
-	return &res.AddProductToSupplierPriceListResult[0], nil
+	return &res.ChangeProductToSupplierPriceListResult[0], nil
 }
 
-func (cli *Client) AddProductToSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (AddProductToSupplierPriceListResponseBulk, error) {
-	var bulkResp AddProductToSupplierPriceListResponseBulk
+//ChangeProductToSupplierPriceListBulk wraps both additions and edits as addProductToSupplierPriceList or editProductInSupplierPriceList
+func (cli *Client) ChangeProductToSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (ChangeProductToSupplierPriceListResponseBulk, error) {
+	var bulkResp ChangeProductToSupplierPriceListResponseBulk
 
 	if len(bulkRequest) > common.MaxBulkRequestsCount {
 		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", common.MaxBulkRequestsCount)
@@ -66,8 +75,13 @@ func (cli *Client) AddProductToSupplierPriceListBulk(ctx context.Context, bulkRe
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
 	for _, prodPrice := range bulkRequest {
+		_, isEditMode := prodPrice["supplierPriceListProductID"]
+		methodName := "addProductToSupplierPriceList"
+		if isEditMode {
+			methodName = "editProductInSupplierPriceList"
+		}
 		bulkInputs = append(bulkInputs, common.BulkInput{
-			MethodName: "addProductToSupplierPriceList",
+			MethodName: methodName,
 			Filters:    prodPrice,
 		})
 	}
@@ -83,7 +97,7 @@ func (cli *Client) AddProductToSupplierPriceListBulk(ctx context.Context, bulkRe
 	}
 
 	if err := json.Unmarshal(body, &bulkResp); err != nil {
-		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal AddProductToSupplierPriceListResponseBulk from '%s': %v", string(body), err)
+		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal ChangeProductToSupplierPriceListResponseBulk from '%s': %v", string(body), err)
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {

@@ -68,21 +68,21 @@ type GetProductPriceListResponse struct {
 	ProductPriceLists []ProductPriceList  `json:"records"`
 }
 
-type AddProductToSupplierPriceListResult struct {
+type ChangeProductToSupplierPriceListResult struct {
 	ProductID int `json:"supplierPriceListProductID"`
 }
 
-type AddProductToSupplierPriceListResponse struct {
-	Status                              sharedCommon.Status                   `json:"status"`
-	AddProductToSupplierPriceListResult []AddProductToSupplierPriceListResult `json:"records"`
+type ChangeProductToSupplierPriceListResponse struct {
+	Status                                 sharedCommon.Status                      `json:"status"`
+	ChangeProductToSupplierPriceListResult []ChangeProductToSupplierPriceListResult `json:"records"`
 }
 
-type AddProductToSupplierPriceListResultBulkItem struct {
-	Status  sharedCommon.StatusBulk               `json:"status"`
-	Records []AddProductToSupplierPriceListResult `json:"records"`
+type ChangeProductToSupplierPriceListResultBulkItem struct {
+	Status  sharedCommon.StatusBulk                  `json:"status"`
+	Records []ChangeProductToSupplierPriceListResult `json:"records"`
 }
 
-type AddProductToSupplierPriceListResponseBulk struct {
-	Status    sharedCommon.Status                           `json:"status"`
-	BulkItems []AddProductToSupplierPriceListResultBulkItem `json:"requests"`
+type ChangeProductToSupplierPriceListResponseBulk struct {
+	Status    sharedCommon.Status                              `json:"status"`
+	BulkItems []ChangeProductToSupplierPriceListResultBulkItem `json:"requests"`
 }

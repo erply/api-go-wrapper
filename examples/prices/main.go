@@ -56,16 +56,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
+	fmt.Printf("ChangeProductToSupplierPriceList:\n%+v\n", res)
 
-	bulkRes, err := AddProductToSupplierPriceListBulk(apiClient, []string{"65539", "65540"}, []string{"1", "1"}, []string{"10.22", "111.00"})
+	bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65539", "65540"}, []string{"1", "1"}, []string{"10.22", "111.00"})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("AddProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
+	fmt.Printf("ChangeProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
 }
 
-func AddProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, prices []string) (prices.AddProductToSupplierPriceListResponseBulk, error) {
+func ChangeProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, prices []string) (prices.ChangeProductToSupplierPriceListResponseBulk, error) {
 	cli := cl.PricesManager
 
 	bulkItems := []map[string]interface{}{}
@@ -80,11 +80,11 @@ func AddProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, pri
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	resp, err := cli.AddProductToSupplierPriceListBulk(ctx, bulkItems, map[string]string{})
+	resp, err := cli.ChangeProductToSupplierPriceListBulk(ctx, bulkItems, map[string]string{})
 	return resp, err
 }
 
-func AddProductToSupplierPriceList(cl *api.Client, productId, priceId, price string) (*prices.AddProductToSupplierPriceListResult, error) {
+func AddProductToSupplierPriceList(cl *api.Client, productId, priceId, price string) (*prices.ChangeProductToSupplierPriceListResult, error) {
 	cli := cl.PricesManager
 
 	filter := map[string]string{
