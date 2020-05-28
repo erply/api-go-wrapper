@@ -52,17 +52,23 @@ func main() {
 	}
 	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
 
-	res, err := AddProductToSupplierPriceList(apiClient, "65538", "1", "100.23")
+	res, err := AddProductToSupplierPriceList(apiClient, "65547", "1", "100.23")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("ChangeProductToSupplierPriceList:\n%+v\n", res)
+	fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
 
-	bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65539", "65540"}, []string{"1", "1"}, []string{"10.22", "111.00"})
+	bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65548", "65549"}, []string{"1", "1"}, []string{"10.22", "111.00"})
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("ChangeProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
+
+	bulkResDel, err := DeleteProductsFromSupplierPriceListBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("DeleteProductsFromSupplierPriceListBulk:\n%+v\n", bulkResDel)
 }
 
 func ChangeProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, prices []string) (prices.ChangeProductToSupplierPriceListResponseBulk, error) {
@@ -174,4 +180,23 @@ func GetSupplierPrices(cl *api.Client, supplierID string) (prics []prices.PriceL
 	defer cancel()
 
 	return cli.GetSupplierPriceLists(ctx, filters)
+}
+
+func DeleteProductsFromSupplierPriceListBulk(cl *api.Client) (prices.DeleteProductsFromSupplierPriceListResponseBulk, error) {
+	cli := cl.PricesManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"supplierPriceListID": "1",
+			"supplierPriceListProductIDs": "8",
+		},
+		{
+			"supplierPriceListID": "3",
+			"supplierPriceListProductIDs": "2,3",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	return cli.DeleteProductsFromSupplierPriceListBulk(ctx, bulkFilters, map[string]string{})
 }

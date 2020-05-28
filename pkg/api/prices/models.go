@@ -69,7 +69,7 @@ type GetProductPriceListResponse struct {
 }
 
 type ChangeProductToSupplierPriceListResult struct {
-	ProductID int `json:"supplierPriceListProductID"`
+	SupplierPriceListProductID int `json:"supplierPriceListProductID"`
 }
 
 type ChangeProductToSupplierPriceListResponse struct {
@@ -85,4 +85,24 @@ type ChangeProductToSupplierPriceListResultBulkItem struct {
 type ChangeProductToSupplierPriceListResponseBulk struct {
 	Status    sharedCommon.Status                              `json:"status"`
 	BulkItems []ChangeProductToSupplierPriceListResultBulkItem `json:"requests"`
+}
+
+type DeleteProductsFromSupplierPriceListResult struct {
+	DeletedIDs     string `json:"deletedIDs"`
+	NonExistingIDs string `json:"nonExistingIDs"`
+}
+
+type DeleteProductsFromSupplierPriceListResponse struct {
+	Status                                    sharedCommon.Status                         `json:"status"`
+	DeleteProductsFromSupplierPriceListResult []DeleteProductsFromSupplierPriceListResult `json:"records"`
+}
+
+type DeleteProductsFromSupplierPriceListBulkItem struct {
+	Status  sharedCommon.StatusBulk                     `json:"status"`
+	Records []DeleteProductsFromSupplierPriceListResult `json:"records"`
+}
+
+type DeleteProductsFromSupplierPriceListResponseBulk struct {
+	Status    sharedCommon.Status                           `json:"status"`
+	BulkItems []DeleteProductsFromSupplierPriceListBulkItem `json:"requests"`
 }

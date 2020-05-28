@@ -42,7 +42,7 @@ func (cli *Client) EditProductToSupplierPriceList(ctx context.Context, filters m
 func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method string, filters map[string]string) (*ChangeProductToSupplierPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return nil, erro.NewFromError(method + " request failed", err)
+		return nil, erro.NewFromError(method+" request failed", err)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -202,6 +202,77 @@ func (cli *Client) GetProductPriceListsBulk(ctx context.Context, bulkFilters []m
 	for _, prodBulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
 			return bulkResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return bulkResp, nil
+}
+
+func (cli *Client) DeleteProductsFromSupplierPriceList(ctx context.Context, filters map[string]string) (*DeleteProductsFromSupplierPriceListResult, error) {
+	resp, err := cli.SendRequest(ctx, "deleteProductsFromSupplierPriceList", filters)
+	if err != nil {
+		return nil, erro.NewFromError("deleteProductsFromSupplierPriceList request failed", err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &DeleteProductsFromSupplierPriceListResponse{}
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductsFromSupplierPriceListResponse from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.DeleteProductsFromSupplierPriceListResult) == 0 {
+		return nil, nil
+	}
+
+	return &res.DeleteProductsFromSupplierPriceListResult[0], nil
+}
+
+func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (DeleteProductsFromSupplierPriceListResponseBulk, error) {
+	var bulkResp DeleteProductsFromSupplierPriceListResponseBulk
+
+	if len(bulkRequest) > common.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", common.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
+	for _, bulkInput := range bulkRequest {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "deleteProductsFromSupplierPriceList",
+			Filters:    bulkInput,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	if err := json.Unmarshal(body, &bulkResp); err != nil {
+		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductsFromSupplierPriceListResponseBulk from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&bulkResp.Status) {
+		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range bulkResp.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return bulkResp, erro.NewErplyError(
+				bulkRespItem.Status.ErrorCode.String(),
+				fmt.Sprintf("%+v", bulkRespItem.Status),
+			)
 		}
 	}
 
