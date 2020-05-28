@@ -51,6 +51,53 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
+
+	res, err := AddProductToSupplierPriceList(apiClient, "65538", "1", "100.23")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
+
+	bulkRes, err := AddProductToSupplierPriceListBulk(apiClient, []string{"65539", "65540"}, []string{"1", "1"}, []string{"10.22", "111.00"})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("AddProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
+}
+
+func AddProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, prices []string) (prices.AddProductToSupplierPriceListResponseBulk, error) {
+	cli := cl.PricesManager
+
+	bulkItems := []map[string]interface{}{}
+	for i, prodID := range productIds {
+		bulkItems = append(bulkItems, map[string]interface{}{
+			"productID":           prodID,
+			"supplierPriceListID": priceIds[i],
+			"price":               prices[i],
+		})
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.AddProductToSupplierPriceListBulk(ctx, bulkItems, map[string]string{})
+	return resp, err
+}
+
+func AddProductToSupplierPriceList(cl *api.Client, productId, priceId, price string) (*prices.AddProductToSupplierPriceListResult, error) {
+	cli := cl.PricesManager
+
+	filter := map[string]string{
+		"productID":           productId,
+		"supplierPriceListID": priceId,
+		"price":               price,
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.AddProductToSupplierPriceList(ctx, filter)
+	return resp, err
 }
 
 func GetPricesBulk(cl *api.Client) (prics []prices.PriceList, err error) {
@@ -106,7 +153,7 @@ func GetProductPrices(cl *api.Client) (prodPrices []prices.ProductPriceList, err
 	cli := cl.PricesManager
 
 	filters := map[string]string{
-			"supplierPriceListID": "3",
+		"supplierPriceListID": "3",
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()

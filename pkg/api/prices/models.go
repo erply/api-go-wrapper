@@ -6,7 +6,7 @@ import (
 
 type PriceListRule struct {
 	ProductID int     `json:"productID"`
-	Price     float32 `json:"price"`
+	Price     float32 `json:"price,string"`
 	Amount    int     `json:"amount"`
 }
 
@@ -29,7 +29,7 @@ type PriceList struct {
 type ProductPriceList struct {
 	PriceID              int     `json:"supplierPriceListProductID"`
 	ProductID            int     `json:"productID"`
-	Price                float32 `json:"price"`
+	Price                float32 `json:"price,string"`
 	Amount               int     `json:"amount"`
 	CountryID            int     `json:"countryID"`
 	ProductSupplierCode  string  `json:"supplierCode"`
@@ -66,4 +66,23 @@ type GetProductPriceListResponseBulk struct {
 type GetProductPriceListResponse struct {
 	Status            sharedCommon.Status `json:"status"`
 	ProductPriceLists []ProductPriceList  `json:"records"`
+}
+
+type AddProductToSupplierPriceListResult struct {
+	ProductID int `json:"supplierPriceListProductID"`
+}
+
+type AddProductToSupplierPriceListResponse struct {
+	Status                              sharedCommon.Status                   `json:"status"`
+	AddProductToSupplierPriceListResult []AddProductToSupplierPriceListResult `json:"records"`
+}
+
+type AddProductToSupplierPriceListResultBulkItem struct {
+	Status  sharedCommon.StatusBulk               `json:"status"`
+	Records []AddProductToSupplierPriceListResult `json:"records"`
+}
+
+type AddProductToSupplierPriceListResponseBulk struct {
+	Status    sharedCommon.Status                           `json:"status"`
+	BulkItems []AddProductToSupplierPriceListResultBulkItem `json:"requests"`
 }

@@ -22,12 +22,12 @@ func TestGetSupplierPriceListsBulk(t *testing.T) {
 					Status: statusBulk,
 					PriceLists: []PriceList{
 						{
-							ID: 123,
-							Name:   "Some Price 123",
+							ID:   123,
+							Name: "Some Price 123",
 						},
 						{
-							ID: 124,
-							Name:   "Some Price 124",
+							ID:   124,
+							Name: "Some Price 124",
 						},
 					},
 				},
@@ -35,8 +35,8 @@ func TestGetSupplierPriceListsBulk(t *testing.T) {
 					Status: statusBulk,
 					PriceLists: []PriceList{
 						{
-							ID: 125,
-							Name:   "Some Price 125",
+							ID:   125,
+							Name: "Some Price 125",
 						},
 					},
 				},
@@ -80,12 +80,12 @@ func TestGetSupplierPriceListsBulk(t *testing.T) {
 
 	assert.Equal(t, []PriceList{
 		{
-			ID: 123,
-			Name:   "Some Price 123",
+			ID:   123,
+			Name: "Some Price 123",
 		},
 		{
-			ID: 124,
-			Name:    "Some Price 124",
+			ID:   124,
+			Name: "Some Price 124",
 		},
 	}, bulkResp.BulkItems[0].PriceLists)
 
@@ -93,10 +93,104 @@ func TestGetSupplierPriceListsBulk(t *testing.T) {
 
 	assert.Equal(t, []PriceList{
 		{
-			ID: 125,
-			Name:    "Some Price 125",
+			ID:   125,
+			Name: "Some Price 125",
 		},
 	}, bulkResp.BulkItems[1].PriceLists)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func TestAddProductToSupplierPriceList(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := AddProductToSupplierPriceListResponse{
+			Status:                              sharedCommon.Status{ResponseStatus: "ok"},
+			AddProductToSupplierPriceListResult: []AddProductToSupplierPriceListResult{{ProductID: 123}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := map[string]string{
+		"productID":           "123",
+		"supplierPriceListID": "10",
+		"price":               "10.00",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	resp, err := cl.AddProductToSupplierPriceList(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 123, resp.ProductID)
+}
+
+func TestAddProductToSupplierPriceListBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		bulkResp := AddProductToSupplierPriceListResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []AddProductToSupplierPriceListResultBulkItem{
+				{
+					Status:  statusBulk,
+					Records: []AddProductToSupplierPriceListResult{{ProductID: 123}},
+				},
+				{
+					Status:  statusBulk,
+					Records: []AddProductToSupplierPriceListResult{{ProductID: 124}},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := []map[string]interface{}{
+		{
+			"productID":           "123",
+			"supplierPriceListID": "10",
+			"price":               "10.00",
+		},
+		{
+			"productID":           "124",
+			"supplierPriceListID": "10",
+			"price":               "20.01",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.AddProductToSupplierPriceListBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Equal(t, []AddProductToSupplierPriceListResult{{ProductID: 123}}, bulkResp.BulkItems[0].Records)
+	assert.Equal(t, []AddProductToSupplierPriceListResult{{ProductID: 124}}, bulkResp.BulkItems[1].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
 
@@ -108,12 +202,12 @@ func TestGetSupplierPriceLists(t *testing.T) {
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			PriceLists: []PriceList{
 				{
-					ID: 123,
-					Name:   "Some Price 123",
+					ID:   123,
+					Name: "Some Price 123",
 				},
 				{
-					ID: 124,
-					Name:   "Some Price 124",
+					ID:   124,
+					Name: "Some Price 124",
 				},
 			},
 		}
@@ -140,12 +234,12 @@ func TestGetSupplierPriceLists(t *testing.T) {
 
 	assert.Equal(t, []PriceList{
 		{
-			ID: 123,
-			Name:   "Some Price 123",
+			ID:   123,
+			Name: "Some Price 123",
 		},
 		{
-			ID: 124,
-			Name:    "Some Price 124",
+			ID:   124,
+			Name: "Some Price 124",
 		},
 	}, actualPrices)
 }
