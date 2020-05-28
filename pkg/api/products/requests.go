@@ -71,6 +71,21 @@ func (cli *Client) GetProductBrands(ctx context.Context, filters map[string]stri
 	return res.ProductBrands, nil
 }
 
+func (cli *Client) GetBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error) {
+	resp, err := cli.SendRequest(ctx, "getBrands", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res getProductBrandsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal getBrandsResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.ProductBrands, nil
+}
+
 func (cli *Client) GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error) {
 	resp, err := cli.SendRequest(ctx, "getProductGroups", filters)
 	if err != nil {
