@@ -626,7 +626,7 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 				"supplierPriceListProductIDs": "3456",
 			},
 			{
-				"requestName":         "deleteProductsFromSupplierPriceList",
+				"requestName":                 "deleteProductsFromSupplierPriceList",
 				"supplierPriceListID":         "23",
 				"supplierPriceListProductIDs": "3457",
 			},
@@ -638,11 +638,11 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 			BulkItems: []DeleteProductsFromSupplierPriceListBulkItem{
 				{
 					Status:  statusBulk,
-					Records: []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3456", NonExistingIDs: "",}},
+					Records: []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3456", NonExistingIDs: ""}},
 				},
 				{
 					Status:  statusBulk,
-					Records: []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3457", NonExistingIDs: "",}},
+					Records: []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3457", NonExistingIDs: ""}},
 				},
 			},
 		}
@@ -655,11 +655,11 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"supplierPriceListID":           "22",
+			"supplierPriceListID":         "22",
 			"supplierPriceListProductIDs": "3456",
 		},
 		{
-			"supplierPriceListID":           "23",
+			"supplierPriceListID":         "23",
 			"supplierPriceListProductIDs": "3457",
 		},
 	}
@@ -683,6 +683,155 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 	assert.Len(t, bulkResp.BulkItems, 2)
 	assert.Equal(t, []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3456", NonExistingIDs: ""}}, bulkResp.BulkItems[0].Records)
 	assert.Equal(t, []DeleteProductsFromSupplierPriceListResult{{DeletedIDs: "3457", NonExistingIDs: ""}}, bulkResp.BulkItems[1].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func TestSaveSupplierPriceList(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "saveSupplierPriceList", r.URL.Query().Get("request"))
+		assert.Equal(t, "Some Price Name 1", r.URL.Query().Get("name"))
+		assert.Equal(t, "34456", r.URL.Query().Get("supplierID"))
+		assert.Equal(t, "1", r.URL.Query().Get("productID"))
+		assert.Equal(t, "100", r.URL.Query().Get("price"))
+		assert.Equal(t, "10", r.URL.Query().Get("amount"))
+
+		resp := SaveSupplierPriceListResultResponse{
+			Status:                      sharedCommon.Status{ResponseStatus: "ok"},
+			SaveSupplierPriceListResult: []SaveSupplierPriceListResult{{SupplierPriceListID: 999}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := map[string]string{
+		"name":       "Some Price Name 1",
+		"supplierID": "34456",
+		"productID":  "1",
+		"price":      "100",
+		"amount":     "10",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	resp, err := cl.SaveSupplierPriceList(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 999, resp.SupplierPriceListID)
+}
+
+func TestSaveSupplierPriceListBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		clientCode := r.FormValue("clientCode")
+		assert.Equal(t, "someclient", clientCode)
+
+		sessKey := r.FormValue("sessionKey")
+		assert.Equal(t, "somesess", sessKey)
+
+		bulkRequestsRaw := r.FormValue("requests")
+
+		bulkRequests := []map[string]interface{}{}
+		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
+		if err != nil {
+			return
+		}
+		expectedBulkRequests := []map[string]interface{}{
+			{
+				"requestName": "saveSupplierPriceList",
+				"name":        "Some Price 1",
+				"supplierID":  "1",
+				"productID":   "3456",
+				"price":       "10.22",
+				"amount":      "23",
+			},
+			{
+				"requestName": "saveSupplierPriceList",
+				"name":        "Some Price 2",
+				"supplierID":  "1",
+				"productID":   "3457",
+				"price":       "230.22",
+				"amount":      "1",
+			},
+		}
+		assert.Equal(t, expectedBulkRequests, bulkRequests)
+
+		bulkResp := SaveSupplierPriceListResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveSupplierPriceListBulkItem{
+				{
+					Status:  statusBulk,
+					Records: []SaveSupplierPriceListResult{{SupplierPriceListID: 3456}},
+				},
+				{
+					Status:  statusBulk,
+					Records: []SaveSupplierPriceListResult{{SupplierPriceListID: 3457}},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := []map[string]interface{}{
+		{
+			"name":        "Some Price 1",
+			"supplierID":  "1",
+			"productID":   "3456",
+			"price":       "10.22",
+			"amount":      "23",
+		},
+		{
+			"name":        "Some Price 2",
+			"supplierID":  "1",
+			"productID":   "3457",
+			"price":       "230.22",
+			"amount":      "1",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveSupplierPriceListBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+	assert.Equal(t, []SaveSupplierPriceListResult{{SupplierPriceListID: 3456}}, bulkResp.BulkItems[0].Records)
+	assert.Equal(t, []SaveSupplierPriceListResult{{SupplierPriceListID: 3457}}, bulkResp.BulkItems[1].Records)
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)

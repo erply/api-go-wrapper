@@ -106,3 +106,22 @@ type DeleteProductsFromSupplierPriceListResponseBulk struct {
 	Status    sharedCommon.Status                           `json:"status"`
 	BulkItems []DeleteProductsFromSupplierPriceListBulkItem `json:"requests"`
 }
+
+type SaveSupplierPriceListResult struct {
+	SupplierPriceListID int `json:"supplierPriceListID"`
+}
+
+type SaveSupplierPriceListResultResponse struct {
+	Status                      sharedCommon.Status           `json:"status"`
+	SaveSupplierPriceListResult []SaveSupplierPriceListResult `json:"records"`
+}
+
+type SaveSupplierPriceListBulkItem struct {
+	Status  sharedCommon.StatusBulk       `json:"status"`
+	Records []SaveSupplierPriceListResult `json:"records"`
+}
+
+type SaveSupplierPriceListResponseBulk struct {
+	Status    sharedCommon.Status             `json:"status"`
+	BulkItems []SaveSupplierPriceListBulkItem `json:"requests"`
+}

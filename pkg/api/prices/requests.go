@@ -278,3 +278,74 @@ func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, 
 
 	return bulkResp, nil
 }
+
+func (cli *Client) SaveSupplierPriceList(ctx context.Context, filters map[string]string) (*SaveSupplierPriceListResult, error) {
+	resp, err := cli.SendRequest(ctx, "saveSupplierPriceList", filters)
+	if err != nil {
+		return nil, erro.NewFromError("saveSupplierPriceList request failed", err)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &SaveSupplierPriceListResultResponse{}
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal SaveSupplierPriceListResultResponse from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
+	if len(res.SaveSupplierPriceListResult) == 0 {
+		return nil, nil
+	}
+
+	return &res.SaveSupplierPriceListResult[0], nil
+}
+
+func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveSupplierPriceListResponseBulk, error) {
+	var bulkResp SaveSupplierPriceListResponseBulk
+
+	if len(bulkRequest) > common.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", common.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
+	for _, bulkInput := range bulkRequest {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveSupplierPriceList",
+			Filters:    bulkInput,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	if err := json.Unmarshal(body, &bulkResp); err != nil {
+		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveSupplierPriceListResponseBulk from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&bulkResp.Status) {
+		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range bulkResp.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return bulkResp, erro.NewErplyError(
+				bulkRespItem.Status.ErrorCode.String(),
+				fmt.Sprintf("%+v", bulkRespItem.Status),
+			)
+		}
+	}
+
+	return bulkResp, nil
+}
