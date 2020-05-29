@@ -3,8 +3,10 @@ package products
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	"io/ioutil"
 )
 
 func (cli *Client) GetProductUnits(ctx context.Context, filters map[string]string) ([]ProductUnit, error) {
@@ -39,6 +41,42 @@ func (cli *Client) GetProducts(ctx context.Context, filters map[string]string) (
 		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Products, nil
+}
+
+// GetProductsBulk will list suppliers according to specified filters sending a bulk request to fetch more products than the default limit
+func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsResponseBulk, error) {
+	var productsResp GetProductsResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getProducts",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return productsResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return productsResp, err
+	}
+
+	if err := json.Unmarshal(body, &productsResp); err != nil {
+		return productsResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&productsResp.Status) {
+		return productsResp, erro.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range productsResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return productsResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return productsResp, nil
 }
 
 func (cli *Client) GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error) {
