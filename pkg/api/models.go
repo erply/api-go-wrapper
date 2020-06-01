@@ -1,7 +1,7 @@
 package api
 
 import (
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 type UserRights struct {
@@ -9,30 +9,24 @@ type UserRights struct {
 }
 
 type GetCountriesResponse struct {
-	Status    common2.Status `json:"status"`
-	Countries []Country      `json:"records"`
+	Status    sharedCommon.Status `json:"status"`
+	Countries []Country           `json:"records"`
 }
 type GetEmployeesResponse struct {
-	Status    common2.Status `json:"status"`
-	Employees []Employee     `json:"records"`
+	Status    sharedCommon.Status `json:"status"`
+	Employees []Employee          `json:"records"`
 }
 type GetBusinessAreasResponse struct {
-	Status        common2.Status `json:"status"`
-	BusinessAreas []BusinessArea `json:"records"`
+	Status        sharedCommon.Status `json:"status"`
+	BusinessAreas []BusinessArea      `json:"records"`
 }
 type GetCurrenciesResponse struct {
-	Status     common2.Status `json:"status"`
-	Currencies []Currency     `json:"records"`
+	Status     sharedCommon.Status `json:"status"`
+	Currencies []Currency          `json:"records"`
 }
 type GetUserRightsResponse struct {
-	Status  common2.Status `json:"status"`
-	Records []UserRights   `json:"records"`
-}
-
-type ObjAttribute struct {
-	AttributeName  string `json:"attributeName"`
-	AttributeType  string `json:"attributeType"`
-	AttributeValue string `json:"attributeValue"`
+	Status  sharedCommon.Status `json:"status"`
+	Records []UserRights        `json:"records"`
 }
 
 type Country struct {
@@ -52,19 +46,19 @@ type Employee struct {
 	LastName               string              `json:"lastName"`
 	Phone                  string              `json:"phone"`
 	Mobile                 string              `json:"mobile"`
-	Email                  string              `json:"email"`
-	Fax                    string              `json:"fax"`
-	Code                   string              `json:"code"`
-	Gender                 string              `json:"gender"`
-	UserID                 string              `json:"userID"`
-	Username               string              `json:"username"`
-	UserGroupID            string              `json:"userGroupID"`
-	Warehouses             []EmployeeWarehouse `json:"warehouses"`
-	PointsOfSale           string              `json:"pointsOfSale"`
-	ProductIDs             []EmployeeProduct   `json:"productIDs"`
-	Attributes             []ObjAttribute      `json:"attributes"`
-	LastModified           uint64              `json:"lastModified"`
-	LastModifiedByUserName string              `json:"lastModifiedByUserName"`
+	Email                  string                      `json:"email"`
+	Fax                    string                      `json:"fax"`
+	Code                   string                      `json:"code"`
+	Gender                 string                      `json:"gender"`
+	UserID                 string                      `json:"userID"`
+	Username               string                      `json:"username"`
+	UserGroupID            string                      `json:"userGroupID"`
+	Warehouses             []EmployeeWarehouse         `json:"warehouses"`
+	PointsOfSale           string                      `json:"pointsOfSale"`
+	ProductIDs             []EmployeeProduct           `json:"productIDs"`
+	Attributes             []sharedCommon.ObjAttribute `json:"attributes"`
+	LastModified           uint64                      `json:"lastModified"`
+	LastModifiedByUserName string                      `json:"lastModifiedByUserName"`
 
 	// detail fileds
 	Skype        string `json:"skype"`

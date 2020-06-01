@@ -2,7 +2,12 @@ package products
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
@@ -61,4 +66,120 @@ func TestProductManager(t *testing.T) {
 		}
 		t.Log(groups)
 	})
+}
+
+func TestGetProductsBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := common2.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		supplierResp := GetProductsResponseBulk{
+			Status: common2.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductsResponseBulkItem{
+				{
+					Status: statusBulk,
+					Products: []Product{
+						{
+							ProductID: 123,
+							Name:   "Some Product 123",
+						},
+						{
+							ProductID: 124,
+							Name:   "Some Product 124",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Products: []Product{
+						{
+							ProductID: 125,
+							Name:   "Some Product 125",
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(supplierResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	productClient := NewClient(cli)
+
+	productsBulk, err := productClient.GetProductsBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 2,
+				"pageNo":        1,
+			},
+			{
+				"recordsOnPage": 2,
+				"pageNo":        2,
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, productsBulk.Status)
+
+	expectedStatus := common2.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Equal(t, []Product{
+		{
+			ProductID: 123,
+			Name:   "Some Product 123",
+		},
+		{
+			ProductID: 124,
+			Name:    "Some Product 124",
+		},
+	}, productsBulk.BulkItems[0].Products)
+
+	assert.Equal(t, expectedStatus, productsBulk.BulkItems[0].Status)
+
+	assert.Equal(t, []Product{
+		{
+			ProductID: 125,
+			Name:    "Some Product 125",
+		},
+	}, productsBulk.BulkItems[1].Products)
+	assert.Equal(t, expectedStatus, productsBulk.BulkItems[1].Status)
+}
+
+func TestGetSuppliersBulkResponseFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`some junk value`))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	_, err := suppliersClient.GetProductsBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 1,
+				"pageNo":        1,
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetProductsResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
 }
