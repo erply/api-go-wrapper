@@ -410,7 +410,6 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 			},
 		}
 		jsonRaw, err := json.Marshal(bulkResp)
-		fmt.Println(string(jsonRaw))
 		assert.NoError(t, err)
 
 		_, err = w.Write(jsonRaw)
