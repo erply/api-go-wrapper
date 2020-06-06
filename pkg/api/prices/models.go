@@ -29,7 +29,7 @@ type PriceList struct {
 type ProductPriceList struct {
 	PriceID              int     `json:"supplierPriceListProductID"`
 	ProductID            int     `json:"productID"`
-	Price                float32 `json:"price,string"`
+	Price                float32 `json:"price"`
 	Amount               int     `json:"amount"`
 	CountryID            int     `json:"countryID"`
 	ProductSupplierCode  string  `json:"supplierCode"`

@@ -3,6 +3,7 @@ package prices
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
@@ -409,6 +410,7 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 			},
 		}
 		jsonRaw, err := json.Marshal(bulkResp)
+		fmt.Println(string(jsonRaw))
 		assert.NoError(t, err)
 
 		_, err = w.Write(jsonRaw)
