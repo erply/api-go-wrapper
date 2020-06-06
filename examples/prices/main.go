@@ -52,7 +52,7 @@ func main() {
 	}
 	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
 
-	res, err := AddProductToSupplierPriceList(apiClient, "65658", "1", "100.23")
+	res, err := AddProductToSupplierPriceList(apiClient, "65661", "1", "100.23")
 	if err != nil {
 		panic(err)
 	}
@@ -148,7 +148,7 @@ func GetProductPricesBulk(cl *api.Client) (prodPrices []prices.ProductPriceList,
 
 	bulkFilters := []map[string]interface{}{
 		{
-			"supplierPriceListID": "3",
+			"supplierPriceListID": "1",
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -171,7 +171,7 @@ func GetProductPrices(cl *api.Client) (prodPrices []prices.ProductPriceList, err
 	cli := cl.PricesManager
 
 	filters := map[string]string{
-		"supplierPriceListID": "3",
+		"supplierPriceListID": "1",
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
