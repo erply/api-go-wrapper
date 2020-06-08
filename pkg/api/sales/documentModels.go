@@ -55,6 +55,7 @@ type (
 
 	InvoiceRow struct {
 		RowID             string  `json:"rowID"`
+		StableRowID       string  `json:"stableRowID"`
 		ProductID         string  `json:"productID"`
 		ItemName          string  `json:"itemName"`
 		Barcode           string  `json:"barcode"`
@@ -65,6 +66,7 @@ type (
 		BillingStartDate  string  `json:"billingStartDate"`
 		BillingEndDate    string  `json:"billingEndDate"`
 		Code              string  `json:"code"`
+		Code2             string  `json:"code2"`
 		FinalNetPrice     float64 `json:"finalNetPrice"`
 		FinalPriceWithVAT float64 `json:"finalPriceWithVAT"`
 		RowNetTotal       float64 `json:"rowNetTotal"`
