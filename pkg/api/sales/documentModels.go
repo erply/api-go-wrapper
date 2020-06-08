@@ -95,10 +95,13 @@ type (
 	}
 	SaleDocImportReports []SaleDocImportReport
 	SaleDocImportReport  struct {
-		InvoiceID int `json:"invoiceID"`
-		//I noticed that if the id is empty then an empty string is returned from the API - therefore an additional field is there for the json parser not to fail
-		InvoiceIDStr string  `json:"invoiceID"`
+		InvoiceID    int     `json:"invoiceID"`
+		InvoiceNo    string  `json:"invoiceNo"`
 		CustomNumber string  `json:"customNumber"`
+		InvoiceLink  string  `json:"invoiceLink"`
+		ReceiptLink  string  `json:"receiptLink"`
+		Net          int     `json:"net"`
+		Vat          int     `json:"vat"`
 		Rounding     float64 `json:"rounding"`
 		Total        float64 `json:"total"`
 	}
