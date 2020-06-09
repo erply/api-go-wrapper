@@ -100,8 +100,8 @@ type (
 		CustomNumber string  `json:"customNumber"`
 		InvoiceLink  string  `json:"invoiceLink"`
 		ReceiptLink  string  `json:"receiptLink"`
-		Net          int     `json:"net"`
-		Vat          int     `json:"vat"`
+		Net          float64 `json:"net"`
+		Vat          float64 `json:"vat"`
 		Rounding     float64 `json:"rounding"`
 		Total        float64 `json:"total"`
 	}
