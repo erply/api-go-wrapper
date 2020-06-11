@@ -385,24 +385,24 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
-		bulkResp := GetProductPriceListResponseBulk{
+		bulkResp := ProductsInSupplierPriceListResponseBulk{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
-			BulkItems: []GetProductPriceListResponseBulkItem{
+			BulkItems: []ProductsInSupplierPriceListResponseBulkItem{
 				{
 					Status: statusBulk,
-					ProductPriceList: []ProductPriceList{
+					ProductsInSupplierPriceList: []ProductsInSupplierPriceList{
 						{
-							PriceID: 123,
-							Price:   100,
+							SupplierPriceListProductID: 123,
+							Price:                      100,
 						},
 					},
 				},
 				{
 					Status: statusBulk,
-					ProductPriceList: []ProductPriceList{
+					ProductsInSupplierPriceList: []ProductsInSupplierPriceList{
 						{
-							PriceID: 124,
-							Price:   200,
+							SupplierPriceListProductID: 124,
+							Price:                      200,
 						},
 					},
 				},
@@ -420,7 +420,7 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 
 	cl := NewClient(cli)
 
-	bulkResp, err := cl.GetProductPriceListsBulk(
+	bulkResp, err := cl.GetProductsInSupplierPriceListBulk(
 		context.Background(),
 		[]map[string]interface{}{
 			{
@@ -440,21 +440,98 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
-	assert.Equal(t, []ProductPriceList{
+	assert.Equal(t, []ProductsInSupplierPriceList{
 		{
-			PriceID: 123,
-			Price:   100,
+			SupplierPriceListProductID: 123,
+			Price:                      100,
 		},
-	}, bulkResp.BulkItems[0].ProductPriceList)
+	}, bulkResp.BulkItems[0].ProductsInSupplierPriceList)
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 
-	assert.Equal(t, []ProductPriceList{
+	assert.Equal(t, []ProductsInSupplierPriceList{
 		{
-			PriceID: 124,
-			Price:   200,
+			SupplierPriceListProductID: 124,
+			Price:                      200,
 		},
-	}, bulkResp.BulkItems[1].ProductPriceList)
+	}, bulkResp.BulkItems[1].ProductsInSupplierPriceList)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func TestGetProductPriceListsBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		bulkResp := GetProductsInPriceListResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductsInPriceListResponseBulkItem{
+				{
+					Status: statusBulk,
+					PriceLists: []ProductsInPriceList{
+						{
+							PriceListProductID: 123,
+							Price:                      100,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					PriceLists: []ProductsInPriceList{
+						{
+							PriceListProductID: 124,
+							Price:                      200,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.GetProductsInPriceListBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 2,
+				"pageNo":        1,
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Equal(t, []ProductsInPriceList{
+		{
+			PriceListProductID: 123,
+			Price:                      100,
+		},
+	}, bulkResp.BulkItems[0].PriceLists)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+
+	assert.Equal(t, []ProductsInPriceList{
+		{
+			PriceListProductID: 124,
+			Price:                      200,
+		},
+	}, bulkResp.BulkItems[1].PriceLists)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
 
@@ -462,16 +539,16 @@ func TestGetProductSupplierPriceLists(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
-		resp := GetProductPriceListResponse{
+		resp := ProductsInSupplierPriceListResponse{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
-			ProductPriceLists: []ProductPriceList{
+			ProductsInSupplierPriceList: []ProductsInSupplierPriceList{
 				{
-					PriceID: 123,
-					Price:   100,
+					SupplierPriceListProductID: 123,
+					Price:                      100,
 				},
 				{
-					PriceID: 124,
-					Price:   200,
+					SupplierPriceListProductID: 124,
+					Price:                      200,
 				},
 			},
 		}
@@ -487,7 +564,7 @@ func TestGetProductSupplierPriceLists(t *testing.T) {
 
 	cl := NewClient(cli)
 
-	actualProductPriceItems, err := cl.GetProductPriceLists(
+	actualProductPriceItems, err := cl.GetProductsInSupplierPriceList(
 		context.Background(),
 		map[string]string{},
 	)
@@ -496,14 +573,64 @@ func TestGetProductSupplierPriceLists(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, []ProductPriceList{
+	assert.Equal(t, []ProductsInSupplierPriceList{
 		{
-			PriceID: 123,
-			Price:   100,
+			SupplierPriceListProductID: 123,
+			Price:                      100,
 		},
 		{
-			PriceID: 124,
-			Price:   200,
+			SupplierPriceListProductID: 124,
+			Price:                      200,
+		},
+	}, actualProductPriceItems)
+}
+
+func TestGetProductPriceLists(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := GetProductsInPriceListResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			PriceLists: []ProductsInPriceList{
+				{
+					PriceListProductID: 123,
+					Price:              100,
+				},
+				{
+					PriceListProductID: 124,
+					Price:              200,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	actualProductPriceItems, err := cl.GetProductsInPriceList(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []ProductsInPriceList{
+		{
+			PriceListProductID: 123,
+			Price:                      100,
+		},
+		{
+			PriceListProductID: 124,
+			Price:                      200,
 		},
 	}, actualProductPriceItems)
 }
@@ -519,7 +646,7 @@ func TestGetProductPriceListsBulkResponseFailure(t *testing.T) {
 
 	pricesCl := NewClient(cli)
 
-	_, err := pricesCl.GetProductPriceListsBulk(
+	_, err := pricesCl.GetProductsInSupplierPriceListBulk(
 		context.Background(),
 		[]map[string]interface{}{
 			{
@@ -529,7 +656,7 @@ func TestGetProductPriceListsBulkResponseFailure(t *testing.T) {
 		},
 		map[string]string{},
 	)
-	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetProductPriceListResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal ProductsInSupplierPriceListResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
 	if err == nil {
 		return
 	}
@@ -546,11 +673,11 @@ func TestGetProductPriceListsResponseFailure(t *testing.T) {
 
 	pricesCl := NewClient(cli)
 
-	_, err := pricesCl.GetProductPriceLists(
+	_, err := pricesCl.GetProductsInSupplierPriceList(
 		context.Background(),
 		map[string]string{},
 	)
-	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetProductPriceListResponse from 'some junk value': invalid character 's' looking for beginning of value`)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal ProductsInSupplierPriceListResponse from 'some junk value': invalid character 's' looking for beginning of value`)
 	if err == nil {
 		return
 	}
@@ -798,18 +925,18 @@ func TestSaveSupplierPriceListBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"name":        "Some Price 1",
-			"supplierID":  "1",
-			"productID":   "3456",
-			"price":       "10.22",
-			"amount":      "23",
+			"name":       "Some Price 1",
+			"supplierID": "1",
+			"productID":  "3456",
+			"price":      "10.22",
+			"amount":     "23",
 		},
 		{
-			"name":        "Some Price 2",
-			"supplierID":  "1",
-			"productID":   "3457",
-			"price":       "230.22",
-			"amount":      "1",
+			"name":       "Some Price 2",
+			"supplierID": "1",
+			"productID":  "3457",
+			"price":      "230.22",
+			"amount":     "1",
 		},
 	}
 
