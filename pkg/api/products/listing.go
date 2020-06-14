@@ -15,8 +15,6 @@ func NewListingDataProvider(erplyClient Manager) *ListingDataProvider {
 }
 
 func (l *ListingDataProvider) Count(ctx context.Context, filters map[string]interface{}) (int, error) {
-	filters["recordsOnPage"] = 1
-	filters["pageNo"] = 1
 	resp, err := l.erplyAPI.GetProductsBulk(ctx, []map[string]interface{}{filters}, map[string]string{})
 
 	if err != nil {
@@ -30,11 +28,8 @@ func (l *ListingDataProvider) Count(ctx context.Context, filters map[string]inte
 	return resp.BulkItems[0].Status.RecordsTotal, nil
 }
 
-func (l *ListingDataProvider) Read(ctx context.Context, limit, offset uint, filters map[string]interface{}, callback func(item interface{})) error {
-	filters["recordsOnPage"] = limit
-	filters["pageNo"] = offset
-
-	resp, err := l.erplyAPI.GetProductsBulk(ctx, []map[string]interface{}{filters}, map[string]string{})
+func (l *ListingDataProvider) Read(ctx context.Context, bulkFilters []map[string]interface{}, callback func(item interface{})) error {
+	resp, err := l.erplyAPI.GetProductsBulk(ctx, bulkFilters, map[string]string{})
 	if err != nil {
 		return err
 	}

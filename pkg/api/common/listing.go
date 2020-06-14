@@ -4,49 +4,43 @@ import (
 	"context"
 	"math"
 	"sync"
-	"time"
 )
 
-const MaxItemsPerBulkRequest = 10000
-const DefaultMaxCountPerRequest = 1000
-const MaxFetchersCount = 100
+const DefaultMaxFetchersCount = 1
+const DefaultMaxRequestsCountPerSecond = 0
 
 type ListingSettings struct {
-	MaxRequestsCountPerSecond uint
-	StreamBufferLength        uint
-	MaxCountPerRequest        uint
-	MaxFetchersCount          uint
+	MaxRequestsCountPerSecond int
+	StreamBufferLength        int
+	MaxFetchersCount          int
+	MaxItemsPerRequest        int
 }
 
 type Cursor struct {
-	Limit  uint
-	Offset uint
+	Limit  int
+	Offset int
 }
 
 type ItemsStream chan Item
 
 type Item struct {
 	Err           error
-	TotalCount    uint
-	ProgressCount uint
+	TotalCount    int
+	ProgressCount int
 	Payload       interface{}
 }
 
 func setListingSettingsDefaults(settingsFromInput ListingSettings) ListingSettings {
 	if settingsFromInput.MaxRequestsCountPerSecond == 0 {
-		settingsFromInput.MaxRequestsCountPerSecond = 5
+		settingsFromInput.MaxRequestsCountPerSecond = DefaultMaxRequestsCountPerSecond
 	}
 
-	if settingsFromInput.MaxCountPerRequest > MaxItemsPerBulkRequest {
-		settingsFromInput.MaxCountPerRequest = MaxItemsPerBulkRequest
-	}
-
-	if settingsFromInput.MaxCountPerRequest == 0 {
-		settingsFromInput.MaxCountPerRequest = DefaultMaxCountPerRequest
+	if settingsFromInput.MaxItemsPerRequest == 0 || settingsFromInput.MaxItemsPerRequest > MaxCountPerBulkRequestItem {
+		settingsFromInput.MaxItemsPerRequest = MaxCountPerBulkRequestItem
 	}
 
 	if settingsFromInput.MaxFetchersCount == 0 {
-		settingsFromInput.MaxFetchersCount = MaxFetchersCount
+		settingsFromInput.MaxFetchersCount = DefaultMaxFetchersCount
 	}
 
 	return settingsFromInput
@@ -54,7 +48,7 @@ func setListingSettingsDefaults(settingsFromInput ListingSettings) ListingSettin
 
 type DataProvider interface {
 	Count(ctx context.Context, filters map[string]interface{}) (int, error)
-	Read(ctx context.Context, limit, offset uint,  filters map[string]interface{}, callback func(item interface{})) error
+	Read(ctx context.Context, bulkFilters []map[string]interface{}, callback func(item interface{})) error
 }
 
 type Lister struct {
@@ -63,12 +57,10 @@ type Lister struct {
 	listingDataProvider DataProvider
 }
 
-func NewLister(settings ListingSettings, dataProvider DataProvider) *Lister {
+func NewLister(settings ListingSettings, dataProvider DataProvider, sl Sleeper) *Lister {
 	settings = setListingSettingsDefaults(settings)
 
-	thrl := NewSleepThrottler(settings.MaxRequestsCountPerSecond, func(sleepTime time.Duration) {
-		time.Sleep(sleepTime)
-	})
+	thrl := NewSleepThrottler(settings.MaxRequestsCountPerSecond, sl)
 
 	return &Lister{
 		listingSettings:     settings,
@@ -78,39 +70,41 @@ func NewLister(settings ListingSettings, dataProvider DataProvider) *Lister {
 }
 
 func (p *Lister) Get(ctx context.Context, filters map[string]interface{}) ItemsStream {
-	outputChan := make(ItemsStream, p.listingSettings.StreamBufferLength)
-	defer close(outputChan)
-
 	p.reqThrottler.Throttle()
+
+	filters["recordsOnPage"] = 1
+	filters["pageNo"] = 1
 
 	totalCount, err := p.listingDataProvider.Count(ctx, filters)
 	if err != nil {
+		outputChan := make(ItemsStream, 1)
+		defer close(outputChan)
+
 		outputChan <- Item{
-			Err:           err,
-			TotalCount:    uint(totalCount),
-			ProgressCount: 0,
-			Payload:       nil,
+			Err:        err,
+			TotalCount: totalCount,
+			Payload:    nil,
 		}
 		return outputChan
 	}
 
-	cursorChan := p.getCursors(ctx, uint(totalCount))
+	cursorsChan := p.getCursors(ctx, totalCount)
 
-	childChans := make([]ItemsStream, p.listingSettings.MaxFetchersCount)
-	for i := 0; i < int(p.listingSettings.MaxFetchersCount); i++ {
-		childChan := p.fetchProductsChunk(ctx, cursorChan, uint(totalCount), filters)
+	childChans := make([]ItemsStream, 0, p.listingSettings.MaxFetchersCount)
+	for i := 0; i < p.listingSettings.MaxFetchersCount; i++ {
+		childChan := p.fetchProductsChunk(ctx, cursorsChan, totalCount, filters)
 		childChans = append(childChans, childChan)
 	}
 
-	return p.mergeChannels(ctx, outputChan, childChans...)
+	return p.mergeChannels(ctx, childChans...)
 }
 
-func (p *Lister) fetchProductsChunk(ctx context.Context, cursorChan chan Cursor, totalCount uint, filters map[string]interface{}) ItemsStream {
+func (p *Lister) fetchProductsChunk(ctx context.Context, cursorChan chan []Cursor, totalCount int, filters map[string]interface{}) ItemsStream {
 	prodStream := make(chan Item, p.listingSettings.StreamBufferLength)
 	go func() {
 		defer close(prodStream)
-		for cursor := range cursorChan {
-			p.fetchProductsFromAPI(ctx, cursor.Offset, cursor.Limit, totalCount, prodStream, filters)
+		for cursors := range cursorChan {
+			p.fetchProductsFromAPI(ctx, cursors, totalCount, prodStream, filters)
 
 			select {
 			case <-ctx.Done():
@@ -124,65 +118,114 @@ func (p *Lister) fetchProductsChunk(ctx context.Context, cursorChan chan Cursor,
 	return prodStream
 }
 
-func (p *Lister) getCursors(ctx context.Context, totalCount uint) chan Cursor {
-	chunksCount := ceilDivisionResult(totalCount, p.listingSettings.MaxCountPerRequest)
+func (p *Lister) getCursors(ctx context.Context, totalCount int) chan []Cursor {
+	out := make(chan []Cursor, p.listingSettings.MaxFetchersCount)
 
-	out := make(chan Cursor, chunksCount)
-	defer close(out)
+	leftCount := totalCount
 
-	var i uint
-	for i = 0; i < chunksCount; i++ {
-		select {
-		case out <- Cursor{Limit: p.listingSettings.MaxCountPerRequest, Offset: i + 1}:
-		case <-ctx.Done():
-			return out
+	go func() {
+		defer close(out)
+
+		curPage := 1
+		if p.listingSettings.MaxItemsPerRequest > MaxCountPerBulkRequestItem*MaxBulkRequestsCount {
+			p.listingSettings.MaxItemsPerRequest = MaxCountPerBulkRequestItem*MaxBulkRequestsCount
 		}
-	}
+
+		for ; leftCount > 0; { //leftCount 1000, p.listingSettings.MaxItemsPerRequest 100
+			countToFetchForBulkRequest := leftCount
+			if leftCount > p.listingSettings.MaxItemsPerRequest {
+				countToFetchForBulkRequest = p.listingSettings.MaxItemsPerRequest
+			}
+
+			//countToFetchForBulkRequest 100
+
+			bulkItemsCount := CeilDivisionInt(countToFetchForBulkRequest, MaxCountPerBulkRequestItem)
+			if bulkItemsCount > MaxBulkRequestsCount {
+				bulkItemsCount = MaxBulkRequestsCount
+			}
+			//bulkItemsCount 1
+
+			limit := CeilDivisionInt(p.listingSettings.MaxItemsPerRequest, bulkItemsCount)
+			if limit > MaxCountPerBulkRequestItem {
+				limit = MaxCountPerBulkRequestItem
+			}
+			//limit 100
+
+			cursorsForBulkRequest := make([]Cursor, 0, bulkItemsCount)
+			for i := 0; i < bulkItemsCount; i++ {
+				cursorsForBulkRequest = append(
+					cursorsForBulkRequest,
+					Cursor{
+						Limit:  limit,
+						Offset: curPage,
+					},
+				)
+				curPage++
+				leftCount -= limit //leftCount 900
+			}
+			select {
+			case out <- cursorsForBulkRequest:
+				continue
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 
 	return out
 }
 
 func (p *Lister) fetchProductsFromAPI(
 	ctx context.Context,
-	offset, limit, totalCount uint,
+	cursors []Cursor,
+	totalCount int,
 	outputChan ItemsStream,
 	filters map[string]interface{},
 ) {
+	bulkFilters := make([]map[string]interface{}, 0, len(cursors))
+	for _, cursor := range cursors {
+		bulkFilter := make(map[string]interface{})
+		for filterKey, filterValue := range filters {
+			bulkFilter[filterKey] = filterValue
+		}
+		bulkFilter["recordsOnPage"] = cursor.Limit
+		bulkFilter["pageNo"] = cursor.Offset
+		bulkFilters = append(bulkFilters, bulkFilter)
+	}
+
 	p.reqThrottler.Throttle()
 
-	err := p.listingDataProvider.Read(ctx, offset, limit, filters, func(item interface{}) {
+	err := p.listingDataProvider.Read(ctx, bulkFilters, func(item interface{}) {
 		outputChan <- Item{
-			Err:           nil,
-			TotalCount:    totalCount,
-			ProgressCount: 0,
-			Payload:       item,
+			Err:        nil,
+			TotalCount: totalCount,
+			Payload:    item,
 		}
 	})
 
 	if err != nil {
 		outputChan <- Item{
-			Err:           err,
-			TotalCount:    totalCount,
-			ProgressCount: 0,
-			Payload:       nil,
+			Err:        err,
+			TotalCount: totalCount,
+			Payload:    nil,
 		}
 		return
 	}
 }
 
-func (p *Lister) mergeChannels(ctx context.Context, parentChan ItemsStream, childChans ...ItemsStream) ItemsStream {
+func (p *Lister) mergeChannels(ctx context.Context, childChans ...ItemsStream) ItemsStream {
+	parentChan := make(ItemsStream, p.listingSettings.StreamBufferLength)
+
 	var wg sync.WaitGroup
 	wg.Add(len(childChans))
 
 	for _, childChan := range childChans {
 		go func(productsChildChan <-chan Item) {
 			defer wg.Done()
-			var i uint = 0
 			for prod := range productsChildChan {
-				i++
-				prod.ProgressCount = i
 				select {
 				case parentChan <- prod:
+					continue
 				case <-ctx.Done():
 					return
 				}
@@ -198,6 +241,11 @@ func (p *Lister) mergeChannels(ctx context.Context, parentChan ItemsStream, chil
 	return parentChan
 }
 
-func ceilDivisionResult(x, y uint) uint {
-	return uint(math.Ceil(float64(x) / float64(y)))
+func CeilDivisionInt(x, y int) int {
+	return int(math.Ceil(float64(x) / float64(y)))
+}
+
+func AddDefaultPaginationOption(filters map[string]interface{}, limit, page int) {
+	filters["recordsOnPage"] = limit
+	filters["pageNo"] = page
 }

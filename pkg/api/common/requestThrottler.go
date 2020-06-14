@@ -16,15 +16,15 @@ var sleepThrottler *SleepThrottler
 
 //SleepThrottler implements sleeping logic for requests throttling
 type SleepThrottler struct {
-	LimitPerSecond uint
+	LimitPerSecond int
 	LastTimestamp  int64
-	Count          uint
+	Count          int
 	sl             Sleeper
 	lock           sync.Mutex
 }
 
 //NewSleepThrottler creates SleepThrottler
-func NewSleepThrottler(limitPerSecond uint, sl Sleeper) *SleepThrottler {
+func NewSleepThrottler(limitPerSecond int, sl Sleeper) *SleepThrottler {
 	if sleepThrottler == nil {
 		sleepThrottler = &SleepThrottler{
 			LimitPerSecond: limitPerSecond,

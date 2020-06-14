@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -85,8 +86,8 @@ func (cli *Client) SaveSupplier(ctx context.Context, filters map[string]string) 
 func (cli *Client) SaveSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (SaveSuppliersResponseBulk, error) {
 	var saveSuppliersResponseBulk SaveSuppliersResponseBulk
 
-	if len(supplierMap) > common.MaxBulkRequestsCount {
-		return saveSuppliersResponseBulk, fmt.Errorf("cannot save more than %d suppliers in one request", common.MaxBulkRequestsCount)
+	if len(supplierMap) > common2.MaxBulkRequestsCount {
+		return saveSuppliersResponseBulk, fmt.Errorf("cannot save more than %d suppliers in one request", common2.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(supplierMap))

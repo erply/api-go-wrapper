@@ -14,15 +14,20 @@ import (
 )
 
 func extractBulkFiltersFromRequest(r *http.Request) (res map[string]interface{}, err error) {
-	err = json.NewDecoder(r.Body).Decode(&res)
+	err = r.ParseForm()
 	if err != nil {
 		return
+	}
+
+	res = make(map[string]interface{})
+	for key, vals := range r.Form {
+		res[key] = vals[0]
 	}
 
 	var requests []map[string]interface{}
 	requestsRaw, ok := res["requests"]
 	if ok {
-		err = json.Unmarshal(requestsRaw.([]byte), &requests)
+		err = json.Unmarshal([]byte(requestsRaw.(string)), &requests)
 		if err != nil {
 			return
 		}
@@ -74,7 +79,7 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 	return nil
 }
 
-func TestListingCount(t *testing.T) {
+func TestListingCountSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		parsedRequest, err := extractBulkFiltersFromRequest(r)
@@ -82,9 +87,61 @@ func TestListingCount(t *testing.T) {
 		if err != nil {
 			return
 		}
-		assert.Equal(t, "", parsedRequest)
 
-		err = sendRequest(w, 0, totalCount, [][]int{})
+		assert.Equal(t, "someclient", parsedRequest["clientCode"])
+		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
+		requests := parsedRequest["requests"].([]map[string]interface{})
+		assert.Equal(t, float64(1), requests[0]["pageNo"])
+		assert.Equal(t, float64(1), requests[0]["recordsOnPage"])
+		assert.Equal(t, "getProducts", requests[0]["requestName"])
+		assert.Equal(t, "smeval", requests[0]["somekey"])
+
+		err = sendRequest(w, 0, totalCount, [][]int{{1}})
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+	}))
+
+	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
+	baseClient.Url = srv.URL
+	productsClient := NewClient(baseClient)
+	productsDataProvider := NewListingDataProvider(productsClient)
+
+	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval", "pageNo": 1, "recordsOnPage": 1})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, totalCount, actualCount)
+}
+
+func TestListingCountError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := sendRequest(w, errors.MalformedRequest, 0, [][]int{{1}})
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+	}))
+
+	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
+	baseClient.Url = srv.URL
+	productsClient := NewClient(baseClient)
+	productsDataProvider := NewListingDataProvider(productsClient)
+
+	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
+	assert.Error(t, err)
+	if err == nil {
+		return
+	}
+	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Equal(t, 0, actualCount)
+}
+
+func TestListingCountWithNoBulkItems(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := sendRequest(w, 0, 0, [][]int{})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -101,5 +158,90 @@ func TestListingCount(t *testing.T) {
 	if err != nil {
 		return
 	}
-	assert.Equal(t, totalCount, actualCount)
+	assert.Equal(t, 0, actualCount)
+}
+
+func TestReadSuccess(t *testing.T) {
+	const limit = 2
+	const offset = 1
+	const totalCount = 10
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		assert.Equal(t, "someclient", parsedRequest["clientCode"])
+		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
+
+		requests := parsedRequest["requests"].([]map[string]interface{})
+		assert.Len(t, requests, 1)
+
+		assert.Equal(t, float64(offset), requests[0]["pageNo"])
+		assert.Equal(t, float64(limit), requests[0]["recordsOnPage"])
+
+		assert.Equal(t, "getProducts", requests[0]["requestName"])
+		assert.Equal(t, "smeval", requests[0]["somekey"])
+
+		err = sendRequest(w, 0, totalCount, [][]int{{1, 2}, {3, 4}, {5}})
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+	}))
+
+	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
+	baseClient.Url = srv.URL
+	productsClient := NewClient(baseClient)
+	productsDataProvider := NewListingDataProvider(productsClient)
+
+	actualProdIDs := make([]int, 0, 5)
+	err := productsDataProvider.Read(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"somekey": "smeval",
+				"pageNo": 1,
+				"recordsOnPage": 2,
+			},
+		},
+		func(item interface{}) {
+			assert.IsType(t, item, Product{})
+			actualProdIDs = append(actualProdIDs, item.(Product).ProductID)
+		},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []int{1,2,3,4,5}, actualProdIDs)
+}
+
+func TestReadError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := sendRequest(w, errors.MalformedRequest, 10, [][]int{{1}})
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+	}))
+
+	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
+	baseClient.Url = srv.URL
+	productsClient := NewClient(baseClient)
+	productsDataProvider := NewListingDataProvider(productsClient)
+
+	err := productsDataProvider.Read(
+		context.Background(),
+		[]map[string]interface{}{{"somekey": "smeval"}},
+		func(item interface{}) {},
+	)
+	assert.Error(t, err)
+	if err == nil {
+		return
+	}
+
+	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
 }
