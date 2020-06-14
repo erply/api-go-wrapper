@@ -41,7 +41,7 @@ type (
 		Dimensions []ProductDimensions `json:"dimensions"`
 	}
 
-	//Product ...
+	//Payload ...
 	Product struct {
 		ProductID          int                `json:"productID"`
 		Name               string             `json:"name"`
