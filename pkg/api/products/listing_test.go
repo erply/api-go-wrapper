@@ -10,7 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"sort"
 	"testing"
+	"time"
 )
 
 func extractBulkFiltersFromRequest(r *http.Request) (res map[string]interface{}, err error) {
@@ -201,8 +203,8 @@ func TestReadSuccess(t *testing.T) {
 		context.Background(),
 		[]map[string]interface{}{
 			{
-				"somekey": "smeval",
-				"pageNo": 1,
+				"somekey":       "smeval",
+				"pageNo":        1,
 				"recordsOnPage": 2,
 			},
 		},
@@ -216,7 +218,7 @@ func TestReadSuccess(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, []int{1,2,3,4,5}, actualProdIDs)
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, actualProdIDs)
 }
 
 func TestReadError(t *testing.T) {
@@ -244,4 +246,75 @@ func TestReadError(t *testing.T) {
 	}
 
 	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+}
+
+func TestReadSuccessIntegration(t *testing.T) {
+	const totalCount = 11
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		requests := parsedRequest["requests"].([]map[string]interface{})
+		assert.Len(t, requests, 1)
+
+		if requests[0]["pageNo"] == float64(1) {
+			err = sendRequest(w, 0, totalCount, [][]int{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}})
+		} else {
+			err = sendRequest(w, 0, totalCount, [][]int{{11}})
+		}
+
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+	}))
+
+	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
+	baseClient.Url = srv.URL
+	productsClient := NewClient(baseClient)
+	productsDataProvider := NewListingDataProvider(productsClient)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 0,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        10,
+			MaxFetchersCount:          10,
+		},
+		productsDataProvider,
+		func(sleepTime time.Duration) {},
+	)
+
+	prodsChan := lister.Get(context.Background(), map[string]interface{}{})
+
+	actualProdIDs := collectProdIDsFromChannel(prodsChan)
+	sort.Ints(actualProdIDs)
+
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, actualProdIDs)
+}
+
+func collectProdIDsFromChannel(prodsChan sharedCommon.ItemsStream) []int {
+	actualProdIDs := make([]int, 0)
+	doneChan := make(chan struct{}, 1)
+	go func() {
+		defer close(doneChan)
+		for prod := range prodsChan {
+			actualProdIDs = append(actualProdIDs, prod.Payload.(Product).ProductID)
+		}
+	}()
+
+mainLoop:
+	for {
+		select {
+		case <-doneChan:
+			break mainLoop
+		case <-time.After(time.Second * 5):
+			break mainLoop
+		}
+	}
+
+	return actualProdIDs
 }

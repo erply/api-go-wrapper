@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/erply/api-go-wrapper/pkg/api/products"
 	"net/http"
 	"time"
@@ -32,7 +33,13 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%+v\n", prods)
+	fmt.Printf("GetProductsBulk:\n%+v\n", prods)
+
+	prods, err = GetProductsInParallel(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GetProductsInParallel:\n%+v\n", prods)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -64,4 +71,43 @@ func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
 	}
 
 	return
+}
+
+func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
+	productsDataProvider := products.NewListingDataProvider(cl.ProductManager)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        10,
+			MaxFetchersCount:          2,
+		},
+		productsDataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	defer cancel()
+
+	prodsChan := lister.Get(ctx, map[string]interface{}{})
+
+	prods := make([]products.Product, 0)
+	var err error
+	doneChan := make(chan struct{}, 1)
+	go func() {
+		defer close(doneChan)
+		for prod := range prodsChan {
+			if prod.Err != nil {
+				err = prod.Err
+				return
+			}
+			prods = append(prods, prod.Payload.(products.Product))
+		}
+	}()
+
+	<-doneChan
+	return prods, err
 }

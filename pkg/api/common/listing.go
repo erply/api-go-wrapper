@@ -26,7 +26,6 @@ type ItemsStream chan Item
 type Item struct {
 	Err           error
 	TotalCount    int
-	ProgressCount int
 	Payload       interface{}
 }
 
@@ -35,8 +34,8 @@ func setListingSettingsDefaults(settingsFromInput ListingSettings) ListingSettin
 		settingsFromInput.MaxRequestsCountPerSecond = DefaultMaxRequestsCountPerSecond
 	}
 
-	if settingsFromInput.MaxItemsPerRequest == 0 || settingsFromInput.MaxItemsPerRequest > MaxCountPerBulkRequestItem {
-		settingsFromInput.MaxItemsPerRequest = MaxCountPerBulkRequestItem
+	if settingsFromInput.MaxItemsPerRequest == 0 || settingsFromInput.MaxItemsPerRequest > MaxCountPerBulkRequestItem * MaxCountPerBulkRequestItem {
+		settingsFromInput.MaxItemsPerRequest = MaxCountPerBulkRequestItem * MaxCountPerBulkRequestItem
 	}
 
 	if settingsFromInput.MaxFetchersCount == 0 {
@@ -131,25 +130,21 @@ func (p *Lister) getCursors(ctx context.Context, totalCount int) chan []Cursor {
 			p.listingSettings.MaxItemsPerRequest = MaxCountPerBulkRequestItem*MaxBulkRequestsCount
 		}
 
-		for ; leftCount > 0; { //leftCount 1000, p.listingSettings.MaxItemsPerRequest 100
+		for ; leftCount > 0; {
 			countToFetchForBulkRequest := leftCount
 			if leftCount > p.listingSettings.MaxItemsPerRequest {
 				countToFetchForBulkRequest = p.listingSettings.MaxItemsPerRequest
 			}
 
-			//countToFetchForBulkRequest 100
-
 			bulkItemsCount := CeilDivisionInt(countToFetchForBulkRequest, MaxCountPerBulkRequestItem)
 			if bulkItemsCount > MaxBulkRequestsCount {
 				bulkItemsCount = MaxBulkRequestsCount
 			}
-			//bulkItemsCount 1
 
 			limit := CeilDivisionInt(p.listingSettings.MaxItemsPerRequest, bulkItemsCount)
 			if limit > MaxCountPerBulkRequestItem {
 				limit = MaxCountPerBulkRequestItem
 			}
-			//limit 100
 
 			cursorsForBulkRequest := make([]Cursor, 0, bulkItemsCount)
 			for i := 0; i < bulkItemsCount; i++ {
@@ -243,9 +238,4 @@ func (p *Lister) mergeChannels(ctx context.Context, childChans ...ItemsStream) I
 
 func CeilDivisionInt(x, y int) int {
 	return int(math.Ceil(float64(x) / float64(y)))
-}
-
-func AddDefaultPaginationOption(filters map[string]interface{}, limit, page int) {
-	filters["recordsOnPage"] = limit
-	filters["pageNo"] = page
 }
