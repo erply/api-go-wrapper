@@ -90,8 +90,8 @@ func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) (
 func (cli *Client) SaveAddressesBulk(ctx context.Context, addrMap []map[string]interface{}, attrs map[string]string) (SaveAddressesResponseBulk, error) {
 	var saveAddressesResponseBulk SaveAddressesResponseBulk
 
-	if len(addrMap) > common.MaxBulkRequestsCount {
-		return saveAddressesResponseBulk, fmt.Errorf("cannot save more than %d addresses in one request", common.MaxBulkRequestsCount)
+	if len(addrMap) > sharedCommon.MaxBulkRequestsCount {
+		return saveAddressesResponseBulk, fmt.Errorf("cannot save more than %d addresses in one request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(addrMap))

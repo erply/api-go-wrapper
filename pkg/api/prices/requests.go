@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -69,8 +70,8 @@ func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method
 func (cli *Client) ChangeProductToSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (ChangeProductToSupplierPriceListResponseBulk, error) {
 	var bulkResp ChangeProductToSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", common.MaxBulkRequestsCount)
+	if len(bulkRequest) > common2.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", common2.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -294,8 +295,8 @@ func (cli *Client) DeleteProductsFromSupplierPriceList(ctx context.Context, filt
 func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (DeleteProductsFromSupplierPriceListResponseBulk, error) {
 	var bulkResp DeleteProductsFromSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", common.MaxBulkRequestsCount)
+	if len(bulkRequest) > common2.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", common2.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -365,8 +366,8 @@ func (cli *Client) SaveSupplierPriceList(ctx context.Context, filters map[string
 func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveSupplierPriceListResponseBulk, error) {
 	var bulkResp SaveSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", common.MaxBulkRequestsCount)
+	if len(bulkRequest) > common2.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", common2.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))

@@ -43,7 +43,7 @@ func (cli *Client) GetProducts(ctx context.Context, filters map[string]string) (
 	return res.Products, nil
 }
 
-// GetProductsBulk will list suppliers according to specified filters sending a bulk request to fetch more products than the default limit
+// GetProductsBulk will list products according to specified filters sending a bulk request to fetch more products than the default limit
 func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsResponseBulk, error) {
 	var productsResp GetProductsResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))

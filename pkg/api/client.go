@@ -30,7 +30,7 @@ type Client struct {
 	CustomerManager customers.Manager
 	//POS related requests
 	PosManager pos.Manager
-	//Products related requests
+	//ListingDataProvider related requests
 	ProductManager products.Manager
 	//SalesDocuments, Payments, Projects, ShoppingCart, VatRates
 	SalesManager sales.Manager
