@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"github.com/erply/api-go-wrapper/pkg/api"
@@ -18,12 +19,20 @@ func main() {
 	clientCode := flag.String("cc", "", "client code")
 	flag.Parse()
 
+	connectionTimeout := 60 * time.Second
+	transport := &http.Transport{
+		DisableKeepAlives:     true,
+		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		ResponseHeaderTimeout: connectionTimeout,
+	}
+	httpCl := &http.Client{Transport: transport}
+
 	sessionKey, err := auth.VerifyUser(*username, *password, *clientCode, http.DefaultClient)
 	if err != nil {
 		panic(err)
 	}
 
-	apiClient, err := api.NewClient(sessionKey, *clientCode, nil)
+	apiClient, err := api.NewClient(sessionKey, *clientCode, httpCl)
 	if err != nil {
 		panic(err)
 	}
@@ -80,8 +89,8 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 		sharedCommon.ListingSettings{
 			MaxRequestsCountPerSecond: 5,
 			StreamBufferLength:        10,
-			MaxItemsPerRequest:        10,
-			MaxFetchersCount:          2,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
 		},
 		productsDataProvider,
 		func(sleepTime time.Duration) {
@@ -92,7 +101,9 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
 	defer cancel()
 
-	prodsChan := lister.Get(ctx, map[string]interface{}{})
+	prodsChan := lister.Get(ctx, map[string]interface{}{
+		"changedSince": time.Date(2020, 2, 15, 0, 0, 0, 0, time.UTC).Unix(),
+	})
 
 	prods := make([]products.Product, 0)
 	var err error

@@ -156,7 +156,7 @@ func (p *Lister) getCursors(ctx context.Context, totalCount int) chan []Cursor {
 					},
 				)
 				curPage++
-				leftCount -= limit //leftCount 900
+				leftCount -= limit
 			}
 			select {
 			case out <- cursorsForBulkRequest:

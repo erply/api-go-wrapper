@@ -15,6 +15,9 @@ func NewListingDataProvider(erplyClient Manager) *ListingDataProvider {
 }
 
 func (l *ListingDataProvider) Count(ctx context.Context, filters map[string]interface{}) (int, error) {
+	filters["recordsOnPage"] = 1
+	filters["pageNo"] = 1
+
 	resp, err := l.erplyAPI.GetProductsBulk(ctx, []map[string]interface{}{filters}, map[string]string{})
 
 	if err != nil {
