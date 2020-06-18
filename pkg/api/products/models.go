@@ -79,7 +79,7 @@ type (
 
 	StockInfo struct {
 		WarehouseID   uint    `json:"warehouseID"`
-		Free          int     `json:"free"`
+		Free          float64 `json:"free"`
 		OrderPending  int     `json:"orderPending"`
 		ReorderPoint  int     `json:"reorderPoint"`
 		RestockLevel  int     `json:"restockLevel"`
