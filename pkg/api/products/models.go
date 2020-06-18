@@ -44,6 +44,7 @@ type (
 	//Payload ...
 	Product struct {
 		ProductID          int                `json:"productID"`
+		Active             int                `json:"active"`
 		Name               string             `json:"name"`
 		NameEng            string             `json:"nameENG"`
 		Code               string             `json:"code"`
@@ -61,15 +62,19 @@ type (
 		LastModified       uint64             `json:"lastModified"`
 		Vatrate            float64            `json:"vatrate"`
 		PriceWithVat       float32            `json:"priceWithVat"`
+		NetWeight          string            `json:"netWeight"`
 		UnitName           *string            `json:"unitName"`
 		BrandName          string             `json:"brandName"`
 		GroupName          string             `json:"groupName"`
 		CategoryId         uint               `json:"categoryID"`
 		CategoryName       string             `json:"categoryName"`
 		Status             string             `json:"status"`
+		SupplierID         int                `json:"supplierID"`
 		Images             []ProductImage     `json:"images"`
 		ProductVariations  []string           `json:"productVariations"` // Variations of matrix product
 		ParentProductID    int                `json:"parentProductID"`
+		NonStockProduct    int                `json:"nonStockProduct"`
+		TaxFree            int                `json:"taxFree"`
 		Type               string             `json:"type"`
 		Warehouses         map[uint]StockInfo `json:"warehouses"`
 

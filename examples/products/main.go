@@ -98,7 +98,7 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 		},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
 	defer cancel()
 
 	prodsChan := lister.Get(ctx, map[string]interface{}{
