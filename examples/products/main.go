@@ -37,6 +37,12 @@ func main() {
 		panic(err)
 	}
 
+	prodGroups, err := GetProductGroups(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GetProductGroups:\n%+v\n", prodGroups)
+
 	prods, err := GetProductsBulk(apiClient)
 	if err != nil {
 		panic(err)
@@ -121,4 +127,15 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 
 	<-doneChan
 	return prods, err
+}
+
+func GetProductGroups(cl *api.Client) ([]products.ProductGroup, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
+	defer cancel()
+
+	groups, err := cl.ProductManager.GetProductGroups(ctx, map[string]string{
+		"productGroupID": "2",
+	})
+
+	return groups, err
 }

@@ -62,7 +62,7 @@ type (
 		LastModified       uint64             `json:"lastModified"`
 		Vatrate            float64            `json:"vatrate"`
 		PriceWithVat       float32            `json:"priceWithVat"`
-		NetWeight          string            `json:"netWeight"`
+		NetWeight          string             `json:"netWeight"`
 		UnitName           *string            `json:"unitName"`
 		BrandName          string             `json:"brandName"`
 		GroupName          string             `json:"groupName"`
@@ -121,15 +121,16 @@ type (
 	}
 
 	ProductGroup struct {
-		ID              uint           `json:"productGroupID"`
-		Name            string         `json:"name"`
-		ShowInWebshop   string         `json:"showInWebshop"`
-		NonDiscountable byte           `json:"nonDiscountable"`
-		PositionNo      int            `json:"positionNo"`
-		ParentGroupID   string         `json:"parentGroupID"`
-		Added           uint64         `json:"added"`
-		LastModified    uint64         `json:"lastModified"`
-		SubGroups       []ProductGroup `json:"subGroups"`
+		ID              uint              `json:"productGroupID"`
+		Name            string            `json:"name"`
+		ShowInWebshop   string            `json:"showInWebshop"`
+		NonDiscountable byte              `json:"nonDiscountable"`
+		PositionNo      int               `json:"positionNo"`
+		ParentGroupID   string            `json:"parentGroupID"`
+		Added           uint64            `json:"added"`
+		LastModified    uint64            `json:"lastModified"`
+		SubGroups       []ProductGroup    `json:"subGroups"`
+		Attributes      []map[string]string `json:"attributes,omitempty"`
 	}
 
 	//GetProductUnitsResponse ...
