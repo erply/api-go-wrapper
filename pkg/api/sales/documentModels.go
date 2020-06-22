@@ -54,25 +54,26 @@ type (
 	}
 
 	InvoiceRow struct {
-		RowID             string  `json:"rowID"`
-		StableRowID       string  `json:"stableRowID"`
-		ProductID         string  `json:"productID"`
-		ItemName          string  `json:"itemName"`
-		Barcode           string  `json:"barcode"`
-		VatrateID         string  `json:"vatrateID"`
-		Amount            string  `json:"amount"`
-		Price             string  `json:"price"`
-		Discount          string  `json:"discount"`
-		BillingStartDate  string  `json:"billingStartDate"`
-		BillingEndDate    string  `json:"billingEndDate"`
-		Code              string  `json:"code"`
-		Code2             string  `json:"code2"`
-		FinalNetPrice     float64 `json:"finalNetPrice"`
-		FinalPriceWithVAT float64 `json:"finalPriceWithVAT"`
-		RowNetTotal       float64 `json:"rowNetTotal"`
-		RowVAT            float64 `json:"rowVAT"`
-		RowTotal          float64 `json:"rowTotal"`
-		CampaignIDs       string  `json:"campaignIDs"`
+		RowID             string      `json:"rowID"`
+		StableRowID       string      `json:"stableRowID"`
+		ProductID         string      `json:"productID"`
+		ItemName          string      `json:"itemName"`
+		Barcode           string      `json:"barcode"`
+		VatrateID         string      `json:"vatrateID"`
+		Amount            string      `json:"amount"`
+		Price             string      `json:"price"`
+		Discount          string      `json:"discount"`
+		BillingStartDate  string      `json:"billingStartDate"`
+		BillingEndDate    string      `json:"billingEndDate"`
+		Code              string      `json:"code"`
+		Code2             string      `json:"code2"`
+		FinalNetPrice     float64     `json:"finalNetPrice"`
+		FinalPriceWithVAT float64     `json:"finalPriceWithVAT"`
+		RowNetTotal       float64     `json:"rowNetTotal"`
+		RowVAT            float64     `json:"rowVAT"`
+		RowTotal          float64     `json:"rowTotal"`
+		CampaignIDs       string      `json:"campaignIDs"`
+		Jdoc              interface{} `json:"jdoc"`
 	}
 	VatTotalsByTaxRates []VatTotalsByTaxRate
 	VatTotalsByTaxRate  struct {
