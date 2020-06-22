@@ -11,6 +11,7 @@ type (
 		WarehouseID  int    `json:"warehouseID"`
 		Number       string `json:"number"`
 		Date         string `json:"date"`
+		DeliveryDate string `json:"deliveryDate"`
 		Time         string `json:"time"`
 
 		//Payer if invoice_client_is_payer = 1
@@ -51,6 +52,7 @@ type (
 		Penalty                 string              `json:"penalty"`
 		InvoiceLink             string              `json:"invoiceLink"`
 		InvoiceRows             []InvoiceRow        `json:"rows"`
+		Attributes              []PaymentAttribute  `json:"attributes"`
 	}
 
 	InvoiceRow struct {
