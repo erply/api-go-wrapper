@@ -14,7 +14,8 @@ type (
 		Time         string `json:"time"`
 
 		//Payer if invoice_client_is_payer = 1
-		ClientID int `json:"clientID"`
+		ClientID    int    `json:"clientID"`
+		ClientEmail string `json:"clientEmail"`
 		//Recipient if invoice_client_is_payer = 1
 		ShipToID int `json:"shipToID"`
 		//Recipient if invoice_client_is_payer = 0
