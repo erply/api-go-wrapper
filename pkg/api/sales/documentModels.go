@@ -11,10 +11,12 @@ type (
 		WarehouseID  int    `json:"warehouseID"`
 		Number       string `json:"number"`
 		Date         string `json:"date"`
+		DeliveryDate string `json:"deliveryDate"`
 		Time         string `json:"time"`
 
 		//Payer if invoice_client_is_payer = 1
-		ClientID int `json:"clientID"`
+		ClientID    int    `json:"clientID"`
+		ClientEmail string `json:"clientEmail"`
 		//Recipient if invoice_client_is_payer = 1
 		ShipToID int `json:"shipToID"`
 		//Recipient if invoice_client_is_payer = 0
@@ -51,28 +53,30 @@ type (
 		Penalty                 string              `json:"penalty"`
 		InvoiceLink             string              `json:"invoiceLink"`
 		InvoiceRows             []InvoiceRow        `json:"rows"`
+		Attributes              []PaymentAttribute  `json:"attributes"`
 	}
 
 	InvoiceRow struct {
-		RowID             string  `json:"rowID"`
-		StableRowID       string  `json:"stableRowID"`
-		ProductID         string  `json:"productID"`
-		ItemName          string  `json:"itemName"`
-		Barcode           string  `json:"barcode"`
-		VatrateID         string  `json:"vatrateID"`
-		Amount            string  `json:"amount"`
-		Price             string  `json:"price"`
-		Discount          string  `json:"discount"`
-		BillingStartDate  string  `json:"billingStartDate"`
-		BillingEndDate    string  `json:"billingEndDate"`
-		Code              string  `json:"code"`
-		Code2             string  `json:"code2"`
-		FinalNetPrice     float64 `json:"finalNetPrice"`
-		FinalPriceWithVAT float64 `json:"finalPriceWithVAT"`
-		RowNetTotal       float64 `json:"rowNetTotal"`
-		RowVAT            float64 `json:"rowVAT"`
-		RowTotal          float64 `json:"rowTotal"`
-		CampaignIDs       string  `json:"campaignIDs"`
+		RowID             string      `json:"rowID"`
+		StableRowID       string      `json:"stableRowID"`
+		ProductID         string      `json:"productID"`
+		ItemName          string      `json:"itemName"`
+		Barcode           string      `json:"barcode"`
+		VatrateID         string      `json:"vatrateID"`
+		Amount            string      `json:"amount"`
+		Price             string      `json:"price"`
+		Discount          string      `json:"discount"`
+		BillingStartDate  string      `json:"billingStartDate"`
+		BillingEndDate    string      `json:"billingEndDate"`
+		Code              string      `json:"code"`
+		Code2             string      `json:"code2"`
+		FinalNetPrice     float64     `json:"finalNetPrice"`
+		FinalPriceWithVAT float64     `json:"finalPriceWithVAT"`
+		RowNetTotal       float64     `json:"rowNetTotal"`
+		RowVAT            float64     `json:"rowVAT"`
+		RowTotal          float64     `json:"rowTotal"`
+		CampaignIDs       string      `json:"campaignIDs"`
+		Jdoc              interface{} `json:"jdoc"`
 	}
 	VatTotalsByTaxRates []VatTotalsByTaxRate
 	VatTotalsByTaxRate  struct {
