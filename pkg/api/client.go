@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"github.com/erply/api-go-wrapper/pkg/api/documents"
 	"github.com/erply/api-go-wrapper/pkg/api/prices"
 	"net/http"
 	"net/url"
@@ -38,6 +39,8 @@ type Client struct {
 	WarehouseManager warehouse.Manager
 	//Prices requests
 	PricesManager prices.Manager
+	//Documents requests
+	DocumentsManager documents.Manager
 	//Service Discovery
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
 }
@@ -83,5 +86,6 @@ func newErplyClient(c *common.Client) *Client {
 		WarehouseManager:  warehouse.NewClient(c),
 		ServiceDiscoverer: servicediscovery.NewClient(c),
 		PricesManager:     prices.NewClient(c),
+		DocumentsManager:  documents.NewClient(c),
 	}
 }

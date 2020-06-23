@@ -80,6 +80,10 @@ func TestReadingSuccess(t *testing.T) {
 				{ID: 1},
 				{ID: 2},
 			},
+			/**
+			the DataProviderMock is dummy and gives always 1,2 at every request, so it is expected to be called 5 times
+			(total 10 / MaxItemsPerRequest 2 which will generate 5 x {1,2} id responses which are expected here
+			*/
 			expectedProdIDs: []int{1, 1, 1, 1, 1, 2, 2, 2, 2, 2},
 			listingSettings: ListingSettings{
 				MaxRequestsCountPerSecond: 0,
@@ -288,8 +292,8 @@ func TestCancelReading(t *testing.T) {
 
 func TestReadItemsError(t *testing.T) {
 	dp := &DataProviderMock{
-		CountOutputCount:    1,
-		ReadErrorStr: "some read items error",
+		CountOutputCount: 1,
+		ReadErrorStr:     "some read items error",
 	}
 
 	lister := NewLister(ListingSettings{}, dp, NullSleeper)
@@ -302,6 +306,87 @@ func TestReadItemsError(t *testing.T) {
 
 	assert.Len(t, actualProds, 1)
 	assert.EqualError(t, actualProds[0].Err, "some read items error")
+}
+
+func TestReadingGroupedSuccess(t *testing.T) {
+	testCases := []struct {
+		name                string
+		total               int
+		inputProds          []payloadMock
+		listingSettings     ListingSettings
+		expectedProdIdsFlat []int
+		itemsCountPerGroup  int
+		expectedGroupCounts []int
+	}{
+		{
+			name:  "4 groups per 5 items with total 20 elements and 1 consumer",
+			total: 20,
+			inputProds: []payloadMock{
+				{ID: 1}, {ID: 2}, {ID: 3}, {ID: 4}, {ID: 5}, {ID: 6}, {ID: 7}, {ID: 8}, {ID: 9}, {ID: 10},
+				{ID: 11}, {ID: 12}, {ID: 13}, {ID: 14}, {ID: 15}, {ID: 16}, {ID: 17}, {ID: 18}, {ID: 19}, {ID: 20},
+			},
+			expectedProdIdsFlat: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},
+			listingSettings: ListingSettings{
+				MaxRequestsCountPerSecond: 0,
+				StreamBufferLength:        0,
+				MaxItemsPerRequest:        100,
+				MaxFetchersCount:          1,
+			},
+			itemsCountPerGroup: 5,
+			expectedGroupCounts: []int{5, 5, 5, 5},
+		},
+		{
+			name:                "4 groups per 3 items with total 10 elements and 10 consumer",
+			total:               12,
+			inputProds:          []payloadMock{{ID: 1}, {ID: 2}, {ID: 3}},
+			//will make ceil(10/3)=4 requests in total, so {1,2,3} * 4
+			expectedProdIdsFlat: []int{1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3},
+			listingSettings: ListingSettings{
+				StreamBufferLength: 3,
+				MaxItemsPerRequest: 3,
+				MaxFetchersCount:   10,
+			},
+			itemsCountPerGroup: 3,
+			expectedGroupCounts: []int{3, 3, 3, 3},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			dp := &DataProviderMock{
+				CountOutputCount:  testCase.total,
+				ProductsToRead:    testCase.inputProds,
+				countLock:         sync.Mutex{},
+				CountFiltersInput: map[string]interface{}{},
+				readLock:          sync.Mutex{},
+				ReadBulkFilters:   [][]map[string]interface{}{},
+			}
+			lister := NewLister(
+				testCase.listingSettings,
+				dp,
+				NullSleeper,
+			)
+
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			prodsChanGrouped := lister.GetGrouped(ctx, map[string]interface{}{"filterKey": "filterVal"}, testCase.itemsCountPerGroup)
+
+			groups, flatItems, flatIDs, actualGroupCounts := collectProdsGroupsFromChannel(prodsChanGrouped)
+
+			assert.Equal(t, map[string]interface{}{"filterKey": "filterVal", "pageNo": 1, "recordsOnPage": 1}, dp.CountFiltersInput)
+			assert.Equal(t, ctx, dp.CountContextInput)
+			assert.Equal(t, ctx, dp.ReadContextInput)
+			assert.ElementsMatch(t, testCase.expectedProdIdsFlat, flatIDs)
+			assert.Len(t, groups, len(testCase.expectedGroupCounts))
+
+			for _, prod := range flatItems {
+				assert.NoError(t, prod.Err)
+				assert.Equal(t, testCase.total, prod.TotalCount)
+				assert.IsType(t, prod.Payload, payloadMock{})
+			}
+			assert.ElementsMatch(t, testCase.expectedGroupCounts, actualGroupCounts)
+		})
+	}
 }
 
 func collectProdsFromChannel(prodsChan ItemsStream) []Item {
@@ -325,4 +410,38 @@ mainLoop:
 	}
 
 	return actualProds
+}
+
+func collectProdsGroupsFromChannel(
+	prodsChanGrouped ItemsStreamGrouped,
+) (groups [][]Item, flatItems []Item, flatIDs []int, actualGroupCounts []int) {
+	groups = make([][]Item, 0)
+	flatItems = make([]Item, 0)
+	flatIDs = make([]int, 0)
+	actualGroupCounts = make([]int, 0)
+	doneChan := make(chan struct{}, 1)
+	go func() {
+		defer close(doneChan)
+		for prodGroup := range prodsChanGrouped {
+			groups = append(groups, prodGroup)
+			for _, prod := range prodGroup {
+				flatItems = append(flatItems, prod)
+				id := prod.Payload.(payloadMock).ID
+				flatIDs = append(flatIDs, id)
+			}
+			actualGroupCounts = append(actualGroupCounts, len(prodGroup))
+		}
+	}()
+
+mainLoop:
+	for {
+		select {
+		case <-doneChan:
+			break mainLoop
+		case <-time.After(time.Second):
+			break mainLoop
+		}
+	}
+
+	return
 }
