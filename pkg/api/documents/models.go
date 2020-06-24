@@ -65,7 +65,7 @@ type PurchaseDocument struct {
 	SupplierName2            string                       `json:"supplierName2"`
 	StateID                  int                          `json:"stateID"`
 	PaymentDays              int                          `json:"paymentDays"`
-	Paid                     int                          `json:"paid,string"`
+	Paid                     json.Number                  `json:"paid"`
 	TransactionTypeID        int                          `json:"transactionTypeID"`
 	TransportTypeID          int                          `json:"transportTypeID"`
 	DeliveryTermsID          int                          `json:"deliveryTermsID"`
@@ -82,7 +82,7 @@ type PurchaseDocument struct {
 	NetTotalsByTaxRate       []VatRate                    `json:"netTotalsByTaxRate"`
 	VatTotalsByTaxRate       []VatRate                    `json:"vatTotalsByTaxRate"`
 	InvoiceLink              string                       `json:"invoiceLink"`
-	ShipDate                 time.Time                    `json:"shipDate"`
+	ShipDate                 string                       `json:"shipDate"`
 	Cost                     float64                      `json:"cost"`
 	NetTotalForAccounting    json.Number                  `json:"netTotalForAccounting"`
 	TotalForAccounting       json.Number                  `json:"totalForAccounting"`
