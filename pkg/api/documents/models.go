@@ -1,6 +1,7 @@
 package documents
 
 import (
+	"encoding/json"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"time"
 )
@@ -43,13 +44,13 @@ type PurchaseDocument struct {
 	Type                     PurchaseOrderType            `json:"type"`
 	Status                   DocumentStatus               `json:"status"`
 	CurrencyCode             string                       `json:"currencyCode"`
-	CurrencyRate             float64                      `json:"currencyRate"`
+	CurrencyRate             json.Number                  `json:"currencyRate"`
 	WarehouseID              int                          `json:"warehouseID"`
 	WarehouseName            string                       `json:"warehouseName"`
 	Number                   string                       `json:"number"`
 	RegNumber                string                       `json:"regnumber"`
-	Date                     time.Time                    `json:"date"`
-	InventoryTransactionDate time.Time                    `json:"inventoryTransactionDate"`
+	Date                     string                       `json:"date"`
+	InventoryTransactionDate string                       `json:"inventoryTransactionDate,omitempty"`
 	Time                     string                       `json:"time"`
 	SupplierID               int                          `json:"supplierID"`
 	SupplierName             string                       `json:"supplierName"`
@@ -64,7 +65,7 @@ type PurchaseDocument struct {
 	SupplierName2            string                       `json:"supplierName2"`
 	StateID                  int                          `json:"stateID"`
 	PaymentDays              int                          `json:"paymentDays"`
-	Paid                     int                          `json:"paid"`
+	Paid                     int                          `json:"paid,string"`
 	TransactionTypeID        int                          `json:"transactionTypeID"`
 	TransportTypeID          int                          `json:"transportTypeID"`
 	DeliveryTermsID          int                          `json:"deliveryTermsID"`
@@ -83,8 +84,8 @@ type PurchaseDocument struct {
 	InvoiceLink              string                       `json:"invoiceLink"`
 	ShipDate                 time.Time                    `json:"shipDate"`
 	Cost                     float64                      `json:"cost"`
-	NetTotalForAccounting    float64                      `json:"netTotalForAccounting"`
-	TotalForAccounting       float64                      `json:"totalForAccounting"`
+	NetTotalForAccounting    json.Number                  `json:"netTotalForAccounting"`
+	TotalForAccounting       json.Number                  `json:"totalForAccounting"`
 	BaseToDocuments          []ReferencedPurchaseDocument `json:"baseToDocuments"`
 	BaseDocuments            []ReferencedPurchaseDocument `json:"baseDocuments"`
 	LastModified             int64                        `json:"lastModified"`
@@ -93,23 +94,23 @@ type PurchaseDocument struct {
 }
 
 type PurchaseDocumentRow struct {
-	ProductID        int       `json:"productID"`
-	ServiceID        int       `json:"serviceID"`
-	ItemName         string    `json:"itemName"`
-	Code             string    `json:"code"`
-	Code2            string    `json:"code2"`
-	VatrateID        int       `json:"vatrateID"`
-	Amount           float64   `json:"amount"`
-	Price            float64   `json:"price"`
-	Discount         float64   `json:"discount"`
-	DeliveryDate     time.Time `json:"deliveryDate"`
-	UnitCost         float64   `json:"unitCost"`
-	CostTotal        float64   `json:"costTotal"`
-	PackageID        int       `json:"packageID"`
-	AmountOfPackages float64   `json:"amountOfPackages"`
-	AmountInPackage  float64   `json:"amountInPackage"`
-	PackageType      string    `json:"packageType"`
-	PackageTypeID    int       `json:"packageTypeID"`
+	ProductID        int         `json:"productID"`
+	ServiceID        int         `json:"serviceID"`
+	ItemName         string      `json:"itemName"`
+	Code             string      `json:"code"`
+	Code2            string      `json:"code2"`
+	VatrateID        int         `json:"vatrateID"`
+	Amount           json.Number `json:"amount"`
+	Price            json.Number `json:"price"`
+	Discount         json.Number `json:"discount"`
+	DeliveryDate     string      `json:"deliveryDate"`
+	UnitCost         json.Number `json:"unitCost"`
+	CostTotal        float64     `json:"costTotal"`
+	PackageID        int         `json:"packageID"`
+	AmountOfPackages json.Number `json:"amountOfPackages"`
+	AmountInPackage  json.Number `json:"amountInPackage"`
+	PackageType      string      `json:"packageType"`
+	PackageTypeID    int         `json:"packageTypeID"`
 }
 
 type GetPurchaseDocumentBulkItem struct {
@@ -118,8 +119,8 @@ type GetPurchaseDocumentBulkItem struct {
 }
 
 type GetPurchaseDocumentResponseBulk struct {
-	Status    sharedCommon.Status `json:"status"`
-	BulkItems []GetPurchaseDocumentBulkItem  `json:"requests"`
+	Status    sharedCommon.Status           `json:"status"`
+	BulkItems []GetPurchaseDocumentBulkItem `json:"requests"`
 }
 
 type GetPurchaseDocumentsResponse struct {
