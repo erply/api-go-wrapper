@@ -57,4 +57,13 @@ type (
 		IdentityToken      string `json:"identityToken"`
 		Token              string `json:"token"`
 	}
+
+	SessionKeyInfoResponse struct {
+		Status  common2.Status   `json:"status"`
+		Records []SessionKeyInfo `json:"records"`
+	}
+	SessionKeyInfo struct {
+		CreationUnixTime string `json:"creationUnixTime"`
+		ExpireUnixTime   string `json:"expireUnixTime"`
+	}
 )
