@@ -6,6 +6,7 @@ import (
 
 type (
 	VerifyUserResponse struct {
+		Status common2.Status `json:"status"`
 		Records []Records `json:"records"`
 	}
 
