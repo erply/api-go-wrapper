@@ -37,6 +37,11 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return "", erro.NewFromError("failed to decode VerifyUserResponse", err)
 	}
+
+	if res.Status.ErrorCode != 0 {
+		return "",  erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+
 	if len(res.Records) < 1 {
 		return "", erro.NewFromError("VerifyUser: no records in response", nil)
 	}
