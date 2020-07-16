@@ -2,10 +2,11 @@ package api
 
 import (
 	"errors"
-	"github.com/erply/api-go-wrapper/pkg/api/documents"
-	"github.com/erply/api-go-wrapper/pkg/api/prices"
 	"net/http"
 	"net/url"
+
+	"github.com/erply/api-go-wrapper/pkg/api/documents"
+	"github.com/erply/api-go-wrapper/pkg/api/prices"
 
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
@@ -71,6 +72,15 @@ func NewClientWithCustomHeaders(customHTTPCli *http.Client, headersSetToEveryReq
 		return nil, errors.New("the function that will set headers to every request is a required argument")
 	}
 	return newErplyClient(common.NewClient("", "", "", customHTTPCli, headersSetToEveryRequest)), nil
+}
+
+//NewClientWithURL creates a new Client which can have a static URL which is not affected by clientCode
+// nor the headersSetToEveryRequest function if set. If the url parameter is set to an empty string, the URL
+// is still resolved normally. This allows creating clients which have a static url in your unit tests but function
+// normally in the rest of your code
+func NewClientWithURL(sk, cc, partnerKey, url string, httpCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) *Client {
+	comCli := common.NewClientWithURL(sk, cc, partnerKey, url, httpCli, headersSetToEveryRequest)
+	return newErplyClient(comCli)
 }
 
 func newErplyClient(c *common.Client) *Client {
