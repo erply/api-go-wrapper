@@ -78,9 +78,12 @@ func NewClientWithCustomHeaders(customHTTPCli *http.Client, headersSetToEveryReq
 // nor the headersSetToEveryRequest function if set. If the url parameter is set to an empty string, the URL
 // is still resolved normally. This allows creating clients which have a static url in your unit tests but function
 // normally in the rest of your code
-func NewClientWithURL(sk, cc, partnerKey, url string, httpCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) *Client {
-	comCli := common.NewClientWithURL(sk, cc, partnerKey, url, httpCli, headersSetToEveryRequest)
-	return newErplyClient(comCli)
+func NewClientWithURL(sessionKey, clientCode, partnerKey, url string, httpCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) (*Client, error) {
+	if (sessionKey == "" || clientCode == "") && headersSetToEveryRequest == nil {
+		return nil, errors.New("Either sessionKey and clientCode or a function for header generation is required")
+	}
+	comCli := common.NewClientWithURL(sessionKey, clientCode, partnerKey, url, httpCli, headersSetToEveryRequest)
+	return newErplyClient(comCli), nil
 }
 
 func newErplyClient(c *common.Client) *Client {
