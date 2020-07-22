@@ -45,17 +45,7 @@ type (
 	Product struct {
 		ProductID          int                `json:"productID"`
 		Active             int                `json:"active"`
-		Name               string             `json:"name"`
-		NameEng            string             `json:"nameENG"`
-		NameSpa            string             `json:"nameSPA"`
-		NameEst            string             `json:"nameEST"`
-		NameGer            string             `json:"nameGER"`
-		NameSwe            string             `json:"nameSWE"`
-		NameFin            string             `json:"nameFIN"`
-		NameRus            string             `json:"nameRUS"`
-		NameLat            string             `json:"nameLAT"`
-		NameLit            string             `json:"nameLIT"`
-		NameGre            string             `json:"nameGRE"`
+		NameLanguages
 		Code               string             `json:"code"`
 		Code2              string             `json:"code2"`
 		Code3              *string            `json:"code3"`
@@ -150,6 +140,18 @@ type (
 
 	ProductGroup struct {
 		ID              uint                `json:"productGroupID"`
+		NameLanguages
+		ShowInWebshop   string              `json:"showInWebshop"`
+		NonDiscountable byte                `json:"nonDiscountable"`
+		PositionNo      int                 `json:"positionNo"`
+		ParentGroupID   string              `json:"parentGroupID"`
+		Added           uint64              `json:"added"`
+		LastModified    uint64              `json:"lastModified"`
+		SubGroups       []ProductGroup      `json:"subGroups"`
+		Attributes      []map[string]string `json:"attributes,omitempty"`
+	}
+
+	NameLanguages struct {
 		Name            string              `json:"name"`
 		NameEng         string              `json:"nameENG"`
 		NameSpa         string              `json:"nameSPA"`
@@ -161,16 +163,7 @@ type (
 		NameLat         string              `json:"nameLAT"`
 		NameLit         string              `json:"nameLIT"`
 		NameGre         string              `json:"nameGRE"`
-		ShowInWebshop   string              `json:"showInWebshop"`
-		NonDiscountable byte                `json:"nonDiscountable"`
-		PositionNo      int                 `json:"positionNo"`
-		ParentGroupID   string              `json:"parentGroupID"`
-		Added           uint64              `json:"added"`
-		LastModified    uint64              `json:"lastModified"`
-		SubGroups       []ProductGroup      `json:"subGroups"`
-		Attributes      []map[string]string `json:"attributes,omitempty"`
 	}
-
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
 		Status       sharedCommon.Status `json:"status"`
