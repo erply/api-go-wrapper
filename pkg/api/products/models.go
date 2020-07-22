@@ -151,6 +151,16 @@ type (
 	ProductGroup struct {
 		ID              uint                `json:"productGroupID"`
 		Name            string              `json:"name"`
+		NameEng         string              `json:"nameENG"`
+		NameSpa         string              `json:"nameSPA"`
+		NameEst         string              `json:"nameEST"`
+		NameGer         string              `json:"nameGER"`
+		NameSwe         string              `json:"nameSWE"`
+		NameFin         string              `json:"nameFIN"`
+		NameRus         string              `json:"nameRUS"`
+		NameLat         string              `json:"nameLAT"`
+		NameLit         string              `json:"nameLIT"`
+		NameGre         string              `json:"nameGRE"`
 		ShowInWebshop   string              `json:"showInWebshop"`
 		NonDiscountable byte                `json:"nonDiscountable"`
 		PositionNo      int                 `json:"positionNo"`
