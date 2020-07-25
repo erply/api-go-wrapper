@@ -7,7 +7,16 @@ import (
 
 type AuthFunc func(string) url.Values
 
+//NewClientWithURL allows creating a new Client with a hardcoded URL. Useful for testing purposes
+func NewClientWithURL(sk, cc, partnerKey, url string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
+	return newClientFull(sk, cc, partnerKey, url, httpCli, headersForEveryRequestFunc)
+}
+
 func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
+	return newClientFull(sk, cc, partnerKey, "", httpCli, headersForEveryRequestFunc)
+}
+
+func newClientFull(sk, cc, partnerKey, url string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
 	if httpCli == nil {
 		httpCli = GetDefaultHTTPClient()
 	}
@@ -22,10 +31,14 @@ func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryR
 	if cli.headersFunc == nil {
 		cli.headersFunc = cli.getDefaultMandatoryHeaders
 	}
-	if cc != "" {
-		cli.Url = GetBaseURL(cc)
+	if url == "" {
+		if cc != "" {
+			cli.Url = GetBaseURL(cc)
+		} else {
+			cli.Url = GetBaseURLFromAuthFunc(cli.headersFunc)
+		}
 	} else {
-		cli.Url = GetBaseURLFromAuthFunc(cli.headersFunc)
+		cli.Url = url
 	}
 	return cli
 }

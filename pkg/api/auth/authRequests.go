@@ -3,11 +3,12 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	erro "github.com/erply/api-go-wrapper/internal/errors"
 )
 
 //VerifyUser will give you session key
@@ -92,6 +93,53 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	res := &SessionKeyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erro.NewFromError("failed to decode SessionKeyUserResponse", err)
+	}
+	if len(res.Records) < 1 {
+		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
+	}
+	return &res.Records[0], nil
+}
+
+//GetSessionKeyInfo returns session key expiration info
+func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) (*SessionKeyInfo, error) {
+	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	params := url.Values{}
+	params.Add("sessionKey", sessionKey)
+	params.Add("request", "getSessionKeyInfo")
+	params.Add("clientCode", clientCode)
+
+	req, err := http.NewRequest("POST", requestUrl, nil)
+	if err != nil {
+		return nil, erro.NewFromError("failed to build HTTP request", err)
+	}
+
+	req.URL.RawQuery = params.Encode()
+	req.Header.Add("Accept", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, erro.NewFromError("failed to call getSessionKeyInfo request", err)
+	}
+
+	if resp.Body != nil {
+		defer resp.Body.Close()
+	}
+
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		body := []byte{}
+		if resp.Body != nil {
+			body, err = ioutil.ReadAll(resp.Body)
+			if err != nil {
+				body = []byte{}
+			}
+		}
+
+		return nil, fmt.Errorf("wrong response status code: %d, body: %s", resp.StatusCode, string(body))
+	}
+
+	res := &SessionKeyInfoResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to decode SessionKeyInfoResponse", err)
 	}
 	if len(res.Records) < 1 {
 		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)

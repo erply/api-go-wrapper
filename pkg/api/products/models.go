@@ -45,8 +45,7 @@ type (
 	Product struct {
 		ProductID          int                `json:"productID"`
 		Active             int                `json:"active"`
-		Name               string             `json:"name"`
-		NameEng            string             `json:"nameENG"`
+		NameLanguages
 		Code               string             `json:"code"`
 		Code2              string             `json:"code2"`
 		Code3              *string            `json:"code3"`
@@ -58,6 +57,24 @@ type (
 		DescriptionLong    string             `json:"longdesc"`
 		DescriptionEng     string             `json:"descriptionENG"`
 		DescriptionLongEng string             `json:"longdescENG"`
+		DescriptionSpa     string             `json:"descriptionSPA"`
+		DescriptionLongSpa string             `json:"longdescSPA"`
+		DescriptionEst     string             `json:"descriptionEST"`
+		DescriptionLongEst string             `json:"longdescEST"`
+		DescriptionGer     string             `json:"descriptionGER"`
+		DescriptionLongGer string             `json:"longdescGER"`
+		DescriptionSwe     string             `json:"descriptionSWE"`
+		DescriptionLongSwe string             `json:"longdescSWE"`
+		DescriptionFin     string             `json:"descriptionFIN"`
+		DescriptionLongFin string             `json:"longdescFIN"`
+		DescriptionRus     string             `json:"descriptionRUS"`
+		DescriptionLongRus string             `json:"longdescRUS"`
+		DescriptionLat     string             `json:"descriptionLAT"`
+		DescriptionLongLat string             `json:"longdescLAT"`
+		DescriptionLit     string             `json:"descriptionLIT"`
+		DescriptionLongLit string             `json:"longdescLIT"`
+		DescriptionGre     string             `json:"descriptionGRE"`
+		DescriptionLongGre string             `json:"longdescGRE"`
 		Added              uint64             `json:"added"`
 		LastModified       uint64             `json:"lastModified"`
 		Vatrate            float64            `json:"vatrate"`
@@ -123,7 +140,7 @@ type (
 
 	ProductGroup struct {
 		ID              uint                `json:"productGroupID"`
-		Name            string              `json:"name"`
+		NameLanguages
 		ShowInWebshop   string              `json:"showInWebshop"`
 		NonDiscountable byte                `json:"nonDiscountable"`
 		PositionNo      int                 `json:"positionNo"`
@@ -134,6 +151,19 @@ type (
 		Attributes      []map[string]string `json:"attributes,omitempty"`
 	}
 
+	NameLanguages struct {
+		Name            string              `json:"name"`
+		NameEng         string              `json:"nameENG"`
+		NameSpa         string              `json:"nameSPA"`
+		NameEst         string              `json:"nameEST"`
+		NameGer         string              `json:"nameGER"`
+		NameSwe         string              `json:"nameSWE"`
+		NameFin         string              `json:"nameFIN"`
+		NameRus         string              `json:"nameRUS"`
+		NameLat         string              `json:"nameLAT"`
+		NameLit         string              `json:"nameLIT"`
+		NameGre         string              `json:"nameGRE"`
+	}
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
 		Status       sharedCommon.Status `json:"status"`
