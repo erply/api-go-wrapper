@@ -234,38 +234,88 @@ The `Lister` is based on a popular [Fan-out](https://blog.golang.org/pipelines) 
 
 ### Get method algorithm
 
-`Lister` requires `DataProvider` interface which wraps all individual Erply APIs which should support advanced parallel listing. A corresponding API should be able to give the amount of elements which match the filter (usually we use `RecordsTotal` value of a [bulk status response](https://learn-api.erply.com/getting-started/bulk-api-calls)) and support pagination options `recordsOnPage`, `pageNo` (see e.g. [getProducts](https://learn-api.erply.com/requests/getproducts)).
+`Lister` requires `DataProvider` interface which wraps all different Erply APIs that support advanced parallel listing. A corresponding API should be able to give the amount of elements which match to the filter (usually we use `RecordsTotal` value of a [bulk status response](https://learn-api.erply.com/getting-started/bulk-api-calls)) and support pagination options `recordsOnPage`, `pageNo` (see e.g. [getProducts](https://learn-api.erply.com/requests/getproducts)).
 
 #### Planning stage
-`Lister` calls  `DataProvider` with the provided filters to figure out how many elements are matching the filters. This also helps to stop the execution and close output channel once all items are fetched.
+`Lister` calls  `DataProvider` with the provided filters to figure out how many elements are matching the filters. This also helps to indicate the end of processing and close the corresponding output channels.
+
+    filters["recordsOnPage"] = 1
+    filters["pageNo"] = 1
+	totalCount, err := p.listingDataProvider.Count(ctx, filters)
 
 #### Creating Cursor channel and planning the fetching
-`Lister` creates an input channel of `[]Cursor` items, where each `Cursor` identifies the chunk of the data which should be fetched from an API. 
+`Lister` creates an input channel of `[]Cursor` items, where each `Cursor` contains pagination options for fetching a subset of data from an API.
 
 The idea of the cursor is simple: imagine you have 100 products in total. You allow to fetch 10 items per request (see `MaxItemsPerRequest` option). You would need 10 cursors to fetch the whole sequence: 
 
 `[1-10], [11-20], [21-30], [31-40], [41-50], [51-60], [61-70], [71-80], [81-90], [91-100]`
 
-You can simplify cursor data as the offset + limit numbers e.g.
+You can simplify cursor data as the offset and limit numbers e.g.
 
 `[1, 10], [11, 10], [31, 10] etc.`
 
-Knowing the amount of items per request and the total number of items to process, we can calculate all the Cursors, which are needed to fetch all items respecting the request limit. 
+Knowing the amount of items per request and the total number of items, we can calculate the `Cursors` collection and distribute the load among multiple fetchers. 
 
-But why we create `chan []Cursor` rather than `chan Cursor`? Of course we could create 10 cursors and make 10 parallel requests but we have bulk request, so practically we could send 1 request with 10 subrequests and spare 9 network requests which will speed up our execution. So the algorithm takes into account the max number of items per 1 API request (100) and the `MaxItemsPerRequest` value to understand how many bulk requests are needed to fetch the whole amount of items.
+But why we create `chan []Cursor` rather than `chan Cursor`? We could create 10 cursors and make 10 parallel requests, but we would be more effecient to pack the load into bulk requests. In our case we can send 1 request with 10 subrequests and spare 9 API calls to speed up our execution. So the algorithm takes into account the max number of items per 1 API request (100) and the `MaxItemsPerRequest` parameter indicating the total limit of items which one bulk request might contain. So we understand how many bulk requests are needed to fetch the whole amount of items.
 
-Let's consider following more realistic example:
+Let's consider a following example:
 
+Input data:
 total items count: 100 000
 max items per request: 500
-chan []Cursor: first item send over the channel will look like []Cursor{{offset:0, limit: 100}, {offset:100, limit: 100}, {offset:200, limit: 100}, {offset:300, limit: 100}, {offset:400, limit: 100}}
 
-This means the first element would require to make a bulk request with 5 subrequests respecting the limit of 500. To total amount of items transferred through the `[]Cursor` channel will be 100 000 / 500 = 20. Of course the logic controls that the amount of `[]Cursor` items is not greather than 100 (you cannot make more than 100 subrequests in one bulk request)
+When we start consuming the `chan []Cursor`, we will probably get the first item like
 
-### Starting fetching
-We start `MaxFetchersCount` go routines (see `fetchItemsChunk` method). Each go routine creates an output channel (`chan Item`) and returns it to the main process. Each go routine starts consumption from the `chan []Cursor` channel.
+    []Cursor{{offset:0, limit: 100}, {offset:100, limit: 100}, {offset:200, limit: 100}, {offset:300, limit: 100}, {offset:400, limit: 100}}
+
+This indicates a command to build a bulk request with 5 subrequests respecting the limit 500. To total amount of items transferred through the `[]Cursor` channel will be 100 000 / 500 = 20. Of course the logic controls that the amount of `[]Cursor` items is not greather than 100 (you cannot make more than 100 subrequests in one bulk request)
+
+See the `func (p *Lister) getCursors` function for an algorithm of building fetchers input
+
+### Start fetching items from an API
+
+We start `MaxFetchersCount` go routines. Each go routine creates an output channel (`chan Item`) and returns it to the main process. Each go routine starts consumption from the `chan []Cursor` channel.
+
+	for i := 0; i < p.listingSettings.MaxFetchersCount; i++ {
+		childChan := p.fetchItemsChunk(ctx, cursorsChan, totalCount, filters)
+		childChans = append(childChans, childChan)
+	}
+	
+    go func() {
+        defer close(prodStream)
+        for cursors := range cursorChan {
+            p.fetchItemsFromAPI(ctx, cursors, totalCount, prodStream, filters)
+
+            select {
+            case <-ctx.Done():
+                return
+            default:
+                continue
+            }
+        }
+    }()
+
 It creates a bulk request with len([]Cursor) items and applies the filters `map[string]interface{}`, which was passed to the Lister in the `Get` method. 
 
+    bulkFilters := make([]map[string]interface{}, 0, len(cursors))
+    for _, cursor := range cursors {
+        bulkFilter := make(map[string]interface{})
+        for filterKey, filterValue := range filters {
+            bulkFilter[filterKey] = filterValue
+        }
+        bulkFilter["recordsOnPage"] = cursor.Limit
+        bulkFilter["pageNo"] = cursor.Offset
+        bulkFilters = append(bulkFilters, bulkFilter)
+    }
+    
+    ...
+    err := p.listingDataProvider.Read(ctx, bulkFilters, func(item interface{}) {
+        outputChan <- Item{
+            Err:        nil,
+            TotalCount: totalCount,
+            Payload:    item,
+        }
+    })
 It calls a bulk request respecting the throttling logic. It sends each item to the output channel (`chan Item`) and reads the next cursor chunk from the input channel. 
 
 All fetchers are respecting context cancellation when consuming the `[]Cursor` channel. Once the cursors are send to the channel, it will be closed, so the fetchers will exit the channel loop and close their output channels. 
