@@ -308,7 +308,9 @@ It creates a bulk request with len([]Cursor) items and applies the filters `map[
         bulkFilters = append(bulkFilters, bulkFilter)
     }
     
-    ...
+It calls a bulk request respecting the throttling logic. Each item is sent to the output channel (`chan Item`). 
+
+    p.reqThrottler.Throttle()
     err := p.listingDataProvider.Read(ctx, bulkFilters, func(item interface{}) {
         outputChan <- Item{
             Err:        nil,
@@ -316,14 +318,91 @@ It creates a bulk request with len([]Cursor) items and applies the filters `map[
             Payload:    item,
         }
     })
-It calls a bulk request respecting the throttling logic. It sends each item to the output channel (`chan Item`) and reads the next cursor chunk from the input channel. 
 
 All fetchers are respecting context cancellation when consuming the `[]Cursor` channel. Once the cursors are send to the channel, it will be closed, so the fetchers will exit the channel loop and close their output channels. 
 
 If a fetcher will get some unhealthy status from a bulk requests or will have any other non-recoverable failure, it will send an `Item` with a non-empty error field to the output channel. It will also stop further execution. The external application logic should handle the error and practically stop all the execution of the whole app. Currently library doesn't support error recovery and restart/reconnect policy.
 
+
+    if err != nil {
+		outputChan <- Item{
+			Err:        err,
+			TotalCount: totalCount,
+			Payload:    nil,
+		}
+		return
+	}
+
 ### Merging output channels
 We create a single output channel, which will at the end be returned to the `Get` method caller. For each of the go routines output channel we start another go routine to consume from it. Each such routine will just forward all consumed items to the single output channel. 
 
-By using the WaitGroup struct, it will start another go routine which will close the final output channel once the all inbound output channels are closed.
-The merged output channel is returne to the `Get` method caller. 
+parentChan := make(ItemsStream, p.listingSettings.StreamBufferLength)
+
+	for _, childChan := range childChans {
+		go func(productsChildhan <-chan Item) {
+			defer wg.Done()
+			for prod := range productsChildChan {
+				select {
+				case parentChan <- prod:
+					continue
+				case <-ctx.Done():
+					return
+				}
+			}
+		}(childChan)
+	}
+The `WaitGroup` struct allows to close the single output channel, once all go routines of the inbound output channels are closed by fetchers in multiple go routines.
+
+    go func() {
+      wg.Wait()
+      close(parentChan)
+    }()
+
+### Returning output channel to the caller
+Once all background processes go routines are started, the `Get` method returns the mrged output channel to the caller. 
+
+    return p.mergeChannels(ctx, childChans...)
+    
+### GetGrouped method algorithm
+
+The method accepts the `groupSize` parameter indicating the amount of items which will be packed into a single group. This parameter should not be greather than max amount of items per bulk request (100 x 100).
+
+First this method calls the `Get` method internally and creates the output channel for grouped items:
+
+    itemsStream := p.Get(ctx, filters)
+    groupedItemsChan := make(ItemsStreamGrouped, p.listingSettings.MaxFetchersCount)
+
+It starts a single go routine which consumes the output channel and stores consumed items into a buffer slice:
+
+    buf := make([]Item, 0, groupSize)
+    ...
+    buf = append(buf, item)
+ 
+Once the buffer length reaches the value of `groupSize`, it gets sends to the group output channel, and the buffer gets reset:
+
+    if len(buf) >= groupSize {
+        groupedItemsChan <- buf
+        buf = make([]Item, 0)
+        continue
+    }
+
+If the inbound output channel is closed, we send the rest of the buffer to the outbound output channel and close it:
+
+    defer func() {
+        if len(buf) == 0 {
+            return
+        }
+        groupedItemsChan <- buf
+    }()
+
+    ...
+    
+    case item, ok := <-itemsStream:
+        if !ok {
+            //channel is closed
+            return
+        }
+        
+The outbound output channel is returned to the caller of the `GetGrouped` method:
+
+    return groupedItemsChan
