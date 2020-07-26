@@ -37,9 +37,8 @@ Advanced listing
 Advanced listing was disigned to read large data collections by multiple parallel fetchers with respect of API limitations. Moreover this API will use the minimal amount of requests by packing them into bigger bulk API calls, so the too many request failures will be less probable. 
 
 Generally all you need is to create a `Lister` struct giving `ListingSettings`which customises the parallel processing. 
-Then you can call either `Get` or `GetGrouped` method, they will give you in return a channel of items which you can consume concurrently with go routines. The fetchers of the library will close the channel once all required data was fetched from a corresponding API, so you can securely iterate over the channel with your go routines.
+Then you can call either `Get` or `GetGrouped` method, they will give you in return a channel of items which you can consume concurrently with go routines. The fetchers of the library will close the channel once all required data was read from a corresponding API, so you can securely iterate over the channel with your go routines.
 
- 
 ### Getting started
 In this intro we want to read all products (`products.Product`) which were changed after a defined date. Since we expect a large amount of such items, we would prefer to use a parallel listing API.
 
