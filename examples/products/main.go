@@ -71,7 +71,7 @@ func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
 			"code": "87001",
 		},
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	bulkResp, err := prodCli.GetProductsBulk(ctx, bulkFilters, map[string]string{})
@@ -104,7 +104,7 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 		},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
 	prodsChan := lister.Get(ctx, map[string]interface{}{
@@ -112,25 +112,18 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 	})
 
 	prods := make([]products.Product, 0)
-	var err error
-	doneChan := make(chan struct{}, 1)
-	go func() {
-		defer close(doneChan)
-		for prod := range prodsChan {
-			if prod.Err != nil {
-				err = prod.Err
-				return
-			}
-			prods = append(prods, prod.Payload.(products.Product))
+	for prod := range prodsChan {
+		if prod.Err != nil {
+			return prods, prod.Err
 		}
-	}()
+		prods = append(prods, prod.Payload.(products.Product))
+	}
 
-	<-doneChan
-	return prods, err
+	return prods, nil
 }
 
 func GetProductGroups(cl *api.Client) ([]products.ProductGroup, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
 	groups, err := cl.ProductManager.GetProductGroups(ctx, map[string]string{

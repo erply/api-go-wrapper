@@ -70,6 +70,11 @@ func NewLister(settings ListingSettings, dataProvider DataProvider, sl Sleeper) 
 	}
 }
 
+//SetRequestThrottler concurrent unsafe setter, call it before calling any Get or GetGrouped method
+func (p *Lister) SetRequestThrottler(thrl Throttler) {
+	p.reqThrottler = thrl
+}
+
 func (p *Lister) GetGrouped(ctx context.Context, filters map[string]interface{}, groupSize int) ItemsStreamGrouped {
 	itemsStream := p.Get(ctx, filters)
 	groupedItemsChan := make(ItemsStreamGrouped, p.listingSettings.MaxFetchersCount)
