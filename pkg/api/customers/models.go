@@ -123,6 +123,16 @@ type (
 		ClientID   int `json:"clientID"`
 		CustomerID int `json:"customerID"`
 	}
+
+	GetCustomersResponseBulkItem struct {
+		Status    sharedCommon.StatusBulk `json:"status"`
+		Customers Customers               `json:"records"`
+	}
+
+	GetCustomersResponseBulk struct {
+		Status    sharedCommon.Status            `json:"status"`
+		BulkItems []GetCustomersResponseBulkItem `json:"requests"`
+	}
 )
 
 type (
