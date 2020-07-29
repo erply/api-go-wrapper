@@ -57,11 +57,11 @@ func GetCustomersBulk(cl *api.Client) (custmrs customers.Customers, err error) {
 
 	bulkFilters := []map[string]interface{}{
 		{
-			"recordsOnPage": "1",
+			"recordsOnPage": "100",
 			"pageNo": "1",
 		},
 		{
-			"recordsOnPage": "1",
+			"recordsOnPage": "100",
 			"pageNo": "2",
 		},
 	}
