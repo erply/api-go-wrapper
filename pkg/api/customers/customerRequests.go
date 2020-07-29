@@ -8,6 +8,7 @@ import (
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -46,6 +47,42 @@ func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 	return res.Customers, nil
+}
+
+// GetCustomersBulk will list customers according to specified filters sending a bulk request to fetch more customers than the default limit
+func (cli *Client) GetCustomersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetCustomersResponseBulk, error) {
+	var customersResponse GetCustomersResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getCustomers",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return customersResponse, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return customersResponse, err
+	}
+
+	if err := json.Unmarshal(body, &customersResponse); err != nil {
+		return customersResponse, fmt.Errorf("ERPLY API: failed to unmarshal GetCustomersResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&customersResponse.Status) {
+		return customersResponse, erro.NewErplyError(customersResponse.Status.ErrorCode.String(), customersResponse.Status.Request+": "+customersResponse.Status.ResponseStatus)
+	}
+
+	for _, supplierBulkItem := range customersResponse.BulkItems {
+		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
+			return customersResponse, erro.NewErplyError(supplierBulkItem.Status.ErrorCode.String(), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return customersResponse, nil
 }
 
 //username and password are required fields here
