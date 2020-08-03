@@ -33,6 +33,8 @@ This library is not in the final state and it means for continuous development. 
 
 Advanced listing
 --------
+<details><summary>Overview</summary>
+
 ### Overview
 Advanced listing was disigned to read large data collections by multiple parallel fetchers with respect of API limitations. Moreover this API will use the minimal amount of requests by packing them into bigger bulk API calls, so the too many request failures will be less probable. 
 
@@ -405,3 +407,4 @@ If the inbound output channel is closed, we send the rest of the buffer to the o
 The outbound output channel is returned to the caller of the `GetGrouped` method:
 
     return groupedItemsChan
+</details>
