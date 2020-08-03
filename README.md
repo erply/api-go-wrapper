@@ -20,12 +20,16 @@ Install
    
 Clients
 --------
-Ways of using the API: 
+
+<details><summary>Ways of using the API</summary>
+
 * One is you create a `Partner Client` that will always use the partner key with requests and will have access to the requests that require the partner key.
 * You can use the simple `Client` that will work without the partner key also.
 * You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor
 
 You can find the example in the `/examples` directory for the client initialization process
+
+</details>
 
 Contributing
 -------
