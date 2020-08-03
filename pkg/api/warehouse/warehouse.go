@@ -10,8 +10,8 @@ import (
 )
 
 //GetWarehouses ...
-func (cli *Client) GetWarehouses(ctx context.Context) (Warehouses, error) {
-	resp, err := cli.SendRequest(ctx, "getWarehouses", map[string]string{"warehouseID": "0"})
+func (cli *Client) GetWarehouses(ctx context.Context, filters map[string]string) (Warehouses, error) {
+	resp, err := cli.SendRequest(ctx, "getWarehouses", filters)
 	if err != nil {
 		return nil, err
 	}
