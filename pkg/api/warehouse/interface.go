@@ -4,7 +4,7 @@ import "context"
 
 type (
 	Manager interface {
-		GetWarehouses(ctx context.Context) (Warehouses, error)
+		GetWarehouses(ctx context.Context, filters map[string]string) (Warehouses, error)
 		GetWarehousesBulk(
 			ctx context.Context,
 			bulkRequest []map[string]interface{},
