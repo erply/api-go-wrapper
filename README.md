@@ -17,7 +17,11 @@ Install
    `go get github.com/erply/api-go-wrapper@X.Y.Z`
    
    where X.Y.Z is your desired version.
-   
+
+Contributing
+-------
+This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
+
 Clients
 --------
 
@@ -30,10 +34,6 @@ Clients
 You can find the example in the `/examples` directory for the client initialization process
 
 </details>
-
-Contributing
--------
-This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
 
 Advanced listing
 --------
