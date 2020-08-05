@@ -138,3 +138,34 @@ func (cli *Client) GetProductGroups(ctx context.Context, filters map[string]stri
 	}
 	return res.ProductGroups, nil
 }
+
+func (cli *Client) GetProductStock(ctx context.Context, filters map[string]string) ([]GetProductStock, error) {
+	resp, err := cli.SendRequest(ctx, "getProductStock", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductStockResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal GetProductStockResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.GetProductStock, nil
+}
+
+func (cli *Client) GetProductStockFile(ctx context.Context, filters map[string]string) ([]GetProductStockFile, error) {
+	filters["responseType"] = ResponseTypeCSV
+	resp, err := cli.SendRequest(ctx, "getProductStock", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductStockFileResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal GetProductStockFileResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.GetProductStockFile, nil
+}

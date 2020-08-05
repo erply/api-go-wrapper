@@ -1,4 +1,4 @@
-package products
+package warehouse
 
 import (
 	"context"
@@ -15,50 +15,7 @@ import (
 	"time"
 )
 
-func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, productIDsBulk [][]int) error {
-	bulkResp := GetProductsResponseBulk{
-		Status: sharedCommon.Status{ResponseStatus: "ok"},
-	}
-
-	bulkItems := make([]GetProductsResponseBulkItem, 0, len(productIDsBulk))
-	for _, productIDs := range productIDsBulk {
-		products := make([]Product, 0, len(productIDs))
-		for _, id := range productIDs {
-			products = append(products, Product{
-				ProductID: id,
-				Code:      fmt.Sprintf("Some Product %d", id),
-			})
-		}
-		statusBulk := sharedCommon.StatusBulk{}
-		if errStatus == 0 {
-			statusBulk.ResponseStatus = "ok"
-		} else {
-			statusBulk.ResponseStatus = "not ok"
-		}
-		statusBulk.RecordsTotal = totalCount
-		statusBulk.ErrorCode = errStatus
-		statusBulk.RecordsInResponse = len(productIDs)
-
-		bulkItems = append(bulkItems, GetProductsResponseBulkItem{
-			Status:   statusBulk,
-			Products: products,
-		})
-	}
-	bulkResp.BulkItems = bulkItems
-
-	jsonRaw, err := json.Marshal(bulkResp)
-	if err != nil {
-		return err
-	}
-
-	_, err = w.Write(jsonRaw)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func TestListingCountSuccess(t *testing.T) {
+func TestWarehouseListingCountSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
@@ -69,13 +26,15 @@ func TestListingCountSuccess(t *testing.T) {
 
 		assert.Equal(t, "someclient", parsedRequest["clientCode"])
 		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
+
 		requests := parsedRequest["requests"].([]map[string]interface{})
+
 		assert.Equal(t, float64(1), requests[0]["pageNo"])
 		assert.Equal(t, float64(1), requests[0]["recordsOnPage"])
-		assert.Equal(t, "getProducts", requests[0]["requestName"])
+		assert.Equal(t, "getWarehouses", requests[0]["requestName"])
 		assert.Equal(t, "smeval", requests[0]["somekey"])
 
-		err = sendRequest(w, 0, totalCount, [][]int{{1}})
+		err = sendWarehouseRequest(w, 0, totalCount, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -84,10 +43,10 @@ func TestListingCountSuccess(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval", "pageNo": 1, "recordsOnPage": 1})
+	actualCount, err := warehouseDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval", "pageNo": 1, "recordsOnPage": 1})
 	assert.NoError(t, err)
 	if err != nil {
 		return
@@ -95,9 +54,9 @@ func TestListingCountSuccess(t *testing.T) {
 	assert.Equal(t, totalCount, actualCount)
 }
 
-func TestListingCountError(t *testing.T) {
+func TestWarehouseListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendWarehouseRequest(w, errors.MalformedRequest, 0, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -106,10 +65,10 @@ func TestListingCountError(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
+	actualCount, err := warehouseDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.Error(t, err)
 	if err == nil {
 		return
@@ -118,9 +77,9 @@ func TestListingCountError(t *testing.T) {
 	assert.Equal(t, 0, actualCount)
 }
 
-func TestListingCountWithNoBulkItems(t *testing.T) {
+func TestWarehouseListingCountWithNoBulkItems(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, 0, 0, [][]int{})
+		err := sendWarehouseRequest(w, 0, 0, [][]string{})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -129,10 +88,10 @@ func TestListingCountWithNoBulkItems(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
+	actualCount, err := warehouseDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.NoError(t, err)
 	if err != nil {
 		return
@@ -140,7 +99,7 @@ func TestListingCountWithNoBulkItems(t *testing.T) {
 	assert.Equal(t, 0, actualCount)
 }
 
-func TestReadSuccess(t *testing.T) {
+func TestWarehouseListingReadSuccess(t *testing.T) {
 	const limit = 2
 	const offset = 1
 	const totalCount = 10
@@ -160,10 +119,10 @@ func TestReadSuccess(t *testing.T) {
 		assert.Equal(t, float64(offset), requests[0]["pageNo"])
 		assert.Equal(t, float64(limit), requests[0]["recordsOnPage"])
 
-		assert.Equal(t, "getProducts", requests[0]["requestName"])
+		assert.Equal(t, "getWarehouses", requests[0]["requestName"])
 		assert.Equal(t, "smeval", requests[0]["somekey"])
 
-		err = sendRequest(w, 0, totalCount, [][]int{{1, 2}, {3, 4}, {5}})
+		err = sendWarehouseRequest(w, 0, totalCount, [][]string{{"1", "2"}, {"3", "4"}, {"5"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -172,11 +131,11 @@ func TestReadSuccess(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
-	actualProdIDs := make([]int, 0, 5)
-	err := productsDataProvider.Read(
+	actualWarehouseCodes := make([]string, 0, 5)
+	err := warehouseDataProvider.Read(
 		context.Background(),
 		[]map[string]interface{}{
 			{
@@ -186,8 +145,8 @@ func TestReadSuccess(t *testing.T) {
 			},
 		},
 		func(item interface{}) {
-			assert.IsType(t, item, Product{})
-			actualProdIDs = append(actualProdIDs, item.(Product).ProductID)
+			assert.IsType(t, item, Warehouse{})
+			actualWarehouseCodes = append(actualWarehouseCodes, item.(Warehouse).Code)
 		},
 	)
 	assert.NoError(t, err)
@@ -195,12 +154,12 @@ func TestReadSuccess(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, []int{1, 2, 3, 4, 5}, actualProdIDs)
+	assert.Equal(t, []string{"1", "2", "3", "4", "5"}, actualWarehouseCodes)
 }
 
-func TestReadError(t *testing.T) {
+func TestWarehouseListingReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendWarehouseRequest(w, errors.MalformedRequest, 10, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -209,10 +168,10 @@ func TestReadError(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
-	err := productsDataProvider.Read(
+	err := warehouseDataProvider.Read(
 		context.Background(),
 		[]map[string]interface{}{{"somekey": "smeval"}},
 		func(item interface{}) {},
@@ -225,7 +184,7 @@ func TestReadError(t *testing.T) {
 	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
 }
 
-func TestReadSuccessIntegration(t *testing.T) {
+func TestWarehouseListingReadSuccessIntegration(t *testing.T) {
 	const totalCount = 11
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
@@ -238,9 +197,9 @@ func TestReadSuccessIntegration(t *testing.T) {
 		assert.Len(t, requests, 1)
 
 		if requests[0]["pageNo"] == float64(1) {
-			err = sendRequest(w, 0, totalCount, [][]int{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}})
+			err = sendWarehouseRequest(w, 0, totalCount, [][]string{{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}})
 		} else {
-			err = sendRequest(w, 0, totalCount, [][]int{{11}})
+			err = sendWarehouseRequest(w, 0, totalCount, [][]string{{"11"}})
 		}
 
 		assert.NoError(t, err)
@@ -251,8 +210,8 @@ func TestReadSuccessIntegration(t *testing.T) {
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
-	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	warehouseClient := NewClient(baseClient)
+	warehouseDataProvider := NewListingDataProvider(warehouseClient)
 
 	lister := sharedCommon.NewLister(
 		sharedCommon.ListingSettings{
@@ -261,25 +220,25 @@ func TestReadSuccessIntegration(t *testing.T) {
 			MaxItemsPerRequest:        10,
 			MaxFetchersCount:          10,
 		},
-		productsDataProvider,
+		warehouseDataProvider,
 		func(sleepTime time.Duration) {},
 	)
 
-	prodsChan := lister.Get(context.Background(), map[string]interface{}{})
+	warehouseChan := lister.Get(context.Background(), map[string]interface{}{})
 
-	actualProdIDs := collectProdIDsFromChannel(prodsChan)
-	sort.Ints(actualProdIDs)
+	actualWarehouseCodes := collectWarehouseCodesFromChannel(warehouseChan)
+	sort.Strings(actualWarehouseCodes)
 
-	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, actualProdIDs)
+	assert.Equal(t, []string{"1", "10", "11", "2", "3", "4", "5", "6", "7", "8", "9"}, actualWarehouseCodes)
 }
 
-func collectProdIDsFromChannel(prodsChan sharedCommon.ItemsStream) []int {
-	actualProdIDs := make([]int, 0)
+func collectWarehouseCodesFromChannel(warehouseChan sharedCommon.ItemsStream) []string {
+	actualWarehouseCodes := make([]string, 0)
 	doneChan := make(chan struct{}, 1)
 	go func() {
 		defer close(doneChan)
-		for prod := range prodsChan {
-			actualProdIDs = append(actualProdIDs, prod.Payload.(Product).ProductID)
+		for warehouse := range warehouseChan {
+			actualWarehouseCodes = append(actualWarehouseCodes, warehouse.Payload.(Warehouse).Code)
 		}
 	}()
 
@@ -293,5 +252,48 @@ mainLoop:
 		}
 	}
 
-	return actualProdIDs
+	return actualWarehouseCodes
+}
+
+func sendWarehouseRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, warehouseCodeBulk [][]string) error {
+	bulkResp := GetWarehousesResponseBulk{
+		Status: sharedCommon.Status{ResponseStatus: "ok"},
+	}
+
+	bulkItems := make([]GetWarehousesBulkItem, 0, len(warehouseCodeBulk))
+	for _, warehouseCodes := range warehouseCodeBulk {
+		warehouses := make(Warehouses, 0, len(warehouseCodes))
+		for _, id := range warehouseCodes {
+			warehouses = append(warehouses, Warehouse{
+				Code: id,
+				Name:      fmt.Sprintf("Some Warehouse %s", id),
+			})
+		}
+		statusBulk := sharedCommon.StatusBulk{}
+		if errStatus == 0 {
+			statusBulk.ResponseStatus = "ok"
+		} else {
+			statusBulk.ResponseStatus = "not ok"
+		}
+		statusBulk.RecordsTotal = totalCount
+		statusBulk.ErrorCode = errStatus
+		statusBulk.RecordsInResponse = len(warehouseCodes)
+
+		bulkItems = append(bulkItems, GetWarehousesBulkItem{
+			Status:    statusBulk,
+			Warehouses: warehouses,
+		})
+	}
+	bulkResp.BulkItems = bulkItems
+
+	jsonRaw, err := json.Marshal(bulkResp)
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(jsonRaw)
+	if err != nil {
+		return err
+	}
+	return nil
 }

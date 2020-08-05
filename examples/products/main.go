@@ -55,6 +55,18 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("GetProductsInParallel:\n%+v\n", prods)
+
+	prodStock, err := GetProductStock(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GetProductStock:\n%+v\n", prodStock)
+
+	prodStockFile, err := GetProductStockFile(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GetProductStockFile:\n%+v\n", prodStockFile)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -108,7 +120,7 @@ func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
 	defer cancel()
 
 	prodsChan := lister.Get(ctx, map[string]interface{}{
-		"changedSince": time.Date(2020, 2, 15, 0, 0, 0, 0, time.UTC).Unix(),
+		"changedSince": time.Date(2021, 2, 15, 0, 0, 0, 0, time.UTC).Unix(),
 	})
 
 	prods := make([]products.Product, 0)
@@ -131,4 +143,26 @@ func GetProductGroups(cl *api.Client) ([]products.ProductGroup, error) {
 	})
 
 	return groups, err
+}
+
+func GetProductStock(cl *api.Client) ([]products.GetProductStock, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	productStock, err := cl.ProductManager.GetProductStock(ctx, map[string]string{
+		"warehouseID": "1",
+	})
+
+	return productStock, err
+}
+
+func GetProductStockFile(cl *api.Client) ([]products.GetProductStockFile, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	productStockFile, err := cl.ProductManager.GetProductStockFile(ctx, map[string]string{
+		"warehouseID": "1",
+	})
+
+	return productStockFile, err
 }

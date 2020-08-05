@@ -15,29 +15,6 @@ import (
 	"time"
 )
 
-func extractBulkFiltersFromRequest(r *http.Request) (res map[string]interface{}, err error) {
-	err = r.ParseForm()
-	if err != nil {
-		return
-	}
-
-	res = make(map[string]interface{})
-	for key, vals := range r.Form {
-		res[key] = vals[0]
-	}
-
-	var requests []map[string]interface{}
-	requestsRaw, ok := res["requests"]
-	if ok {
-		err = json.Unmarshal([]byte(requestsRaw.(string)), &requests)
-		if err != nil {
-			return
-		}
-	}
-	res["requests"] = requests
-	return
-}
-
 func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, documentsIDBulk [][]int) error {
 	bulkResp := GetPurchaseDocumentResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
@@ -84,7 +61,7 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 func TestListingCountSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -168,7 +145,7 @@ func TestReadSuccess(t *testing.T) {
 	const offset = 1
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -251,7 +228,7 @@ func TestReadError(t *testing.T) {
 func TestReadSuccessIntegration(t *testing.T) {
 	const totalCount = 11
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return

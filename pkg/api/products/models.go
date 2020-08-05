@@ -1,7 +1,12 @@
 package products
 
 import (
+	"encoding/json"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+)
+
+const (
+	ResponseTypeCSV = "CSV"
 )
 
 type (
@@ -43,8 +48,8 @@ type (
 
 	//Payload ...
 	Product struct {
-		ProductID          int                `json:"productID"`
-		Active             int                `json:"active"`
+		ProductID int `json:"productID"`
+		Active    int `json:"active"`
 		NameLanguages
 		Code               string             `json:"code"`
 		Code2              string             `json:"code2"`
@@ -139,7 +144,7 @@ type (
 	}
 
 	ProductGroup struct {
-		ID              uint                `json:"productGroupID"`
+		ID uint `json:"productGroupID"`
 		NameLanguages
 		ShowInWebshop   string              `json:"showInWebshop"`
 		NonDiscountable byte                `json:"nonDiscountable"`
@@ -152,17 +157,17 @@ type (
 	}
 
 	NameLanguages struct {
-		Name            string              `json:"name"`
-		NameEng         string              `json:"nameENG"`
-		NameSpa         string              `json:"nameSPA"`
-		NameEst         string              `json:"nameEST"`
-		NameGer         string              `json:"nameGER"`
-		NameSwe         string              `json:"nameSWE"`
-		NameFin         string              `json:"nameFIN"`
-		NameRus         string              `json:"nameRUS"`
-		NameLat         string              `json:"nameLAT"`
-		NameLit         string              `json:"nameLIT"`
-		NameGre         string              `json:"nameGRE"`
+		Name    string `json:"name"`
+		NameEng string `json:"nameENG"`
+		NameSpa string `json:"nameSPA"`
+		NameEst string `json:"nameEST"`
+		NameGer string `json:"nameGER"`
+		NameSwe string `json:"nameSWE"`
+		NameFin string `json:"nameFIN"`
+		NameRus string `json:"nameRUS"`
+		NameLat string `json:"nameLAT"`
+		NameLit string `json:"nameLIT"`
+		NameGre string `json:"nameGRE"`
 	}
 	//GetProductUnitsResponse ...
 	GetProductUnitsResponse struct {
@@ -184,5 +189,33 @@ type (
 	GetProductsResponseBulk struct {
 		Status    sharedCommon.Status           `json:"status"`
 		BulkItems []GetProductsResponseBulkItem `json:"requests"`
+	}
+
+	GetProductStockResponse struct {
+		Status          sharedCommon.Status `json:"status"`
+		GetProductStock []GetProductStock   `json:"records"`
+	}
+
+	GetProductStock struct {
+		ProductID              int         `json:"productID"`
+		AmountInStock          json.Number `json:"amountInStock"`
+		AmountReserved         float64     `json:"amountReserved"`
+		SuggestedPurchasePrice float64     `json:"suggestedPurchasePrice"`
+		AveragePurchasePrice   float64     `json:"averagePurchasePrice"`
+		AverageCost            float64     `json:"averageCost"`
+		FirstPurchaseDate      string      `json:"firstPurchaseDate"`
+		LastPurchaseDate       string      `json:"lastPurchaseDate"`
+		LastSoldDate           string      `json:"lastSoldDate"`
+		ReorderPoint           int         `json:"reorderPoint"`
+		RestockLevel           int         `json:"restockLevel"`
+	}
+
+	GetProductStockFileResponse struct {
+		Status              sharedCommon.Status   `json:"status"`
+		GetProductStockFile []GetProductStockFile `json:"records"`
+	}
+
+	GetProductStockFile struct {
+		ReportLink string `json:"reportLink"`
 	}
 )

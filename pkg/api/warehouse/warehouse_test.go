@@ -20,7 +20,7 @@ func TestErplyClient_GetWarehouses(t *testing.T) {
 	)
 
 	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
-	resp, err := cli.GetWarehouses(context.Background())
+	resp, err := cli.GetWarehouses(context.Background(), map[string]string{})
 	if err != nil {
 		t.Error(err)
 		return
@@ -92,21 +92,19 @@ func TestGetWarehousesBulk(t *testing.T) {
 	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
-	assert.Equal(t, Warehouses{
-		{
-			WarehouseID: "123",
-		},
-		{
-			WarehouseID: "124",
-		},
-	}, bulkResp.BulkItems[0].Warehouses)
+	assert.Equal(t, []string{"123", "124"}, collectWarehouseIDs(bulkResp, 0))
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 
-	assert.Equal(t, Warehouses{
-		{
-			WarehouseID: "125",
-		},
-	}, bulkResp.BulkItems[1].Warehouses)
+	assert.Equal(t, []string{"125"}, collectWarehouseIDs(bulkResp, 1))
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func collectWarehouseIDs(resp GetWarehousesResponseBulk, index int) []string {
+	res := make([]string, 0)
+	for _, warehouse := range resp.BulkItems[index].Warehouses {
+		res = append(res, warehouse.WarehouseID)
+	}
+
+	return res
 }
