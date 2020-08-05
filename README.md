@@ -17,22 +17,28 @@ Install
    `go get github.com/erply/api-go-wrapper@X.Y.Z`
    
    where X.Y.Z is your desired version.
-   
+
+Contributing
+-------
+This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
+
 Clients
 --------
-Ways of using the API: 
+
+<details><summary>Ways of using the API</summary>
+
 * One is you create a `Partner Client` that will always use the partner key with requests and will have access to the requests that require the partner key.
 * You can use the simple `Client` that will work without the partner key also.
 * You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor
 
 You can find the example in the `/examples` directory for the client initialization process
 
-Contributing
--------
-This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
+</details>
 
 Advanced listing
 --------
+<details><summary>Overview</summary>
+
 ### Overview
 Advanced listing was disigned to read large data collections by multiple parallel fetchers with respect of API limitations. Moreover this API will use the minimal amount of requests by packing them into bigger bulk API calls, so the too many request failures will be less probable. 
 
@@ -405,3 +411,4 @@ If the inbound output channel is closed, we send the rest of the buffer to the o
 The outbound output channel is returned to the caller of the `GetGrouped` method:
 
     return groupedItemsChan
+</details>
