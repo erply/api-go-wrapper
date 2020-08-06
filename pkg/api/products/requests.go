@@ -169,3 +169,39 @@ func (cli *Client) GetProductStockFile(ctx context.Context, filters map[string]s
 	}
 	return res.GetProductStockFile, nil
 }
+
+func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error) {
+	var productsStockResp GetProductStockFileResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getProductStock",
+			Filters:    bulkFilterMap,
+		})
+	}
+	baseFilters["responseType"] = ResponseTypeCSV
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return productsStockResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return productsStockResp, err
+	}
+
+	if err := json.Unmarshal(body, &productsStockResp); err != nil {
+		return productsStockResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductStockFileResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&productsStockResp.Status) {
+		return productsStockResp, erro.NewErplyError(productsStockResp.Status.ErrorCode.String(), productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range productsStockResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return productsStockResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return productsStockResp, nil
+}

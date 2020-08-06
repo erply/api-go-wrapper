@@ -67,6 +67,12 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("GetProductStockFile:\n%+v\n", prodStockFile)
+
+	prodStockFileBulk, err := GetProductStockFileBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("GetProductStockFileBulk:\n%+v\n", prodStockFileBulk)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -165,4 +171,29 @@ func GetProductStockFile(cl *api.Client) ([]products.GetProductStockFile, error)
 	})
 
 	return productStockFile, err
+}
+
+func GetProductStockFileBulk(cl *api.Client) (stockFiles []products.GetProductStockFile, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	bulkResp, err := cl.ProductManager.GetProductStockFileBulk(ctx, []map[string]interface{}{
+		{
+			"warehouseID": "1",
+		},
+		{
+			"warehouseID": "2",
+		},
+	}, map[string]string{})
+	if err !=nil {
+		return
+	}
+
+	for _, bulkItem := range bulkResp.BulkItems {
+		for _, stockFile := range bulkItem.GetProductStockFiles {
+			stockFiles = append(stockFiles, stockFile)
+		}
+	}
+
+	return stockFiles, err
 }

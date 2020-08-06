@@ -218,4 +218,14 @@ type (
 	GetProductStockFile struct {
 		ReportLink string `json:"reportLink"`
 	}
+
+	GetProductStockFileResponseBulkItem struct {
+		Status               sharedCommon.StatusBulk `json:"status"`
+		GetProductStockFiles []GetProductStockFile   `json:"records"`
+	}
+
+	GetProductStockFileResponseBulk struct {
+		Status    sharedCommon.Status           `json:"status"`
+		BulkItems []GetProductStockFileResponseBulkItem `json:"requests"`
+	}
 )

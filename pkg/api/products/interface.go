@@ -12,4 +12,5 @@ type Manager interface {
 	GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
 	GetProductStock(ctx context.Context, filters map[string]string) ([]GetProductStock, error)
 	GetProductStockFile(ctx context.Context, filters map[string]string) ([]GetProductStockFile, error)
+	GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error)
 }
