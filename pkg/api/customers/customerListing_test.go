@@ -18,7 +18,7 @@ import (
 func TestCustomerListingCountSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -102,7 +102,7 @@ func TestCustomerListingReadSuccess(t *testing.T) {
 	const offset = 1
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -185,7 +185,7 @@ func TestCustomerListingReadError(t *testing.T) {
 func TestCustomerListingReadSuccessIntegration(t *testing.T) {
 	const totalCount = 11
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := extractBulkFiltersFromRequest(r)
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
 		assert.NoError(t, err)
 		if err != nil {
 			return

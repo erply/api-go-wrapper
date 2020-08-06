@@ -183,3 +183,121 @@ func TestGetSuppliersBulkResponseFailure(t *testing.T) {
 		return
 	}
 }
+
+func TestGetProductsStockFileBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		assert.Equal(t, "someclient", parsedRequest["clientCode"])
+		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
+		assert.Equal(t, ResponseTypeCSV, parsedRequest["responseType"])
+
+		requests := parsedRequest["requests"].([]map[string]interface{})
+		assert.Len(t, requests, 2)
+		assert.Equal(t, float64(1), requests[0]["warehouseID"])
+		assert.Equal(t, "getProductStock", requests[0]["requestName"])
+		assert.Equal(t, float64(2), requests[1]["warehouseID"])
+		assert.Equal(t, "getProductStock", requests[1]["requestName"])
+
+		statusBulk := common2.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		supplierResp := GetProductStockFileResponseBulk{
+			Status: common2.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductStockFileResponseBulkItem{
+				{
+					Status: statusBulk,
+					GetProductStockFiles: []GetProductStockFile{
+						{
+							ReportLink: "some link 1",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					GetProductStockFiles: []GetProductStockFile{
+						{
+							ReportLink: "some link 2",
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(supplierResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	productClient := NewClient(cli)
+
+	productsBulk, err := productClient.GetProductStockFileBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"warehouseID": 1,
+			},
+			{
+				"warehouseID": 2,
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, productsBulk.Status)
+
+	expectedStatus := common2.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Equal(t, []GetProductStockFile{
+		{
+			ReportLink: "some link 1",
+		},
+	}, productsBulk.BulkItems[0].GetProductStockFiles)
+
+	assert.Equal(t, expectedStatus, productsBulk.BulkItems[0].Status)
+
+	assert.Equal(t, []GetProductStockFile{
+		{
+			ReportLink: "some link 2",
+		},
+	}, productsBulk.BulkItems[1].GetProductStockFiles)
+	assert.Equal(t, expectedStatus, productsBulk.BulkItems[1].Status)
+}
+
+func TestTestGetProductsStockFileBulkFailure(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`some junk value`))
+		assert.NoError(t, err)
+	}))
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	productsClient := NewClient(cli)
+
+	_, err := productsClient.GetProductStockFileBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"warehouseID": 1,
+			},
+		},
+		map[string]string{},
+	)
+	assert.EqualError(t, err, `ERPLY API: failed to unmarshal GetProductStockFileResponseBulk from 'some junk value': invalid character 's' looking for beginning of value`)
+	if err == nil {
+		return
+	}
+}
