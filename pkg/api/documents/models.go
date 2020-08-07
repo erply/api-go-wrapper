@@ -3,7 +3,6 @@ package documents
 import (
 	"encoding/json"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"time"
 )
 
 type PurchaseOrderType string
@@ -36,7 +35,7 @@ type ReferencedPurchaseDocument struct {
 	Number    string            `json:"number"`
 	RegNumber string            `json:"regnumber"`
 	Type      PurchaseOrderType `json:"type"`
-	Date      time.Time         `json:"date"`
+	Date      string            `json:"date"`
 }
 
 type PurchaseDocument struct {
