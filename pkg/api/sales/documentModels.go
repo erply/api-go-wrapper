@@ -1,7 +1,20 @@
 package sales
 
 import (
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+)
+
+const (
+	SaleDocumentTypeInvWayBill    = "INVWAYBILL"
+	SaleDocumentTypeCASHINVOICE   = "CASHINVOICE"
+	SaleDocumentTypeWayBill       = "WAYBILL"
+	SaleDocumentTypePrepayment    = "PREPAYMENT"
+	SaleDocumentTypeOffer         = "OFFER"
+	SaleDocumentTypeExportInvoice = "EXPORTINVOICE"
+	SaleDocumentTypeReservation   = "RESERVATION"
+	SaleDocumentTypeCreditInvoice = "CREDITINVOICE"
+	SaleDocumentTypeOrder         = "ORDER"
+	SaleDocumentTypeInvoice       = "INVOICE"
 )
 
 type (
@@ -24,36 +37,42 @@ type (
 		//Payer if invoice_client_is_payer = 0
 		PayerID int `json:"payerID"`
 
-		AddressID               int                 `json:"addressID"`
-		PayerAddressID          int                 `json:"payerAddressID"`
-		ShipToAddressID         string              `json:"shipToAddressID"`
-		ContactID               int                 `json:"contactID"`
-		EmployeeID              int                 `json:"employeeID"`
-		PaymentDays             string              `json:"paymentDays"`
-		Confirmed               string              `json:"confirmed"`
-		Notes                   string              `json:"notes"`
-		LastModified            int                 `json:"lastModified"`
-		PackingUnitsDescription string              `json:"packingUnitsDescription"`
-		CurrencyCode            string              `json:"currencyCode"`
-		ContactName             string              `json:"contactName"`
-		Type                    string              `json:"type"`
-		InvoiceState            string              `json:"invoiceState"`
-		PaymentType             string              `json:"paymentType"`
-		BaseDocuments           []BaseDocument      `json:"baseDocuments"`
-		NetTotal                float64             `json:"netTotal"`
-		VatTotal                float64             `json:"vatTotal"`
-		VatTotalsByTaxRates     VatTotalsByTaxRates `json:"vatTotalsByTaxRate"`
-		Rounding                float64             `json:"rounding"`
-		Total                   float64             `json:"total"`
-		Paid                    string              `json:"paid"`
-		PrintDiscounts          int                 `json:"printDiscounts"`
-		ReferenceNumber         string              `json:"referenceNumber"`
-		CustomReferenceNumber   string              `json:"customReferenceNumber"`
-		PaymentStatus           string              `json:"paymentStatus"`
-		Penalty                 string              `json:"penalty"`
-		InvoiceLink             string              `json:"invoiceLink"`
-		InvoiceRows             []InvoiceRow        `json:"rows"`
-		Attributes              []PaymentAttribute  `json:"attributes"`
+		AddressID                int                 `json:"addressID"`
+		PayerAddressID           int                 `json:"payerAddressID"`
+		ShipToAddressID          string              `json:"shipToAddressID"`
+		ContactID                int                 `json:"contactID"`
+		EmployeeID               int                 `json:"employeeID"`
+		PaymentDays              string              `json:"paymentDays"`
+		Confirmed                string              `json:"confirmed"`
+		Notes                    string              `json:"notes"`
+		LastModified             int                 `json:"lastModified"`
+		PackingUnitsDescription  string              `json:"packingUnitsDescription"`
+		InventoryTransactionDate string              `json:"inventoryTransactionDate"`
+		CurrencyCode             string              `json:"currencyCode"`
+		ContactName              string              `json:"contactName"`
+		ClientName               string              `json:"clientName"`
+		Type                     string              `json:"type"`
+		InvoiceState             string              `json:"invoiceState"`
+		PaymentType              string              `json:"paymentType"`
+		BaseDocuments            []BaseDocument      `json:"baseDocuments"`
+		NetTotal                 float64             `json:"netTotal"`
+		VatTotal                 float64             `json:"vatTotal"`
+		VatTotalsByTaxRates      VatTotalsByTaxRates `json:"vatTotalsByTaxRate"`
+		Rounding                 float64             `json:"rounding"`
+		Total                    float64             `json:"total"`
+		Paid                     string              `json:"paid"`
+		PrintDiscounts           int                 `json:"printDiscounts"`
+		ReferenceNumber          string              `json:"referenceNumber"`
+		CustomReferenceNumber    string              `json:"customReferenceNumber"`
+		PaymentStatus            string              `json:"paymentStatus"`
+		Penalty                  string              `json:"penalty"`
+		InvoiceLink              string              `json:"invoiceLink"`
+		EmployeeName             string              `json:"employeeName"`
+		TransportTypeName        string              `json:"transportTypeName"`
+		ShipToName               string              `json:"shipToName"`
+		ShippingDate             string              `json:"shippingDate"`
+		InvoiceRows              []InvoiceRow        `json:"rows"`
+		Attributes               []PaymentAttribute  `json:"attributes"`
 	}
 
 	InvoiceRow struct {
@@ -91,13 +110,13 @@ type (
 	}
 
 	PostSalesDocumentResponse struct {
-		Status        common2.Status       `json:"status"`
+		Status        sharedCommon.Status  `json:"status"`
 		ImportReports SaleDocImportReports `json:"records"`
 	}
 
 	GetSalesDocumentResponse struct {
-		Status         common2.Status `json:"status"`
-		SalesDocuments []SaleDocument `json:"records"`
+		Status         sharedCommon.Status `json:"status"`
+		SalesDocuments []SaleDocument      `json:"records"`
 	}
 	SaleDocImportReports []SaleDocImportReport
 	SaleDocImportReport  struct {
@@ -120,7 +139,17 @@ type (
 	}
 
 	SavePurchaseDocumentResponse struct {
-		Status        common2.Status           `json:"status"`
+		Status        sharedCommon.Status      `json:"status"`
 		ImportReports PurchaseDocImportReports `json:"records"`
+	}
+
+	GetSaleDocumentBulkItem struct {
+		Status        sharedCommon.StatusBulk `json:"status"`
+		SaleDocuments []SaleDocument          `json:"records"`
+	}
+
+	GetSaleDocumentResponseBulk struct {
+		Status    sharedCommon.Status       `json:"status"`
+		BulkItems []GetSaleDocumentBulkItem `json:"requests"`
 	}
 )
