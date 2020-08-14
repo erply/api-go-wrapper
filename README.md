@@ -10,7 +10,7 @@ Client Structure
 Majority of the request wrappers are available through the client.
 The client is described in `GoDoc` type `Client` and in `/pkg/api/client.go`. It is divided into sub-clients for each topic that the underlying API covers. 
 For now not all the requests are mapped to topics. Such request wrappers are in `/pkg/api` directory. 
-Some of the requests are accessible not from the client, but from the `auth` package of this SDK. They are covered in the example in `/examples` directory.
+Some requests are accessible not from the client, but from the `auth` package of this SDK. They are covered in the example in `/examples` directory.
 
 Install
 -------
@@ -20,7 +20,7 @@ Install
 
 Contributing
 -------
-This library is not in the final state and it means for continuous development. Therefore I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well established, so adding new methods is relatively straightforward. 
+This library is not in the final state, and it means for continuous development. Therefore, I would like to cover the entire ERPLY API and contributions are of course always welcome. The calling pattern is pretty well-established, so adding new methods is relatively straightforward. 
 
 Clients
 --------
@@ -28,8 +28,8 @@ Clients
 <details><summary>Ways of using the API</summary>
 
 * One is you create a `Partner Client` that will always use the partner key with requests and will have access to the requests that require the partner key.
-* You can use the simple `Client` that will work without the partner key also.
-* You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor
+* You can use the simple `Client` that will work without the partner key as well.
+* You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor.
 
 You can find the example in the `/examples` directory for the client initialization process
 
@@ -40,10 +40,10 @@ Advanced listing
 <details><summary>Overview</summary>
 
 ### Overview
-Advanced listing was disigned to read large data collections by multiple parallel fetchers with respect of API limitations. Moreover this API will use the minimal amount of requests by packing them into bigger bulk API calls, so the too many request failures will be less probable. 
+Advanced listing was designed to read large data collections by multiple parallel fetchers with respect of API limitations. Moreover, this API will use the minimal amount of requests by packing them into bigger bulk API calls, so the too many request failures will be less probable. 
 
 Generally all you need is to create a `Lister` struct giving `ListingSettings`which customises the parallel processing. 
-Then you can call either `Get` or `GetGrouped` method, they will give you in return a channel of items which you can consume concurrently with go routines. The fetchers of the library will close the channel once all required data was read from a corresponding API, so you can securely iterate over the channel with your go routines.
+Then you can call either `Get` or `GetGrouped` method, they will give you in return a channel of items which you can consume concurrently with go routines. The fetchers of the library will close the channel once all required data has been read from a corresponding API, so you can securely iterate over the channel with your go routines.
 
 ### Getting started
 In this intro we want to read all products (`products.Product`) which were changed after a defined date. Since we expect a large amount of such items, we would prefer to use a parallel listing API.
@@ -154,9 +154,9 @@ Instead of this you could call the `GetGrouped` method to pack individual produc
      
 You might ask yourself what happens if the product lister makes max 5 requests per second, and the consumer, as it's running in parallel, will make the 6th request which will lead to a "too many requests" failure. That's absolutely true. If your application code is running in parallel with the lister, you should also take into account the requests speed of it.
 
-To limit the requests count, the `Lister` uses the `Throttler` interface. The library offers `SleepThrottler` as it's implementation. It's logic is pretty simple: each fetcher instance will call `Throttle` method of the `SleepThrottler` before any call to Erply API. `SleepThrottler` will count the amount of requests in the last second, and if it's more than the defined count (e.g. 5), it will sleep 1 second. As a result, too fast requests will be slowed down if needed. 
+To limit the requests count, the `Lister` uses the `Throttler` interface. The library offers `SleepThrottler` as it's implementation. Its logic is pretty simple: each fetcher instance will call `Throttle` method of the `SleepThrottler` before any call to Erply API. `SleepThrottler` will count the amount of requests in the last second, and if it's more than the defined count (e.g. 5), it will sleep 1 second. As a result, too fast requests will be slowed down if needed. 
 
-To solve our problem we need to make sure that your application code is using the same throttler, so it should be practically shared with the lister. To achieve this we can do the following:
+To solve our problem we need to make sure your application code is using the same throttler, so it should be practically shared with the lister. To achieve this we can do the following:
 
     sleepFunc := func(sleepTime time.Duration) {
        time.Sleep(sleepTime)
@@ -224,18 +224,18 @@ This option indicates the amount of requests per second, which are allowed for t
  Imagine that you fetch products with 10 fetchers and each is sending 10 products per second giving in total 100 prod/s speed. At the same time your consumer(s) process 500 prod/s, so you probably don't need to set `StreamBufferLength` to a very high number. On the other hand if your consumer is able to process 1 product per second, it will block all 10 fetchers, so you won't have a good processing speed. In this case the buffer length should be a number around 100, so you will let your consumer to do most of the work after the fetchers finish their work. 
  
 **MaxItemsPerRequest**
-This parameter sets the limit of total items, which are allowed to be fetched per bulk request. One might ask, why this parameter is needed, since we could always use the max possible fetching count per request: 100 bulk requests x 100 per request. Unfortunately we noticed that fetching of 10 000 items per bulk request could take up to 30 seconds, but making 20 requests with 500 items each can take up to 10 seconds.
+This parameter sets the limit of total items, which are allowed to be fetched per bulk request. One might ask why this parameter is needed, since we could always use the max possible fetching count per request: 100 bulk requests x 100 per request. Unfortunately we noticed that fetching of 10 000 items per bulk request could take up to 30 seconds, but making 20 requests with 500 items each can take up to 10 seconds.
 
-You should set a balanced value for this option depending on your filters, API type and overall load of the Erply infastructure, try to set this value between 500 and 1000 and see which one gives the most performance. 
+You should set a balanced value for this option depending on your filters, API type and overall load of the Erply infrastructure, try to set this value between 500 and 1000 and see which one gives the most performance. 
 
 **MaxFetchersCount**
 The amount of parallel fetchers, which are allowed to call the Erply API. Don't try to use very high numbers here, hoping to reach the most of the processing speed. This value should be well balanced with the consumption speed and `StreamBufferLength` parameter. 
 
-For example if you fetchers are able to send 10 items per second each but your consumers can process only 1 item per second, you probably would need only one consumer and `StreamBufferLength` = 10. On the other hand if you can consume 100 items per second, set the `MaxFetchersCount` = 10 and `StreamBufferLength` = 10.
+For example if you fetchers are able to send 10 items per second each, but your consumers can process only 1 item per second, you probably would need only one consumer and `StreamBufferLength` = 10. On the other hand if you can consume 100 items per second, set the `MaxFetchersCount` = 10 and `StreamBufferLength` = 10.
 
 ### Implementation details
 
-The `Lister` is based on a popular [Fan-out](https://blog.golang.org/pipelines) concurrent pattern where multiple go routines are getting payload from a single input channel. An output channel is created for each go routine, where it sends the result of the parallel work. There is also a separate go routine which consumes from all those channels and sends the result to the single output channel, which is returned in the output of the `Get` or `GetGrouped` method.
+The `Lister` is based on a popular [Fan-out](https://blog.golang.org/pipelines) concurrent pattern where multiple go routines are getting payload from a single input channel. An output channel is created for each go routine, where it sends the result of the parallel work. There is also a separate go routine which consumes from all those channels and sends the result to the single output channel, which is returned to the output of the `Get` or `GetGrouped` method.
 
 ### Get method algorithm
 
@@ -259,9 +259,9 @@ You can simplify cursor data as the offset and limit numbers e.g.
 
 `[1, 10], [11, 10], [31, 10] etc.`
 
-Knowing the amount of items per request and the total number of items, we can calculate the `Cursors` collection and distribute the load among multiple fetchers. 
+Knowing the amount of items per request, and the total number of items, we can calculate the `Cursors` collection and distribute the load among multiple fetchers. 
 
-But why we create `chan []Cursor` rather than `chan Cursor`? We could create 10 cursors and make 10 parallel requests, but we would be more effecient to pack the load into bulk requests. In our case we can send 1 request with 10 subrequests and spare 9 API calls to speed up our execution. So the algorithm takes into account the max number of items per 1 API request (100) and the `MaxItemsPerRequest` parameter indicating the total limit of items which one bulk request might contain. So we understand how many bulk requests are needed to fetch the whole amount of items.
+But why we create `chan []Cursor` rather than `chan Cursor`? We could create 10 cursors and make 10 parallel requests, but we would be more efficient to pack the load into bulk requests. In our case we can send 1 request with 10 subrequests and spare 9 API calls to speed up our execution. So the algorithm takes into account the max number of items per 1 API request (100) and the `MaxItemsPerRequest` parameter indicating the total limit of items which one bulk request might contain. So we understand how many bulk requests are needed to fetch the whole amount of items.
 
 Let's consider a following example:
 
@@ -273,7 +273,7 @@ When we start consuming the `chan []Cursor`, we will probably get the first item
 
     []Cursor{{offset:0, limit: 100}, {offset:100, limit: 100}, {offset:200, limit: 100}, {offset:300, limit: 100}, {offset:400, limit: 100}}
 
-This indicates a command to build a bulk request with 5 subrequests respecting the limit 500. To total amount of items transferred through the `[]Cursor` channel will be 100 000 / 500 = 20. Of course the logic controls that the amount of `[]Cursor` items is not greather than 100 (you cannot make more than 100 subrequests in one bulk request)
+This indicates a command to build a bulk request with 5 subrequests respecting the limit 500. To total amount of items transferred through the `[]Cursor` channel will be 100 000 / 500 = 20. Of course the logic controls that the amount of `[]Cursor` items is not greater than 100 (you cannot make more than 100 subrequests in one bulk request)
 
 See the `func (p *Lister) getCursors` function for an algorithm of building fetchers input
 
@@ -326,7 +326,7 @@ It calls a bulk request respecting the throttling logic. Each item is sent to th
 
 All fetchers are respecting context cancellation when consuming the `[]Cursor` channel. Once the cursors are send to the channel, it will be closed, so the fetchers will exit the channel loop and close their output channels. 
 
-If a fetcher will get some unhealthy status from a bulk requests or will have any other non-recoverable failure, it will send an `Item` with a non-empty error field to the output channel. It will also stop further execution. The external application logic should handle the error and practically stop all the execution of the whole app. Currently library doesn't support error recovery and restart/reconnect policy.
+If a fetcher will get some unhealthy status from a bulk requests or will have any other non-recoverable failure, it will send an `Item` with a non-empty error field to the output channel. It will also stop further execution. The external application logic should handle the error and practically stop all the execution of the whole app. Currently, library doesn't support error recovery and restart/reconnect policy.
 
 
     if err != nil {
@@ -364,13 +364,13 @@ The `WaitGroup` struct allows to close the single output channel, once all go ro
     }()
 
 ### Returning output channel to the caller
-Once all background processes go routines are started, the `Get` method returns the mrged output channel to the caller. 
+Once all background processes go routines are started, the `Get` method returns the merged output channel to the caller. 
 
     return p.mergeChannels(ctx, childChans...)
     
 ### GetGrouped method algorithm
 
-The method accepts the `groupSize` parameter indicating the amount of items which will be packed into a single group. This parameter should not be greather than max amount of items per bulk request (100 x 100).
+The method accepts the `groupSize` parameter indicating the amount of items which will be packed into a single group. This parameter should not be greater than max amount of items per bulk request (100 x 100).
 
 First this method calls the `Get` method internally and creates the output channel for grouped items:
 
