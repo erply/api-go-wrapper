@@ -19,13 +19,14 @@ const (
 
 type (
 	SaleDocument struct {
-		ID           int    `json:"id"`
-		CurrencyRate string `json:"currencyRate"`
-		WarehouseID  int    `json:"warehouseID"`
-		Number       string `json:"number"`
-		Date         string `json:"date"`
-		DeliveryDate string `json:"deliveryDate"`
-		Time         string `json:"time"`
+		ID            int    `json:"id"`
+		CurrencyRate  string `json:"currencyRate"`
+		WarehouseID   int    `json:"warehouseID"`
+		WarehouseName string `json:"warehouseName"`
+		Number        string `json:"number"`
+		Date          string `json:"date"`
+		DeliveryDate  string `json:"deliveryDate"`
+		Time          string `json:"time"`
 
 		//Payer if invoice_client_is_payer = 1
 		ClientID    int    `json:"clientID"`
