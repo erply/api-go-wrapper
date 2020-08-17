@@ -8,4 +8,5 @@ const (
 	GetUserRightsMethod               = "getUserRights"
 	logProcessingOfCustomerDataMethod = "logProcessingOfCustomerData"
 	createInstallationMethod          = "createInstallation"
+	SaveEventMethod                   = "saveEvent"
 )
