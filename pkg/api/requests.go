@@ -33,7 +33,7 @@ func (c *Client) GetCountries(ctx context.Context, filters map[string]string) ([
 		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
 	if !common.IsJSONResponseOK((*common2.Status)(&res.Status)) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Countries, nil
 }
@@ -51,7 +51,7 @@ func (c *Client) GetUserRights(ctx context.Context, filters map[string]string) (
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Records) == 0 {
@@ -72,7 +72,7 @@ func (c *Client) GetEmployees(ctx context.Context, filters map[string]string) ([
 		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Employees, nil
 }
@@ -88,7 +88,7 @@ func (c *Client) GetBusinessAreas(ctx context.Context, filters map[string]string
 		return nil, erro.NewFromError("failed to unmarshal GetBusinessAreasResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.BusinessAreas, nil
 }
@@ -104,7 +104,7 @@ func (c *Client) GetCurrencies(ctx context.Context, filters map[string]string) (
 		return nil, erro.NewFromError("failed to unmarshal GetCurrenciesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Currencies, nil
 }
@@ -137,7 +137,7 @@ func (c *Client) SaveEvent(ctx context.Context, filters map[string]string) (int,
 		return 0, erro.NewFromError(fmt.Sprintf("failed to unmarshal %s response", SaveEventMethod), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return 0, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return 0, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Records[0].EventID, nil
 }

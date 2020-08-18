@@ -22,7 +22,7 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.Addresses, nil
@@ -77,7 +77,7 @@ func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) (
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Addresses) == 0 {
@@ -131,4 +131,3 @@ func (cli *Client) SaveAddressesBulk(ctx context.Context, addrMap []map[string]i
 
 	return saveAddressesResponseBulk, nil
 }
-

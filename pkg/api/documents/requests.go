@@ -25,7 +25,7 @@ func (cli *Client) GetPurchaseDocuments(ctx context.Context, filters map[string]
 		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetPurchaseDocumentsResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.PurchaseDocuments, nil

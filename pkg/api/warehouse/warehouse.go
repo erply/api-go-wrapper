@@ -22,7 +22,7 @@ func (cli *Client) GetWarehouses(ctx context.Context, filters map[string]string)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Warehouses) == 0 {

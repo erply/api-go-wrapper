@@ -20,7 +20,7 @@ func (cli *Client) GetConfParameters(ctx context.Context) (*ConfParameter, error
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.ConfParameters) == 0 {

@@ -39,7 +39,7 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 	}
 
 	if res.Status.ErrorCode != 0 {
-		return "",  erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return "", erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Records) < 1 {

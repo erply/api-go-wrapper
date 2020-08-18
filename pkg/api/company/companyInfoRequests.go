@@ -19,7 +19,7 @@ func (cli *Client) GetCompanyInfo(ctx context.Context) (*Info, error) {
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.CompanyInfos) == 0 {

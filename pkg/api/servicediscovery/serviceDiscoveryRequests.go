@@ -21,7 +21,7 @@ func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, 
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode %s response", method))
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.Records) < 1 {
 		return nil, errors.New("no records in response")

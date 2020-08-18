@@ -20,7 +20,7 @@ func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]str
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.ImportReports) == 0 {
@@ -62,7 +62,7 @@ func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]str
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SalesDocuments) == 0 {
@@ -119,7 +119,7 @@ func (cli *Client) DeleteDocument(ctx context.Context, filters map[string]string
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return erro.NewFromResponseStatus(&res.Status)
 	}
 
 	return nil
