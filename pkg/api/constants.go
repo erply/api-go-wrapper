@@ -9,4 +9,5 @@ const (
 	logProcessingOfCustomerDataMethod = "logProcessingOfCustomerData"
 	createInstallationMethod          = "createInstallation"
 	SaveEventMethod                   = "saveEvent"
+	GetEvents                         = "getEvents"
 )

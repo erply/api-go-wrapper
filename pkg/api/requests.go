@@ -19,6 +19,7 @@ type Manager interface {
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
 	SaveEvent(ctx context.Context, filters map[string]string) (int, error)
+	GetEvents(ctx context.Context, filters map[string]string) ([]Event, error)
 	LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error
 }
 
@@ -127,12 +128,7 @@ func (c *Client) SaveEvent(ctx context.Context, filters map[string]string) (int,
 	if err != nil {
 		return 0, err
 	}
-	var res = struct {
-		Status  common2.Status
-		Records []struct {
-			EventID int `json:"eventID"`
-		} `json:"records"`
-	}{}
+	var res SaveEventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return 0, erro.NewFromError(fmt.Sprintf("failed to unmarshal %s response", SaveEventMethod), err)
 	}
@@ -140,4 +136,19 @@ func (c *Client) SaveEvent(ctx context.Context, filters map[string]string) (int,
 		return 0, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Records[0].EventID, nil
+}
+
+func (c *Client) GetEvents(ctx context.Context, filters map[string]string) ([]Event, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetEvents, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetEventsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res.Events, nil
 }

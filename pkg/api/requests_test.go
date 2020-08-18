@@ -69,4 +69,10 @@ func TestApiRequests(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotEqual(t, 0, eventID)
 	})
+
+	t.Run("test GetEvents", func(t *testing.T) {
+		events, err := cli.GetEvents(context.Background(), map[string]string{})
+		assert.NoError(t, err)
+		t.Log(events)
+	})
 }
