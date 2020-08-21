@@ -52,6 +52,7 @@ type (
 		CurrencyCode             string              `json:"currencyCode"`
 		ContactName              string              `json:"contactName"`
 		ClientName               string              `json:"clientName"`
+		ClientCardNumber         string              `json:"clientCardNumber"`
 		Type                     string              `json:"type"`
 		InvoiceState             string              `json:"invoiceState"`
 		PaymentType              string              `json:"paymentType"`
