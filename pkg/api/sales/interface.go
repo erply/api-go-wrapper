@@ -19,10 +19,15 @@ type (
 		GetVatRates(ctx context.Context, filters map[string]string) (VatRates, error)
 	}
 
+	AssignmentsManger interface {
+		SaveAssignment(ctx context.Context, filters map[string]string) (int64, error)
+	}
+
 	Manager interface {
 		ProjectManager
 		DocumentManager
 		VatRateManager
+		AssignmentsManger
 		//payment requests
 		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
