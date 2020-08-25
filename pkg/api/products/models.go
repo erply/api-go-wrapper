@@ -106,10 +106,10 @@ type (
 	}
 
 	Parameter struct {
-		ID      uint   `json:"parameterID"`
+		ID      string `json:"parameterID"`
 		Name    string `json:"parameterName"`
 		Type    string `json:"parameterType"`
-		GroupID uint   `json:"parameterGroupID"`
+		GroupID string `json:"parameterGroupID"`
 		Value   string `json:"parameterValue"`
 	}
 	StockInfo struct {
