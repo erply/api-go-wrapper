@@ -100,11 +100,18 @@ type (
 		TaxFree            int                `json:"taxFree"`
 		Type               string             `json:"type"`
 		Warehouses         map[uint]StockInfo `json:"warehouses"`
-
-		RelatedProducts []string          `json:"relatedProducts"`
-		VariationList   []ProductVariaton `json:"variationList"`
+		Parameters         []Parameter        `json:"parameters"`
+		RelatedProducts    []string           `json:"relatedProducts"`
+		VariationList      []ProductVariaton  `json:"variationList"`
 	}
 
+	Parameter struct {
+		ID      uint   `json:"parameterID"`
+		Name    string `json:"parameterName"`
+		Type    string `json:"parameterType"`
+		GroupID uint   `json:"parameterGroupID"`
+		Value   string `json:"parameterValue"`
+	}
 	StockInfo struct {
 		WarehouseID   uint    `json:"warehouseID"`
 		Free          float64 `json:"free"`
@@ -225,7 +232,7 @@ type (
 	}
 
 	GetProductStockFileResponseBulk struct {
-		Status    sharedCommon.Status           `json:"status"`
+		Status    sharedCommon.Status                   `json:"status"`
 		BulkItems []GetProductStockFileResponseBulkItem `json:"requests"`
 	}
 )
