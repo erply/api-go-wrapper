@@ -34,7 +34,7 @@ type Country struct {
 	CountryName           string `json:"countryName"`
 	CountryCode           string `json:"countryCode"`
 	MemberOfEuropeanUnion byte   `json:"memberOfEuropeanUnion"`
-	LastModified          string `json:"lastModified"`
+	LastModified          uint64 `json:"lastModified"`
 	Added                 uint64 `json:"added"`
 }
 
