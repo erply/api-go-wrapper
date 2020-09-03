@@ -5,16 +5,16 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	"github.com/breathbath/api-go-wrapper/pkg/api/addresses"
-	"github.com/breathbath/api-go-wrapper/pkg/api/auth"
-	"github.com/breathbath/api-go-wrapper/pkg/api/company"
-	"github.com/breathbath/api-go-wrapper/pkg/api/customers"
-	"github.com/breathbath/api-go-wrapper/pkg/api/pos"
-	"github.com/breathbath/api-go-wrapper/pkg/api/products"
-	"github.com/breathbath/api-go-wrapper/pkg/api/sales"
-	"github.com/breathbath/api-go-wrapper/pkg/api/servicediscovery"
-	"github.com/breathbath/api-go-wrapper/pkg/api/warehouse"
+	"github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api/addresses"
+	"github.com/erply/api-go-wrapper/pkg/api/auth"
+	"github.com/erply/api-go-wrapper/pkg/api/company"
+	"github.com/erply/api-go-wrapper/pkg/api/customers"
+	"github.com/erply/api-go-wrapper/pkg/api/pos"
+	"github.com/erply/api-go-wrapper/pkg/api/products"
+	"github.com/erply/api-go-wrapper/pkg/api/sales"
+	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
+	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
 )
 
 type Client struct {

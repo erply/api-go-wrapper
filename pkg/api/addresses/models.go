@@ -1,8 +1,8 @@
 package addresses
 
 import (
-	"github.com/breathbath/api-go-wrapper/internal/common"
-	common2 "github.com/breathbath/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/internal/common"
+	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 type (

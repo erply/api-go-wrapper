@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/breathbath/api-go-wrapper/internal/common"
+import "github.com/erply/api-go-wrapper/internal/common"
 
 type (
 	Client        struct{ *common.Client }
