@@ -5,6 +5,7 @@ const (
 	GetEmployeesMethod                = "getEmployees"
 	GetBusinessAreasMethod            = "getBusinessAreas"
 	GetCurrenciesMethod               = "getCurrencies"
+	GetUserOperationsLog              = "getUserOperationsLog"
 	GetUserRightsMethod               = "getUserRights"
 	logProcessingOfCustomerDataMethod = "logProcessingOfCustomerData"
 	createInstallationMethod          = "createInstallation"

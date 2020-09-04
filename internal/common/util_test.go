@@ -54,12 +54,12 @@ func TestSendRequestBulk(t *testing.T) {
 
 	cli := &Client{
 		Url: srv.URL,
-		httpClient:  &http.Client{
+		httpClient: &http.Client{
 			Timeout: 5 * time.Second,
 		},
-		sessionKey:  "somesess",
-		clientCode:   "someclient",
-		partnerKey:  "",
+		sessionKey: "somesess",
+		clientCode: "someclient",
+		partnerKey: "",
 	}
 
 	resp, err := cli.SendRequestBulk(
@@ -89,4 +89,3 @@ func TestSendRequestBulk(t *testing.T) {
 	assert.Equal(t, 200, resp.StatusCode)
 	assert.Equal(t, 1, calledTimes)
 }
-

@@ -24,6 +24,20 @@ type GetCurrenciesResponse struct {
 	Status     common2.Status `json:"status"`
 	Currencies []Currency     `json:"records"`
 }
+
+type GetUserOperationsLogResponse struct {
+	Status        common2.Status `json:"status"`
+	OperationLogs []OperationLog `json:"records"`
+}
+type OperationLog struct {
+	LogID     int    `json:"logID"`
+	Username  string `json:"username"`
+	Timestamp uint64 `json:"timestamp"`
+	TableName string `json:"tableName"`
+	ItemID    int    `json:"itemID"`
+	Operation string `json:"operation"`
+}
+
 type GetUserRightsResponse struct {
 	Status  common2.Status `json:"status"`
 	Records []UserRights   `json:"records"`

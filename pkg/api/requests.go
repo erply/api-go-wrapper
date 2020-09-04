@@ -121,3 +121,18 @@ func (cli *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[
 
 	return nil
 }
+
+func (cli *Client) GetUserOperationsLog(ctx context.Context, filters map[string]string) ([]OperationLog, error) {
+	resp, err := cli.commonClient.SendRequest(ctx, GetUserOperationsLog, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetUserOperationsLogResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+	}
+	return res.OperationLogs, nil
+}
