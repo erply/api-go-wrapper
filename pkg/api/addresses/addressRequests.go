@@ -22,7 +22,7 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
 
 	return res.Addresses, nil

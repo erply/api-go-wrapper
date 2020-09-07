@@ -30,16 +30,16 @@ func (cm *ClientMock) Do(req *http.Request) (*http.Response, error) {
 
 //BodyMock implements resp.Body
 type BodyMock struct {
-	Body io.Reader
-	WasClosed bool
+	Body       io.Reader
+	WasClosed  bool
 	CloseError error
 }
 
 //NewFromStr creates BodyMock from a string
 func NewFromStr(body string) *BodyMock {
 	return &BodyMock{
-		Body:strings.NewReader(body),
-		WasClosed: false,
+		Body:       strings.NewReader(body),
+		WasClosed:  false,
 		CloseError: nil,
 	}
 }
@@ -49,15 +49,15 @@ func NewFromStruct(input interface{}) *BodyMock {
 	c, err := json.Marshal(input)
 	if err != nil {
 		return &BodyMock{
-			Body:strings.NewReader(fmt.Sprintf("%+v", input)),
-			WasClosed: false,
+			Body:       strings.NewReader(fmt.Sprintf("%+v", input)),
+			WasClosed:  false,
 			CloseError: nil,
 		}
 	}
 	buf := bytes.NewBuffer(c)
 	return &BodyMock{
-		Body: buf,
-		WasClosed: false,
+		Body:       buf,
+		WasClosed:  false,
 		CloseError: nil,
 	}
 }
