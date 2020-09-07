@@ -20,6 +20,7 @@ type Manager interface {
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
 	LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error
+	GetUserOperationsLog(ctx context.Context, filters map[string]string) ([]OperationLog, *common2.Status, error)
 }
 
 // GetCountries will list countries according to specified filters.
@@ -122,17 +123,17 @@ func (cli *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[
 	return nil
 }
 
-func (cli *Client) GetUserOperationsLog(ctx context.Context, filters map[string]string) ([]OperationLog, error) {
+func (cli *Client) GetUserOperationsLog(ctx context.Context, filters map[string]string) ([]OperationLog, *common2.Status, error) {
 	resp, err := cli.commonClient.SendRequest(ctx, GetUserOperationsLog, filters)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	var res GetUserOperationsLogResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
+		return nil, nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, nil, erro.NewErplyError(strconv.Itoa(res.Status.ErrorCode), res.Status.Request+": "+res.Status.ResponseStatus)
 	}
-	return res.OperationLogs, nil
+	return res.OperationLogs, &res.Status, nil
 }
