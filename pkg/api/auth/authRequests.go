@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -72,10 +70,6 @@ func VerifyUserV2(ctx context.Context, filters map[string]string, clientCode str
 
 	if res.Status.ErrorCode != 0 {
 		return "", erro.NewFromResponseStatus(&res.Status)
-	}
-
-	if len(res.Records) < 1 {
-		return "", erro.NewFromError("VerifyUser: no records in response", nil)
 	}
 	return res.Records[0].SessionKey, nil
 }
