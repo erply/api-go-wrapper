@@ -245,4 +245,17 @@ type (
 		Status    sharedCommon.Status             `json:"status"`
 		BulkItems []SaveSuppliersResponseBulkItem `json:"requests"`
 	}
+
+	DeleteSupplierResponse struct {
+		Status sharedCommon.Status `json:"status"`
+	}
+
+	DeleteSuppliersResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk  `json:"status"`
+	}
+
+	DeleteSuppliersResponseBulk struct {
+		Status    sharedCommon.Status               `json:"status"`
+		BulkItems []DeleteSuppliersResponseBulkItem `json:"requests"`
+	}
 )

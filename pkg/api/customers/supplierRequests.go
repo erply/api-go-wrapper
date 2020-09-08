@@ -127,3 +127,64 @@ func (cli *Client) SaveSupplierBulk(ctx context.Context, supplierMap []map[strin
 
 	return saveSuppliersResponseBulk, nil
 }
+
+// DeleteSupplier https://learn-api.erply.com/requests/deletesupplier/
+func (cli *Client) DeleteSupplier(ctx context.Context, filters map[string]string) error {
+	resp, err := cli.SendRequest(ctx, "deleteSupplier", filters)
+	if err != nil {
+		return err
+	}
+	var res DeleteSupplierResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return erro.NewFromError("failed to unmarshal DeleteSupplierResponse ", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return erro.NewFromResponseStatus(&res.Status)
+	}
+	return nil
+}
+
+func (cli *Client) DeleteSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (DeleteSuppliersResponseBulk, error) {
+	var deleteSupplierResponse DeleteSuppliersResponseBulk
+
+	if len(supplierMap) > common2.MaxBulkRequestsCount {
+		return deleteSupplierResponse, fmt.Errorf("cannot delete more than %d suppliers in one request", common2.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(supplierMap))
+	for _, filter := range supplierMap {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "deleteSupplier",
+			Filters:    filter,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, attrs)
+	if err != nil {
+		return deleteSupplierResponse, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return deleteSupplierResponse, err
+	}
+
+	if err := json.Unmarshal(body, &deleteSupplierResponse); err != nil {
+		return deleteSupplierResponse, fmt.Errorf("ERPLY API: failed to unmarshal DeleteSuppliersResponseBulk from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&deleteSupplierResponse.Status) {
+		return deleteSupplierResponse, erro.NewErplyError(deleteSupplierResponse.Status.ErrorCode.String(), deleteSupplierResponse.Status.Request+": "+deleteSupplierResponse.Status.ResponseStatus)
+	}
+
+	for _, supplierBulkItem := range deleteSupplierResponse.BulkItems {
+		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
+			return deleteSupplierResponse, erro.NewErplyError(
+				supplierBulkItem.Status.ErrorCode.String(),
+				fmt.Sprintf("%+v", supplierBulkItem.Status),
+			)
+		}
+	}
+
+	return deleteSupplierResponse, nil
+}
