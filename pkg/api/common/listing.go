@@ -172,7 +172,7 @@ func (p *Lister) getCursors(ctx context.Context, totalCount int) chan []Cursor {
 			p.listingSettings.MaxItemsPerRequest = MaxCountPerBulkRequestItem * MaxBulkRequestsCount
 		}
 
-		for ; leftCount > 0; {
+		for leftCount > 0 {
 			countToFetchForBulkRequest := leftCount
 			if leftCount > p.listingSettings.MaxItemsPerRequest {
 				countToFetchForBulkRequest = p.listingSettings.MaxItemsPerRequest

@@ -22,10 +22,10 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 					Status: statusBulk,
 					PurchaseDocuments: []PurchaseDocument{
 						{
-							ID:   123,
+							ID: 123,
 						},
 						{
-							ID:   124,
+							ID: 124,
 						},
 					},
 				},
@@ -33,7 +33,7 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 					Status: statusBulk,
 					PurchaseDocuments: []PurchaseDocument{
 						{
-							ID:   125,
+							ID: 125,
 						},
 					},
 				},
@@ -77,10 +77,10 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 
 	assert.Equal(t, []PurchaseDocument{
 		{
-			ID:   123,
+			ID: 123,
 		},
 		{
-			ID:   124,
+			ID: 124,
 		},
 	}, bulkResp.BulkItems[0].PurchaseDocuments)
 
@@ -88,7 +88,7 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 
 	assert.Equal(t, []PurchaseDocument{
 		{
-			ID:   125,
+			ID: 125,
 		},
 	}, bulkResp.BulkItems[1].PurchaseDocuments)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
@@ -102,10 +102,10 @@ func TestGetPurchaseDocuments(t *testing.T) {
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			PurchaseDocuments: []PurchaseDocument{
 				{
-					ID:   123,
+					ID: 123,
 				},
 				{
-					ID:   124,
+					ID: 124,
 				},
 			},
 		}
@@ -132,10 +132,10 @@ func TestGetPurchaseDocuments(t *testing.T) {
 
 	assert.Equal(t, []PurchaseDocument{
 		{
-			ID:   123,
+			ID: 123,
 		},
 		{
-			ID:   124,
+			ID: 124,
 		},
 	}, actualDocuments)
 }

@@ -83,12 +83,12 @@ func TestGetCustomersBulk(t *testing.T) {
 					Status: statusBulk,
 					Customers: []Customer{
 						{
-							ID: 123,
-							CompanyName:   "Customer 123",
+							ID:          123,
+							CompanyName: "Customer 123",
 						},
 						{
-							ID: 124,
-							CompanyName:   "Customer 124",
+							ID:          124,
+							CompanyName: "Customer 124",
 						},
 					},
 				},
@@ -96,8 +96,8 @@ func TestGetCustomersBulk(t *testing.T) {
 					Status: statusBulk,
 					Customers: []Customer{
 						{
-							ID: 125,
-							CompanyName:   "Customer 125",
+							ID:          125,
+							CompanyName: "Customer 125",
 						},
 					},
 				},
@@ -141,12 +141,12 @@ func TestGetCustomersBulk(t *testing.T) {
 
 	assert.Equal(t, Customers{
 		{
-			ID: 123,
-			CompanyName:   "Customer 123",
+			ID:          123,
+			CompanyName: "Customer 123",
 		},
 		{
-			ID: 124,
-			CompanyName:   "Customer 124",
+			ID:          124,
+			CompanyName: "Customer 124",
 		},
 	}, customersBulk.BulkItems[0].Customers)
 
@@ -154,8 +154,8 @@ func TestGetCustomersBulk(t *testing.T) {
 
 	assert.Equal(t, Customers{
 		{
-			ID: 125,
-			CompanyName:   "Customer 125",
+			ID:          125,
+			CompanyName: "Customer 125",
 		},
 	}, customersBulk.BulkItems[1].Customers)
 	assert.Equal(t, expectedStatus, customersBulk.BulkItems[1].Status)
@@ -187,4 +187,3 @@ func TestGetCustomersBulkResponseFailure(t *testing.T) {
 		return
 	}
 }
-

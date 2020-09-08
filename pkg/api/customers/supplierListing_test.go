@@ -26,7 +26,7 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 		for _, id := range supplierIDs {
 			suppliers = append(suppliers, Supplier{
 				SupplierId: uint(id),
-				FullName:      fmt.Sprintf("Some Supplier %d", id),
+				FullName:   fmt.Sprintf("Some Supplier %d", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}
@@ -40,7 +40,7 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 		statusBulk.RecordsInResponse = len(supplierIDs)
 
 		bulkItems = append(bulkItems, GetSuppliersResponseBulkItem{
-			Status:   statusBulk,
+			Status:    statusBulk,
 			Suppliers: suppliers,
 		})
 	}

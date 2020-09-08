@@ -89,7 +89,7 @@ func GetSalesDocumentsInParallel(cl *api.Client) ([]sales.SaleDocument, error) {
 		},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
 	docsChan := lister.Get(ctx, map[string]interface{}{

@@ -58,11 +58,11 @@ func GetCustomersBulk(cl *api.Client) (custmrs customers.Customers, err error) {
 	bulkFilters := []map[string]interface{}{
 		{
 			"recordsOnPage": "100",
-			"pageNo": "1",
+			"pageNo":        "1",
 		},
 		{
 			"recordsOnPage": "100",
-			"pageNo": "2",
+			"pageNo":        "2",
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)

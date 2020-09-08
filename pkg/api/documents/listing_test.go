@@ -25,8 +25,8 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 		documents := make([]PurchaseDocument, 0, len(documentID))
 		for _, id := range documentID {
 			documents = append(documents, PurchaseDocument{
-				ID: id,
-				Number:      fmt.Sprintf("Doc %d", id),
+				ID:     id,
+				Number: fmt.Sprintf("Doc %d", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}
@@ -40,7 +40,7 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 		statusBulk.RecordsInResponse = len(documentID)
 
 		bulkItems = append(bulkItems, GetPurchaseDocumentBulkItem{
-			Status:   statusBulk,
+			Status:            statusBulk,
 			PurchaseDocuments: documents,
 		})
 	}

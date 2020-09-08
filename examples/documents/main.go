@@ -114,7 +114,7 @@ func GetPurchaseDocumentsInParallel(cl *api.Client) ([]documents.PurchaseDocumen
 		},
 	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 60)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
 	defer cancel()
 
 	docsChan := lister.Get(ctx, map[string]interface{}{

@@ -53,7 +53,7 @@ func GetAddressesBulk(cl *api.Client) (addresses []common.Address, err error) {
 			"pageNo":        2,
 		},
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	bulkResp, err := addressCli.GetAddressesBulk(ctx, bulkFilters, map[string]string{})
@@ -73,17 +73,17 @@ func GetAddressesBulk(cl *api.Client) (addresses []common.Address, err error) {
 func SaveAddressesBulk(cl *api.Client) (err error) {
 	addressProvider := cl.AddressProvider
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	dataToUpdate := []map[string]interface{}{
 		{
-			"street": "Elmstr",
-			"city": "Rome",
+			"street":     "Elmstr",
+			"city":       "Rome",
 			"postalCode": "123456",
-			"country": "Italy",
-			"ownerID": 12355,
-			"typeID": 1,
+			"country":    "Italy",
+			"ownerID":    12355,
+			"typeID":     1,
 		},
 	}
 	bulkResponse, err := addressProvider.SaveAddressesBulk(ctx, dataToUpdate, map[string]string{})

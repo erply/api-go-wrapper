@@ -20,7 +20,7 @@ func TestSaveAssignment(t *testing.T) {
 	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
 
 	resp, err := cli.SaveAssignment(ctx, map[string]string{
-		"customerComment1":  "Test",
+		"customerComment1": "Test",
 	})
 
 	if err != nil {

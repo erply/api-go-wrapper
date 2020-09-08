@@ -80,11 +80,11 @@ func TestGetProductsBulk(t *testing.T) {
 					Products: []Product{
 						{
 							ProductID: 123,
-							Code:   "Some Payload 123",
+							Code:      "Some Payload 123",
 						},
 						{
 							ProductID: 124,
-							Code:   "Some Payload 124",
+							Code:      "Some Payload 124",
 						},
 					},
 				},
@@ -93,7 +93,7 @@ func TestGetProductsBulk(t *testing.T) {
 					Products: []Product{
 						{
 							ProductID: 125,
-							Code:   "Some Payload 125",
+							Code:      "Some Payload 125",
 						},
 					},
 				},
@@ -138,11 +138,11 @@ func TestGetProductsBulk(t *testing.T) {
 	assert.Equal(t, []Product{
 		{
 			ProductID: 123,
-			Code:   "Some Payload 123",
+			Code:      "Some Payload 123",
 		},
 		{
 			ProductID: 124,
-			Code:    "Some Payload 124",
+			Code:      "Some Payload 124",
 		},
 	}, productsBulk.BulkItems[0].Products)
 
@@ -151,7 +151,7 @@ func TestGetProductsBulk(t *testing.T) {
 	assert.Equal(t, []Product{
 		{
 			ProductID: 125,
-			Code:    "Some Payload 125",
+			Code:      "Some Payload 125",
 		},
 	}, productsBulk.BulkItems[1].Products)
 	assert.Equal(t, expectedStatus, productsBulk.BulkItems[1].Status)

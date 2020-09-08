@@ -266,7 +266,7 @@ func sendWarehouseRequest(w http.ResponseWriter, errStatus errors.ApiError, tota
 		for _, id := range warehouseCodes {
 			warehouses = append(warehouses, Warehouse{
 				Code: id,
-				Name:      fmt.Sprintf("Some Warehouse %s", id),
+				Name: fmt.Sprintf("Some Warehouse %s", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}
@@ -280,7 +280,7 @@ func sendWarehouseRequest(w http.ResponseWriter, errStatus errors.ApiError, tota
 		statusBulk.RecordsInResponse = len(warehouseCodes)
 
 		bulkItems = append(bulkItems, GetWarehousesBulkItem{
-			Status:    statusBulk,
+			Status:     statusBulk,
 			Warehouses: warehouses,
 		})
 	}

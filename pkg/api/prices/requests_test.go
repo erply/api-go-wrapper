@@ -470,7 +470,7 @@ func TestGetProductPriceListsBulk(t *testing.T) {
 					PriceLists: []ProductsInPriceList{
 						{
 							PriceListProductID: 123,
-							Price:                      100,
+							Price:              100,
 						},
 					},
 				},
@@ -479,7 +479,7 @@ func TestGetProductPriceListsBulk(t *testing.T) {
 					PriceLists: []ProductsInPriceList{
 						{
 							PriceListProductID: 124,
-							Price:                      200,
+							Price:              200,
 						},
 					},
 				},
@@ -520,7 +520,7 @@ func TestGetProductPriceListsBulk(t *testing.T) {
 	assert.Equal(t, []ProductsInPriceList{
 		{
 			PriceListProductID: 123,
-			Price:                      100,
+			Price:              100,
 		},
 	}, bulkResp.BulkItems[0].PriceLists)
 
@@ -529,7 +529,7 @@ func TestGetProductPriceListsBulk(t *testing.T) {
 	assert.Equal(t, []ProductsInPriceList{
 		{
 			PriceListProductID: 124,
-			Price:                      200,
+			Price:              200,
 		},
 	}, bulkResp.BulkItems[1].PriceLists)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
@@ -626,11 +626,11 @@ func TestGetProductPriceLists(t *testing.T) {
 	assert.Equal(t, []ProductsInPriceList{
 		{
 			PriceListProductID: 123,
-			Price:                      100,
+			Price:              100,
 		},
 		{
 			PriceListProductID: 124,
-			Price:                      200,
+			Price:              200,
 		},
 	}, actualProductPriceItems)
 }

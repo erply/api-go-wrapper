@@ -27,7 +27,7 @@ type GetCurrenciesResponse struct {
 
 type GetUserOperationsLogResponse struct {
 	Status        sharedCommon.Status `json:"status"`
-	OperationLogs []OperationLog `json:"records"`
+	OperationLogs []OperationLog      `json:"records"`
 }
 type OperationLog struct {
 	LogID     int    `json:"logID"`
