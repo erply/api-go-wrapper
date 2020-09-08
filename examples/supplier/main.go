@@ -106,10 +106,10 @@ func DeleteSupplierBulk(cl *api.Client) (err error) {
 
 	ids := []map[string]interface{}{
 		{
-			"supplierID":      "100000049",
+			"supplierID": "100000049",
 		},
 		{
-			"supplierID":      "100000050",
+			"supplierID": "100000050",
 		},
 	}
 	bulkResponse, err := supplierCli.DeleteSupplierBulk(ctx, ids, map[string]string{})
