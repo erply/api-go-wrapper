@@ -38,6 +38,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = DeleteSupplierBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error) {
@@ -84,6 +89,30 @@ func SaveSupplierBulk(cl *api.Client) (err error) {
 		},
 	}
 	bulkResponse, err := supplierCli.SaveSupplierBulk(ctx, sup, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	fmt.Printf("%+v", bulkResponse)
+
+	return
+}
+
+func DeleteSupplierBulk(cl *api.Client) (err error) {
+	supplierCli := cl.CustomerManager
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	ids := []map[string]interface{}{
+		{
+			"supplierID":      "100000049",
+		},
+		{
+			"supplierID":      "100000050",
+		},
+	}
+	bulkResponse, err := supplierCli.DeleteSupplierBulk(ctx, ids, map[string]string{})
 	if err != nil {
 		return
 	}
