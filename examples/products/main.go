@@ -185,7 +185,7 @@ func GetProductStockFileBulk(cl *api.Client) (stockFiles []products.GetProductSt
 			"warehouseID": "2",
 		},
 	}, map[string]string{})
-	if err !=nil {
+	if err != nil {
 		return
 	}
 

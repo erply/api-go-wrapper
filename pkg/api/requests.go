@@ -18,12 +18,15 @@ type Manager interface {
 	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
+	SaveEvent(ctx context.Context, filters map[string]string) (int, error)
+	GetEvents(ctx context.Context, filters map[string]string) ([]Event, error)
 	LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error
+	GetUserOperationsLog(ctx context.Context, filters map[string]string) (*GetUserOperationsLogResponse, error)
 }
 
 // GetCountries will list countries according to specified filters.
-func (cli *Client) GetCountries(ctx context.Context, filters map[string]string) ([]Country, error) {
-	resp, err := cli.commonClient.SendRequest(ctx, GetCountriesMethod, filters)
+func (c *Client) GetCountries(ctx context.Context, filters map[string]string) ([]Country, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetCountriesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -32,15 +35,15 @@ func (cli *Client) GetCountries(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
 	}
 	if !common.IsJSONResponseOK((*common2.Status)(&res.Status)) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Countries, nil
 }
 
 //GetUserName from GetUserRights erply API request
-func (cli *Client) GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error) {
+func (c *Client) GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error) {
 
-	resp, err := cli.commonClient.SendRequest(ctx, GetUserRightsMethod, filters)
+	resp, err := c.commonClient.SendRequest(ctx, GetUserRightsMethod, filters)
 	if err != nil {
 		return nil, erro.NewFromError(GetUserRightsMethod+" request failed", err)
 	}
@@ -50,7 +53,7 @@ func (cli *Client) GetUserRights(ctx context.Context, filters map[string]string)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Records) == 0 {
@@ -61,8 +64,8 @@ func (cli *Client) GetUserRights(ctx context.Context, filters map[string]string)
 }
 
 // GetEmployees will list employees according to specified filters.
-func (cli *Client) GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error) {
-	resp, err := cli.commonClient.SendRequest(ctx, GetEmployeesMethod, filters)
+func (c *Client) GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetEmployeesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +74,14 @@ func (cli *Client) GetEmployees(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Employees, nil
 }
 
 // GetBusinessAreas will list business areas according to specified filters.
-func (cli *Client) GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error) {
-	resp, err := cli.commonClient.SendRequest(ctx, GetBusinessAreasMethod, filters)
+func (c *Client) GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetBusinessAreasMethod, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -87,14 +90,14 @@ func (cli *Client) GetBusinessAreas(ctx context.Context, filters map[string]stri
 		return nil, erro.NewFromError("failed to unmarshal GetBusinessAreasResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.BusinessAreas, nil
 }
 
 // GetCurrencies will list currencies according to specified filters.
-func (cli *Client) GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error) {
-	resp, err := cli.commonClient.SendRequest(ctx, GetCurrenciesMethod, filters)
+func (c *Client) GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetCurrenciesMethod, filters)
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +106,13 @@ func (cli *Client) GetCurrencies(ctx context.Context, filters map[string]string)
 		return nil, erro.NewFromError("failed to unmarshal GetCurrenciesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Currencies, nil
 }
 
-func (cli *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error {
-	resp, err := cli.commonClient.SendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
+func (c *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error {
+	resp, err := c.commonClient.SendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
 	if err != nil {
 		return erro.NewFromError("logProcessingOfCustomerData request failed", err)
 	}
@@ -119,4 +122,49 @@ func (cli *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[
 	}
 
 	return nil
+}
+
+func (c *Client) GetUserOperationsLog(ctx context.Context, filters map[string]string) (*GetUserOperationsLogResponse, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetUserOperationsLog, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetUserOperationsLogResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewFromResponseStatus(&res.Status)
+	}
+	return &res, nil
+}
+
+func (c *Client) SaveEvent(ctx context.Context, filters map[string]string) (int, error) {
+	resp, err := c.commonClient.SendRequest(ctx, SaveEventMethod, filters)
+	if err != nil {
+		return 0, err
+	}
+	var res SaveEventResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return 0, erro.NewFromError(fmt.Sprintf("failed to unmarshal %s response", SaveEventMethod), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return 0, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res.Records[0].EventID, nil
+}
+
+func (c *Client) GetEvents(ctx context.Context, filters map[string]string) ([]Event, error) {
+	resp, err := c.commonClient.SendRequest(ctx, GetEvents, filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetEventsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res.Events, nil
 }

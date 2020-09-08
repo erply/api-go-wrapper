@@ -263,8 +263,8 @@ func sendCustomersRequest(w http.ResponseWriter, errStatus errors.ApiError, tota
 		customers := make(Customers, 0, len(customerIDs))
 		for _, id := range customerIDs {
 			customers = append(customers, Customer{
-				ID: id,
-				CompanyName:      fmt.Sprintf("Some Customer %d", id),
+				ID:          id,
+				CompanyName: fmt.Sprintf("Some Customer %d", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}
@@ -278,7 +278,7 @@ func sendCustomersRequest(w http.ResponseWriter, errStatus errors.ApiError, tota
 		statusBulk.RecordsInResponse = len(customerIDs)
 
 		bulkItems = append(bulkItems, GetCustomersResponseBulkItem{
-			Status:   statusBulk,
+			Status:    statusBulk,
 			Customers: customers,
 		})
 	}

@@ -53,7 +53,7 @@ func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error)
 			"pageNo":        2,
 		},
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	bulkResp, err := supplierCli.GetSuppliersBulk(ctx, bulkFilters, map[string]string{})
@@ -73,13 +73,13 @@ func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error)
 func SaveSupplierBulk(cl *api.Client) (err error) {
 	supplierCli := cl.CustomerManager
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	sup := []map[string]interface{}{
 		{
-			"phone": "+1919-820-1136",
-			"fullname": "Max Mustermann",
+			"phone":      "+1919-820-1136",
+			"fullname":   "Max Mustermann",
 			"supplierID": 12355,
 		},
 	}

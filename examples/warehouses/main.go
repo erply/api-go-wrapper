@@ -54,7 +54,7 @@ func GetWarehousesBulk(cl *api.Client) (warehouses warehouse.Warehouses, err err
 			"warehouseID": 2,
 		},
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	bulkResp, err := warehouseManager.GetWarehousesBulk(ctx, bulkFilters, map[string]string{})
@@ -104,4 +104,3 @@ func GetWarehousesInParallel(cl *api.Client) (warehouse.Warehouses, error) {
 
 	return warehouses, nil
 }
-

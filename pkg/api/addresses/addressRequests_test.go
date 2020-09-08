@@ -201,10 +201,10 @@ func TestSaveAddressesBulk(t *testing.T) {
 		[]map[string]interface{}{
 			{
 				"addressID": 123,
-				"street":  "Some street 123",
+				"street":    "Some street 123",
 			},
 			{
-				"street":  "Some street new",
+				"street": "Some street new",
 			},
 		},
 		map[string]string{},
@@ -254,7 +254,7 @@ func TestSaveAddressesBulkResponseFailure(t *testing.T) {
 		[]map[string]interface{}{
 			{
 				"addressID": 123,
-				"street":  "Some street 123",
+				"street":    "Some street 123",
 			},
 		},
 		map[string]string{},

@@ -18,7 +18,7 @@ func (cli *Client) GetPointsOfSale(ctx context.Context, filters map[string]strin
 		return nil, erro.NewFromError("failed to unmarshal GetPointsOfSaleResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.PointsOfSale, nil
 }

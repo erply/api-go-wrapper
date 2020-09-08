@@ -332,13 +332,13 @@ func TestReadingGroupedSuccess(t *testing.T) {
 				MaxItemsPerRequest:        100,
 				MaxFetchersCount:          1,
 			},
-			itemsCountPerGroup: 5,
+			itemsCountPerGroup:  5,
 			expectedGroupCounts: []int{5, 5, 5, 5},
 		},
 		{
-			name:                "4 groups per 3 items with total 10 elements and 10 consumer",
-			total:               12,
-			inputProds:          []payloadMock{{ID: 1}, {ID: 2}, {ID: 3}},
+			name:       "4 groups per 3 items with total 10 elements and 10 consumer",
+			total:      12,
+			inputProds: []payloadMock{{ID: 1}, {ID: 2}, {ID: 3}},
 			//will make ceil(10/3)=4 requests in total, so {1,2,3} * 4
 			expectedProdIdsFlat: []int{1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3},
 			listingSettings: ListingSettings{
@@ -346,7 +346,7 @@ func TestReadingGroupedSuccess(t *testing.T) {
 				MaxItemsPerRequest: 3,
 				MaxFetchersCount:   10,
 			},
-			itemsCountPerGroup: 3,
+			itemsCountPerGroup:  3,
 			expectedGroupCounts: []int{3, 3, 3, 3},
 		},
 	}

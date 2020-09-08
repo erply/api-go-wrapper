@@ -64,6 +64,6 @@ type ThrottlerMock struct {
 	WasTriggered bool
 }
 
-func (tm *ThrottlerMock) Throttle(){
+func (tm *ThrottlerMock) Throttle() {
 	tm.WasTriggered = true
 }

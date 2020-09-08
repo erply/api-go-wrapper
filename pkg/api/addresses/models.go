@@ -22,12 +22,12 @@ type (
 	}
 
 	SaveAddressResp struct {
-		AddressID    int `json:"addressID"`
+		AddressID int `json:"addressID"`
 	}
 
 	SaveAddressesResponseBulkItem struct {
 		Status  sharedCommon.StatusBulk `json:"status"`
-		Records []SaveAddressResp      `json:"records"`
+		Records []SaveAddressResp       `json:"records"`
 	}
 
 	SaveAddressesResponseBulk struct {

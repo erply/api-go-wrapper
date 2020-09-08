@@ -21,7 +21,7 @@ func (cli *Client) GetSuppliers(ctx context.Context, filters map[string]string) 
 		return nil, erro.NewFromError("failed to unmarshal GetSuppliersResponse ", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Suppliers, nil
 }
@@ -73,7 +73,7 @@ func (cli *Client) SaveSupplier(ctx context.Context, filters map[string]string) 
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.CustomerImportReports) == 0 {

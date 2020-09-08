@@ -24,6 +24,20 @@ type GetCurrenciesResponse struct {
 	Status     sharedCommon.Status `json:"status"`
 	Currencies []Currency          `json:"records"`
 }
+
+type GetUserOperationsLogResponse struct {
+	Status        sharedCommon.Status `json:"status"`
+	OperationLogs []OperationLog      `json:"records"`
+}
+type OperationLog struct {
+	LogID     int    `json:"logID"`
+	Username  string `json:"username"`
+	Timestamp uint64 `json:"timestamp"`
+	TableName string `json:"tableName"`
+	ItemID    int    `json:"itemID"`
+	Operation string `json:"operation"`
+}
+
 type GetUserRightsResponse struct {
 	Status  sharedCommon.Status `json:"status"`
 	Records []UserRights        `json:"records"`
@@ -34,18 +48,58 @@ type Country struct {
 	CountryName           string `json:"countryName"`
 	CountryCode           string `json:"countryCode"`
 	MemberOfEuropeanUnion byte   `json:"memberOfEuropeanUnion"`
-	LastModified          string `json:"lastModified"`
+	LastModified          uint64 `json:"lastModified"`
 	Added                 uint64 `json:"added"`
 }
 
+type Event struct {
+	EventID       string `json:"eventID"`
+	ID            string `json:"id"`
+	Description   string `json:"description"`
+	TypeID        string `json:"typeID"`
+	StartTime     string `json:"startTime"`
+	EndTime       string `json:"endTime"`
+	CustomerID    string `json:"customerID"`
+	ContactID     string `json:"contactID"`
+	ProjectID     string `json:"projectID"`
+	EmployeeID    string `json:"employeeID"`
+	SubmitterID   string `json:"submitterID"`
+	SupplierID    string `json:"supplierID"`
+	SupplierName  string `json:"supplierName"`
+	StatusID      string `json:"statusID"`
+	ResourceID    string `json:"resourceID"`
+	Notes         string `json:"notes"`
+	LastModified  string `json:"lastModified"`
+	ContactName   string `json:"contactName"`
+	CustomerName  string `json:"customerName"`
+	EmployeeName  string `json:"employeeName"`
+	SubmitterName string `json:"submitterName"`
+	ProjectName   string `json:"projectName"`
+	ResourceName  string `json:"resourceName"`
+	StatusName    string `json:"statusName"`
+	TypeName      string `json:"typeName"`
+	Completed     string `json:"completed"`
+}
+
+type GetEventsResponse struct {
+	Status sharedCommon.Status `json:"status"`
+	Events []Event             `json:"records"`
+}
+
+type SaveEventResponse struct {
+	Status  sharedCommon.Status
+	Records []struct {
+		EventID int `json:"eventID"`
+	} `json:"records"`
+}
 type Employee struct {
-	EmployeeID             string              `json:"employeeID"`
-	FullName               string              `json:"fullName"`
-	EmployeeName           string              `json:"employeeName"`
-	FirstName              string              `json:"firstName"`
-	LastName               string              `json:"lastName"`
-	Phone                  string              `json:"phone"`
-	Mobile                 string              `json:"mobile"`
+	EmployeeID             string                      `json:"employeeID"`
+	FullName               string                      `json:"fullName"`
+	EmployeeName           string                      `json:"employeeName"`
+	FirstName              string                      `json:"firstName"`
+	LastName               string                      `json:"lastName"`
+	Phone                  string                      `json:"phone"`
+	Mobile                 string                      `json:"mobile"`
 	Email                  string                      `json:"email"`
 	Fax                    string                      `json:"fax"`
 	Code                   string                      `json:"code"`

@@ -7,18 +7,18 @@ import (
 )
 
 type structToConvert struct {
-	SupplierId      uint           `json:"supplierID"`
-	SupplierType    string         `json:"supplierType"`
-	FullName        string         `json:"fullName"`
-	CompanyName     string         `json:"companyName"`
-	FirstName       string         `json:"firstName"`
-	LstName         string         `json:"lastName"`
-	GroupId         uint           `json:"groupID"`
-	GroupName       string         `json:"groupName"`
-	Phone           string         `json:"phone"`
-	Mobile          string         `json:"mobile"`
-	Email           string         `json:"email"`
-	Fax             string         `json:"fax"`
+	SupplierId      uint                  `json:"supplierID"`
+	SupplierType    string                `json:"supplierType"`
+	FullName        string                `json:"fullName"`
+	CompanyName     string                `json:"companyName"`
+	FirstName       string                `json:"firstName"`
+	LstName         string                `json:"lastName"`
+	GroupId         uint                  `json:"groupID"`
+	GroupName       string                `json:"groupName"`
+	Phone           string                `json:"phone"`
+	Mobile          string                `json:"mobile"`
+	Email           string                `json:"email"`
+	Fax             string                `json:"fax"`
 	Code            string                `json:"code"`
 	IntegrationCode string                `json:"integrationCode"`
 	VatrateID       uint                  `json:"vatrateID"`
@@ -99,45 +99,45 @@ func TestConvertingStructToMap(t *testing.T) {
 		return
 	}
 	expectedMap := map[string]string{
-		"GLN": "gln222",
-		"added": "1",
-		"address": "Elm Str 11",
-		"attributes": "[]",
-		"bankAccountNumber": "3413412434",
-		"bankIBAN": "341t45243535",
-		"bankName": "some swiss bank",
-		"bankSWIFT": "some swift",
-		"birthday": "11.11.2011", 
-		"code": "32413", 
-		"companyID": "9", 
-		"companyName": "Some company", 
-		"countryCode": "DE", 
-		"countryID": "6", 
-		"countryName": "Deutschland", 
-		"currencyCode": "eur", 
-		"deliveryTermsID": "7", 
-		"email": "no@mail.me", 
-		"fax": "341234343241", 
-		"firstName": "some first", 
-		"fullName": "Some full name", 
-		"groupID": "3", 
-		"groupName": "some group", 
-		"integrationCode": "341324", 
-		"lastModified": "2001-01-01 00:00:00", 
-		"lastName": "some last", 
-		"mobile": "341431434", 
-		"notes": "some notes", 
-		"parentCompanyName": "some parent", 
-		"paymentDays": "11", 
-		"phone": "3334444444", 
-		"skype": "nono", 
-		"supplierID": "1",
-		"supplierManagerID": "10", 
-		"supplierManagerName": "Some manager", 
-		"supplierType": "some type", 
-		"vatNumber": "3431241", 
-		"vatrateID": "5", 
-		"website": "ya.ru",
+		"GLN":                 "gln222",
+		"added":               "1",
+		"address":             "Elm Str 11",
+		"attributes":          "[]",
+		"bankAccountNumber":   "3413412434",
+		"bankIBAN":            "341t45243535",
+		"bankName":            "some swiss bank",
+		"bankSWIFT":           "some swift",
+		"birthday":            "11.11.2011",
+		"code":                "32413",
+		"companyID":           "9",
+		"companyName":         "Some company",
+		"countryCode":         "DE",
+		"countryID":           "6",
+		"countryName":         "Deutschland",
+		"currencyCode":        "eur",
+		"deliveryTermsID":     "7",
+		"email":               "no@mail.me",
+		"fax":                 "341234343241",
+		"firstName":           "some first",
+		"fullName":            "Some full name",
+		"groupID":             "3",
+		"groupName":           "some group",
+		"integrationCode":     "341324",
+		"lastModified":        "2001-01-01 00:00:00",
+		"lastName":            "some last",
+		"mobile":              "341431434",
+		"notes":               "some notes",
+		"parentCompanyName":   "some parent",
+		"paymentDays":         "11",
+		"phone":               "3334444444",
+		"skype":               "nono",
+		"supplierID":          "1",
+		"supplierManagerID":   "10",
+		"supplierManagerName": "Some manager",
+		"supplierType":        "some type",
+		"vatNumber":           "3431241",
+		"vatrateID":           "5",
+		"website":             "ya.ru",
 	}
 	assert.Equal(t, expectedMap, actualMap)
 }

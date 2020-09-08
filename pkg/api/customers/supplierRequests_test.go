@@ -168,7 +168,6 @@ func TestGetSuppliersBulkResponseFailure(t *testing.T) {
 	}
 }
 
-
 func TestSaveSupplierBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := common2.StatusBulk{}
@@ -180,7 +179,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: []SaveSupplierResp{
 						{
-							SupplierID: 123,
+							SupplierID:    123,
 							AlreadyExists: false,
 						},
 					},
@@ -189,7 +188,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: []SaveSupplierResp{
 						{
-							SupplierID: 124,
+							SupplierID:    124,
 							AlreadyExists: true,
 						},
 					},
@@ -213,10 +212,10 @@ func TestSaveSupplierBulk(t *testing.T) {
 		[]map[string]interface{}{
 			{
 				"supplierID": 123,
-				"fullName":  "Some name",
+				"fullName":   "Some name",
 			},
 			{
-				"fullName":  "Some other name",
+				"fullName": "Some other name",
 			},
 		},
 		map[string]string{},
@@ -235,7 +234,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 
 	assert.Equal(t, []SaveSupplierResp{
 		{
-			SupplierID: 123,
+			SupplierID:    123,
 			AlreadyExists: false,
 		},
 	}, saveResp.BulkItems[0].Records)
@@ -244,7 +243,7 @@ func TestSaveSupplierBulk(t *testing.T) {
 
 	assert.Equal(t, []SaveSupplierResp{
 		{
-			SupplierID: 124,
+			SupplierID:    124,
 			AlreadyExists: true,
 		},
 	}, saveResp.BulkItems[1].Records)
@@ -268,7 +267,7 @@ func TestSaveSupplierBulkResponseFailure(t *testing.T) {
 		[]map[string]interface{}{
 			{
 				"supplierID": 123,
-				"fullName":  "Some name",
+				"fullName":   "Some name",
 			},
 		},
 		map[string]string{},

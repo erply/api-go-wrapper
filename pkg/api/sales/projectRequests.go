@@ -18,7 +18,7 @@ func (cli *Client) GetProjects(ctx context.Context, filters map[string]string) (
 		return nil, erro.NewFromError("failed to unmarshal GetProjectsResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Projects, nil
 }
@@ -34,7 +34,7 @@ func (cli *Client) GetProjectStatus(ctx context.Context, filters map[string]stri
 		return nil, erro.NewFromError("failed to unmarshal GetProjectStatusesResponse", err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+": "+res.Status.ResponseStatus)
+		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProjectStatuses, nil
 }
