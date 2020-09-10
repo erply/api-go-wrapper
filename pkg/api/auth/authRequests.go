@@ -125,6 +125,7 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	req.Header.Add("Accept", "application/json")
 
 	resp, err := client.Do(req)
+	defer resp.Body.Close()
 	if err != nil {
 		return nil, erro.NewFromError("failed to call getSessionKeyUser request", err)
 	}
@@ -148,10 +149,6 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	if len(res.Records) < 1 {
 		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
 	}
-
-	if resp.Body != nil {
-		return &res.Records[0], resp.Body.Close()
-	}
 	return &res.Records[0], nil
 }
 
@@ -172,6 +169,7 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 	req.Header.Add("Accept", "application/json")
 
 	resp, err := client.Do(req)
+	resp.Body.Close()
 	if err != nil {
 		return nil, erro.NewFromError("failed to call getSessionKeyInfo request", err)
 	}
@@ -194,10 +192,6 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 	}
 	if len(res.Records) < 1 {
 		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
-	}
-
-	if resp.Body != nil {
-		return &res.Records[0], resp.Body.Close()
 	}
 	return &res.Records[0], nil
 }
