@@ -11,7 +11,16 @@ type (
 	}
 
 	Records struct {
-		SessionKey string `json:"sessionKey"`
+		UserID        string `json:"userID,omitempty"`
+		UserName      string `json:"userName,omitempty"`
+		EmployeeID    string `json:"employeeID,omitempty"`
+		EmployeeName  string `json:"employeeName,omitempty"`
+		GroupID       string `json:"groupID,omitempty"`
+		GroupName     string `json:"groupName,omitempty"`
+		SessionKey    string `json:"sessionKey,omitempty"`
+		SessionLength int    `json:"sessionLength,omitempty"`
+		IdentityToken string `json:"identityToken,omitempty"`
+		Token         string `json:"token,omitempty"`
 	}
 	verifyIdentityTokenResponse struct {
 		Status common2.Status `json:"status"`
