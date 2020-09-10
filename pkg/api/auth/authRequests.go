@@ -125,10 +125,10 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	req.Header.Add("Accept", "application/json")
 
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, erro.NewFromError("failed to call getSessionKeyUser request", err)
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		var body []byte
@@ -169,10 +169,10 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 	req.Header.Add("Accept", "application/json")
 
 	resp, err := client.Do(req)
-	resp.Body.Close()
 	if err != nil {
 		return nil, erro.NewFromError("failed to call getSessionKeyInfo request", err)
 	}
+	resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		var body []byte
