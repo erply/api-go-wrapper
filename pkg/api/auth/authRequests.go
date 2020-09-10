@@ -74,6 +74,35 @@ func VerifyUserV2(ctx context.Context, filters map[string]string, clientCode str
 	return res.Records[0].SessionKey, nil
 }
 
+func VerifyUserV3(ctx context.Context, filters map[string]string, clientCode string, cli *http.Client) (*VerifyUserResponse, error) {
+	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	params := url.Values{}
+	for k, v := range filters {
+		params.Add(k, v)
+	}
+	params.Add("request", "verifyUser")
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl, nil)
+	if err != nil {
+		return nil, erro.NewFromError("failed to build HTTP request", err)
+	}
+	req.URL.RawQuery = params.Encode()
+	req.Header.Add("Accept", "application/json")
+	resp, err := cli.Do(req)
+
+	if err != nil {
+		return nil, erro.NewFromError("failed to build VerifyUser request", err)
+	}
+	res := &VerifyUserResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, erro.NewFromError("failed to decode VerifyUserResponse", err)
+	}
+
+	if res.Status.ErrorCode != 0 {
+		return nil, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res, nil
+}
+
 type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -100,12 +129,8 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 		return nil, erro.NewFromError("failed to call getSessionKeyUser request", err)
 	}
 
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
-
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		body := []byte{}
+		var body []byte
 		if resp.Body != nil {
 			body, err = ioutil.ReadAll(resp.Body)
 			if err != nil {
@@ -122,6 +147,10 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	}
 	if len(res.Records) < 1 {
 		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
+	}
+
+	if resp.Body != nil {
+		return &res.Records[0], resp.Body.Close()
 	}
 	return &res.Records[0], nil
 }
@@ -147,12 +176,8 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 		return nil, erro.NewFromError("failed to call getSessionKeyInfo request", err)
 	}
 
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
-
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		body := []byte{}
+		var body []byte
 		if resp.Body != nil {
 			body, err = ioutil.ReadAll(resp.Body)
 			if err != nil {
@@ -169,6 +194,10 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 	}
 	if len(res.Records) < 1 {
 		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
+	}
+
+	if resp.Body != nil {
+		return &res.Records[0], resp.Body.Close()
 	}
 	return &res.Records[0], nil
 }
