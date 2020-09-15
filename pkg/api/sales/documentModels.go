@@ -46,6 +46,7 @@ type (
 		PaymentDays              string              `json:"paymentDays"`
 		Confirmed                string              `json:"confirmed"`
 		Notes                    string              `json:"notes"`
+		InternalNotes            string              `json:"internalNotes"`
 		LastModified             int                 `json:"lastModified"`
 		PackingUnitsDescription  string              `json:"packingUnitsDescription"`
 		InventoryTransactionDate string              `json:"inventoryTransactionDate"`
