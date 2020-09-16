@@ -9,6 +9,7 @@ import (
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
+	"strings"
 )
 
 //this interface sums up the general requests here
@@ -133,8 +134,13 @@ func (c *Client) GetUserOperationsLog(ctx context.Context, filters map[string]st
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
 		return nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
 	}
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+	if !strings.EqualFold(res.Status.ResponseStatus, "ok") {
+		return nil, erro.NewFromResponseStatus(&common2.Status{
+			Request:        res.Status.Request,
+			ResponseStatus: res.Status.ResponseStatus,
+			ErrorCode:      res.Status.ErrorCode,
+			ErrorField:     res.Status.ErrorField,
+		})
 	}
 	return &res, nil
 }

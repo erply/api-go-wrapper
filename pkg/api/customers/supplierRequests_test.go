@@ -381,10 +381,10 @@ func TestDeleteSupplier(t *testing.T) {
 
 		assert.Equal(t, map[string]interface{}{
 			"setContentType": "1",
-			"request": "deleteSupplier",
-			"sessionKey": "somesess",
-			"supplierID": "100000046",
-			"clientCode":"someclient",
+			"request":        "deleteSupplier",
+			"sessionKey":     "somesess",
+			"supplierID":     "100000046",
+			"clientCode":     "someclient",
 		}, reqItems)
 	}))
 

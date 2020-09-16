@@ -251,7 +251,7 @@ type (
 	}
 
 	DeleteSuppliersResponseBulkItem struct {
-		Status  sharedCommon.StatusBulk  `json:"status"`
+		Status sharedCommon.StatusBulk `json:"status"`
 	}
 
 	DeleteSuppliersResponseBulk struct {
