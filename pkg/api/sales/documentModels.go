@@ -135,10 +135,10 @@ type (
 	}
 	PurchaseDocImportReports []PurchaseDocImportReport
 	PurchaseDocImportReport  struct {
-		InvoiceID    int    `json:"invoiceID"`
-		CustomNumber string `json:"customNumber"`
-		Rounding     int    `json:"rounding"`
-		Total        int    `json:"total"`
+		InvoiceID    int     `json:"invoiceID"`
+		CustomNumber string  `json:"customNumber"`
+		Rounding     int     `json:"rounding"`
+		Total        float64 `json:"total"`
 	}
 
 	SavePurchaseDocumentResponse struct {
