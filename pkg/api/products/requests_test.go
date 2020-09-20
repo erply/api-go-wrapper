@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -70,10 +70,10 @@ func TestProductManager(t *testing.T) {
 
 func TestGetProductsBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusBulk := common2.StatusBulk{}
+		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
 		supplierResp := GetProductsResponseBulk{
-			Status: common2.Status{ResponseStatus: "ok"},
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []GetProductsResponseBulkItem{
 				{
 					Status: statusBulk,
@@ -130,9 +130,9 @@ func TestGetProductsBulk(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, productsBulk.Status)
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, productsBulk.Status)
 
-	expectedStatus := common2.StatusBulk{}
+	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
 	assert.Equal(t, []Product{
@@ -203,10 +203,10 @@ func TestGetProductsStockFileBulk(t *testing.T) {
 		assert.Equal(t, float64(2), requests[1]["warehouseID"])
 		assert.Equal(t, "getProductStock", requests[1]["requestName"])
 
-		statusBulk := common2.StatusBulk{}
+		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
 		supplierResp := GetProductStockFileResponseBulk{
-			Status: common2.Status{ResponseStatus: "ok"},
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []GetProductStockFileResponseBulkItem{
 				{
 					Status: statusBulk,
@@ -255,9 +255,9 @@ func TestGetProductsStockFileBulk(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, productsBulk.Status)
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, productsBulk.Status)
 
-	expectedStatus := common2.StatusBulk{}
+	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
 	assert.Equal(t, []GetProductStockFile{
@@ -300,4 +300,283 @@ func TestTestGetProductsStockFileBulkFailure(t *testing.T) {
 	if err == nil {
 		return
 	}
+}
+
+func TestSaveProduct(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveProductResponse{
+			Status:             sharedCommon.Status{ResponseStatus: "ok"},
+			SaveProductResults: []SaveProductResult{{ProductID: 123}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := map[string]string{
+		"groupID": "4",
+		"code":    "code10",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	resp, err := cl.SaveProduct(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 123, resp.ProductID)
+}
+
+func TestSaveProductBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		clientCode := r.FormValue("clientCode")
+		assert.Equal(t, "someclient", clientCode)
+
+		sessKey := r.FormValue("sessionKey")
+		assert.Equal(t, "somesess", sessKey)
+
+		bulkRequestsRaw := r.FormValue("requests")
+
+		bulkRequests := []map[string]interface{}{}
+		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
+		if err != nil {
+			return
+		}
+		expectedBulkRequests := []map[string]interface{}{
+			{
+				"requestName": "saveProduct",
+				"groupID":     "4",
+				"code":        "code1",
+			},
+			{
+				"requestName": "saveProduct",
+				"groupID":     "4",
+				"code":        "code2",
+			},
+			{
+				"requestName": "saveProduct",
+				"groupID":     "4",
+				"code":        "code3",
+			},
+		}
+		assert.Equal(t, expectedBulkRequests, bulkRequests)
+
+		bulkResp := SaveProductResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveProductResponseBulkItem{
+				{
+					Status:   statusBulk,
+					Products: []SaveProductResult{{ProductID: 123}},
+				},
+				{
+					Status:   statusBulk,
+					Products: []SaveProductResult{{ProductID: 124}},
+				},
+				{
+					Status:   statusBulk,
+					Products: []SaveProductResult{{ProductID: 125}},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := []map[string]interface{}{
+		{
+			"requestName": "saveProduct",
+			"groupID":     "4",
+			"code":        "code1",
+		},
+		{
+			"requestName": "saveProduct",
+			"groupID":     "4",
+			"code":        "code2",
+		},
+		{
+			"requestName": "saveProduct",
+			"groupID":     "4",
+			"code":        "code3",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveProductBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+	assert.Equal(t, []SaveProductResult{{ProductID: 123}}, bulkResp.BulkItems[0].Products)
+	assert.Equal(t, []SaveProductResult{{ProductID: 124}}, bulkResp.BulkItems[1].Products)
+	assert.Equal(t, []SaveProductResult{{ProductID: 125}}, bulkResp.BulkItems[2].Products)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
+}
+
+func TestDeleteProduct(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := DeleteProductResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		clientCode := r.FormValue("clientCode")
+		assert.Equal(t, "someclient", clientCode)
+
+		sessKey := r.FormValue("sessionKey")
+		assert.Equal(t, "somesess", sessKey)
+
+		requestName := r.FormValue("request")
+		assert.Equal(t, "deleteProduct", requestName)
+
+		productToDelete := r.FormValue("productID")
+		assert.Equal(t, "100001021", productToDelete)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := map[string]string{
+		"productID": "100001021",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	err := cl.DeleteProduct(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+}
+
+func TestDeleteProductBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		clientCode := r.FormValue("clientCode")
+		assert.Equal(t, "someclient", clientCode)
+
+		sessKey := r.FormValue("sessionKey")
+		assert.Equal(t, "somesess", sessKey)
+
+		bulkRequestsRaw := r.FormValue("requests")
+
+		bulkRequests := []map[string]interface{}{}
+		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
+		if err != nil {
+			return
+		}
+		expectedBulkRequests := []map[string]interface{}{
+			{
+				"requestName": "deleteProduct",
+				"productID":   "123",
+			},
+			{
+				"requestName": "deleteProduct",
+				"productID":   "124",
+			},
+			{
+				"requestName": "deleteProduct",
+				"productID":   "125",
+			},
+		}
+		assert.Equal(t, expectedBulkRequests, bulkRequests)
+
+		bulkResp := DeleteProductResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []DeleteProductResponseBulkItem{
+				{
+					Status: statusBulk,
+				},
+				{
+					Status: statusBulk,
+				},
+				{
+					Status: statusBulk,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	inpt := []map[string]interface{}{
+		{
+			"productID": "123",
+		},
+		{
+			"productID": "124",
+		},
+		{
+			"productID": "125",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.DeleteProductBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
 }

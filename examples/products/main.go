@@ -37,6 +37,29 @@ func main() {
 		panic(err)
 	}
 
+	resp, err := DeleteProductBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("DeleteProductBulk:\n%+v\n", resp)
+
+	err = DeleteProduct(apiClient)
+	if err != nil {
+		panic(err)
+	}
+
+	saveProd, err := SaveProduct(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveProduct:\n%+v\n", saveProd)
+
+	saveProds, err := SaveProductsBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveProductsBulk:\n%+v\n", saveProds)
+
 	prodGroups, err := GetProductGroups(apiClient)
 	if err != nil {
 		panic(err)
@@ -196,4 +219,91 @@ func GetProductStockFileBulk(cl *api.Client) (stockFiles []products.GetProductSt
 	}
 
 	return stockFiles, err
+}
+
+func SaveProductsBulk(cl *api.Client) (saveProdResult []products.SaveProductResult, err error) {
+	prodCli := cl.ProductManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"groupID": "4",
+			"code":    "123",
+		},
+		{
+			"groupID": "4",
+			"code":    "124",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := prodCli.SaveProductBulk(ctx, bulkFilters, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	for _, bulkItem := range bulkResp.BulkItems {
+		for _, prod := range bulkItem.Products {
+			saveProdResult = append(saveProdResult, prod)
+		}
+	}
+
+	return
+}
+
+func SaveProduct(cl *api.Client) (saveProdResult products.SaveProductResult, err error) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"groupID": "4",
+		"code":    "127",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	saveProdResult, err = prodCli.SaveProduct(ctx, filter)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func DeleteProduct(cl *api.Client) (err error) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"productID": "85656",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	err = prodCli.DeleteProduct(ctx, filter)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func DeleteProductBulk(cl *api.Client) (bulkResp products.DeleteProductResponseBulk, err error) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"productID": "85654",
+		},
+		{
+			"productID": "85655",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err = prodCli.DeleteProductBulk(ctx, filter, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	return
 }

@@ -79,6 +79,110 @@ func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string
 	return productsResp, nil
 }
 
+func (cli *Client) SaveProduct(ctx context.Context, filters map[string]string) (SaveProductResult, error) {
+	resp, err := cli.SendRequest(ctx, "saveProduct", filters)
+	if err != nil {
+		return SaveProductResult{}, err
+	}
+	var res SaveProductResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return SaveProductResult{}, erro.NewFromError("failed to unmarshal SaveProductResult", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return SaveProductResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.SaveProductResults) > 0 {
+		return res.SaveProductResults[0], nil
+	}
+
+	return SaveProductResult{}, nil
+}
+
+func (cli *Client) SaveProductBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SaveProductResponseBulk, error) {
+	var productsResp SaveProductResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveProduct",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return productsResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return productsResp, err
+	}
+
+	if err := json.Unmarshal(body, &productsResp); err != nil {
+		return productsResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&productsResp.Status) {
+		return productsResp, erro.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range productsResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return productsResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return productsResp, nil
+}
+
+func (cli *Client) DeleteProduct(ctx context.Context, filters map[string]string) error {
+	resp, err := cli.SendRequest(ctx, "deleteProduct", filters)
+	if err != nil {
+		return err
+	}
+	var res DeleteProductResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return erro.NewFromError("failed to unmarshal DeleteProductResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return erro.NewFromResponseStatus(&res.Status)
+	}
+	return nil
+}
+
+func (cli *Client) DeleteProductBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductResponseBulk, error) {
+	var deleteRespBulk DeleteProductResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "deleteProduct",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return deleteRespBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return deleteRespBulk, err
+	}
+
+	if err := json.Unmarshal(body, &deleteRespBulk); err != nil {
+		return deleteRespBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&deleteRespBulk.Status) {
+		return deleteRespBulk, erro.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range deleteRespBulk.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return deleteRespBulk, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return deleteRespBulk, nil
+}
+
 func (cli *Client) GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error) {
 	resp, err := cli.SendRequest(ctx, "getProductCategories", filters)
 	if err != nil {
