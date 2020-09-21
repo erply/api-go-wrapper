@@ -13,4 +13,8 @@ type Manager interface {
 	GetProductStock(ctx context.Context, filters map[string]string) ([]GetProductStock, error)
 	GetProductStockFile(ctx context.Context, filters map[string]string) ([]GetProductStockFile, error)
 	GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error)
+	SaveProduct(ctx context.Context, filters map[string]string) (SaveProductResult, error)
+	SaveProductBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SaveProductResponseBulk, error)
+	DeleteProduct(ctx context.Context, filters map[string]string) error
+	DeleteProductBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductResponseBulk, error)
 }
