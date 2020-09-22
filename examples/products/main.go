@@ -96,6 +96,18 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("GetProductStockFileBulk:\n%+v\n", prodStockFileBulk)
+
+	res, err := SaveAssortment(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveAssortment:\n%+v\n", res)
+
+	resBulk, err := SaveAssortmentBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveAssortmentBulk:\n%+v\n", resBulk)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -301,6 +313,51 @@ func DeleteProductBulk(cl *api.Client) (bulkResp products.DeleteProductResponseB
 	defer cancel()
 
 	bulkResp, err = prodCli.DeleteProductBulk(ctx, filter, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func SaveAssortment(cl *api.Client) (res products.SaveAssortmentResult, err error) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some assortment",
+		"code": "123",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err = prodCli.SaveAssortment(ctx, filter)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func SaveAssortmentBulk(cl *api.Client) (res products.SaveAssortmentResponseBulk, err error) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name":            "onetwothree",
+			"code":            "126",
+			"attributeName1":  "one",
+			"attributeType1":  "string",
+			"attributeValue1": "mine",
+		},
+		{
+			"name": "onefour",
+			"code": "127",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err = prodCli.SaveAssortmentBulk(ctx, filter, map[string]string{})
 	if err != nil {
 		return
 	}

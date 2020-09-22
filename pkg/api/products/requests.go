@@ -309,3 +309,57 @@ func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []ma
 
 	return productsStockResp, nil
 }
+
+func (cli *Client) SaveAssortment(ctx context.Context, filters map[string]string) (SaveAssortmentResult, error) {
+	resp, err := cli.SendRequest(ctx, "saveAssortment", filters)
+	if err != nil {
+		return SaveAssortmentResult{}, err
+	}
+	var res SaveAssortmentResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return SaveAssortmentResult{}, erro.NewFromError("failed to unmarshal SaveAssortmentResult", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return SaveAssortmentResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.SaveAssortmentResults) > 0 {
+		return res.SaveAssortmentResults[0], nil
+	}
+
+	return SaveAssortmentResult{}, nil
+}
+
+func (cli *Client) SaveAssortmentBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SaveAssortmentResponseBulk, error) {
+	var assortmentResp SaveAssortmentResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveAssortment",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	if err := json.Unmarshal(body, &assortmentResp); err != nil {
+		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveAssortmentResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&assortmentResp.Status) {
+		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+	}
+
+	for _, assortmentItem := range assortmentResp.BulkItems {
+		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
+			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+		}
+	}
+
+	return assortmentResp, nil
+}
