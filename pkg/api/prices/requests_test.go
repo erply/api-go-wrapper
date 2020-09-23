@@ -49,6 +49,8 @@ func TestGetSupplierPriceListsBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -113,6 +115,8 @@ func TestAddProductToSupplierPriceList(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	inpt := map[string]string{
 		"productID":           "123",
 		"supplierPriceListID": "10",
@@ -151,6 +155,8 @@ func TestEditProductToSupplierPriceList(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := map[string]string{
 		"supplierPriceListProductID": "1234",
@@ -240,6 +246,8 @@ func TestChangeProductToSupplierPriceListBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	inpt := []map[string]interface{}{
 		{
 			"productID":           "123",
@@ -307,6 +315,8 @@ func TestGetSupplierPriceLists(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -339,6 +349,8 @@ func TestGetSupplierPriceListsBulkResponseFailure(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -365,6 +377,8 @@ func TestGetSupplierPriceListsResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte(`some junk value`))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -414,6 +428,8 @@ func TestGetProductSupplierPriceListsBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -492,6 +508,8 @@ func TestGetProductPriceListsBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -559,6 +577,8 @@ func TestGetProductSupplierPriceLists(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -609,6 +629,8 @@ func TestGetProductPriceLists(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -641,6 +663,8 @@ func TestGetProductPriceListsBulkResponseFailure(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -667,6 +691,8 @@ func TestGetProductPriceListsResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte(`some junk value`))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -701,6 +727,8 @@ func TestDeleteProductsFromSupplierPriceList(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := map[string]string{
 		"supplierPriceListID":         "2223",
@@ -780,6 +808,8 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	inpt := []map[string]interface{}{
 		{
 			"supplierPriceListID":         "22",
@@ -836,6 +866,8 @@ func TestSaveSupplierPriceList(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := map[string]string{
 		"name":       "Some Price Name 1",
@@ -922,6 +954,8 @@ func TestSaveSupplierPriceListBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := []map[string]interface{}{
 		{

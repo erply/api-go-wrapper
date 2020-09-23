@@ -81,6 +81,8 @@ func TestGetAddressesBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -137,6 +139,7 @@ func TestGetAddressesBulkResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte(`some junk`))
 		assert.NoError(t, err)
 	}))
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -191,6 +194,8 @@ func TestSaveAddressesBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -243,6 +248,8 @@ func TestSaveAddressesBulkResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte(`some junk`))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL

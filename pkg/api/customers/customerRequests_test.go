@@ -110,6 +110,8 @@ func TestGetCustomersBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -166,6 +168,8 @@ func TestGetCustomersBulkResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte(`some junk value`))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL

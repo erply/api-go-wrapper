@@ -108,6 +108,8 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 

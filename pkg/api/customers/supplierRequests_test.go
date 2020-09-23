@@ -90,6 +90,8 @@ func TestGetSuppliersBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -147,6 +149,8 @@ func TestGetSuppliersBulkResponseFailure(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -202,6 +206,8 @@ func TestSaveSupplierBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -256,6 +262,8 @@ func TestSaveSupplierBulkResponseFailure(t *testing.T) {
 		_, err := w.Write([]byte("some junk value"))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -326,6 +334,8 @@ func TestDeleteSupplierBulk(t *testing.T) {
 		assert.Equal(t, "100000047", requests[1]["supplierID"])
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -388,6 +398,8 @@ func TestDeleteSupplier(t *testing.T) {
 		}, reqItems)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -410,6 +422,8 @@ func TestDeleteSupplierBulkFailure(t *testing.T) {
 		_, err := w.Write([]byte("some junk value"))
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
