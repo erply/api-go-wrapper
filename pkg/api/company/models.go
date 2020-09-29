@@ -42,6 +42,7 @@ type (
 	ConfParameter struct {
 		Announcement         string `json:"invoice_announcement_eng"`
 		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
+		DefaultLanguage      string `json:"default_language"`
 	}
 	//GetConfParametersResponse ...
 	GetConfParametersResponse struct {
