@@ -82,6 +82,8 @@ func TestSaleDocumentsListingCountSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	salesClient := NewClient(baseClient)
@@ -103,6 +105,8 @@ func TestSaleDocumentsListingCountError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -126,6 +130,8 @@ func TestSaleDocumentsListingCountWithNoBulkItems(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -170,6 +176,8 @@ func TestSaleDocumentsReadSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	salesClient := NewClient(baseClient)
@@ -206,6 +214,8 @@ func TestSaleDocumentsReadError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -248,6 +258,8 @@ func TestSaleDocumentsReadSuccessIntegration(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL

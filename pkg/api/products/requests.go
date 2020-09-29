@@ -309,3 +309,219 @@ func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []ma
 
 	return productsStockResp, nil
 }
+
+func (cli *Client) SaveAssortment(ctx context.Context, filters map[string]string) (SaveAssortmentResult, error) {
+	resp, err := cli.SendRequest(ctx, "saveAssortment", filters)
+	if err != nil {
+		return SaveAssortmentResult{}, err
+	}
+	var res SaveAssortmentResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return SaveAssortmentResult{}, erro.NewFromError("failed to unmarshal SaveAssortmentResult", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return SaveAssortmentResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.SaveAssortmentResults) > 0 {
+		return res.SaveAssortmentResults[0], nil
+	}
+
+	return SaveAssortmentResult{}, nil
+}
+
+func (cli *Client) SaveAssortmentBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SaveAssortmentResponseBulk, error) {
+	var assortmentResp SaveAssortmentResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveAssortment",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	if err := json.Unmarshal(body, &assortmentResp); err != nil {
+		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveAssortmentResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&assortmentResp.Status) {
+		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+	}
+
+	for _, assortmentItem := range assortmentResp.BulkItems {
+		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
+			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+		}
+	}
+
+	return assortmentResp, nil
+}
+
+func (cli *Client) AddAssortmentProducts(ctx context.Context, filters map[string]string) (AddAssortmentProductsResult, error) {
+	resp, err := cli.SendRequest(ctx, "addAssortmentProducts", filters)
+	if err != nil {
+		return AddAssortmentProductsResult{}, err
+	}
+	var res AddAssortmentProductsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return AddAssortmentProductsResult{}, erro.NewFromError("failed to unmarshal AddAssortmentProductsResult", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return AddAssortmentProductsResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.AddAssortmentProductsResults) > 0 {
+		return res.AddAssortmentProductsResults[0], nil
+	}
+
+	return AddAssortmentProductsResult{}, nil
+}
+
+func (cli *Client) AddAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (AddAssortmentProductsResponseBulk, error) {
+	var assortmentResp AddAssortmentProductsResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "addAssortmentProducts",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	if err := json.Unmarshal(body, &assortmentResp); err != nil {
+		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal AddAssortmentProductsResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&assortmentResp.Status) {
+		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+	}
+
+	for _, assortmentItem := range assortmentResp.BulkItems {
+		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
+			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+		}
+	}
+
+	return assortmentResp, nil
+}
+
+func (cli *Client) EditAssortmentProducts(ctx context.Context, filters map[string]string) (EditAssortmentProductsResult, error) {
+	resp, err := cli.SendRequest(ctx, "editAssortmentProducts", filters)
+	if err != nil {
+		return EditAssortmentProductsResult{}, err
+	}
+	var res EditAssortmentProductsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return EditAssortmentProductsResult{}, erro.NewFromError("failed to unmarshal EditAssortmentProductsResult", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return EditAssortmentProductsResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.EditAssortmentProductsResults) > 0 {
+		return res.EditAssortmentProductsResults[0], nil
+	}
+
+	return EditAssortmentProductsResult{}, nil
+}
+
+func (cli *Client) EditAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (EditAssortmentProductsResponseBulk, error) {
+	var assortmentResp EditAssortmentProductsResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "editAssortmentProducts",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	if err := json.Unmarshal(body, &assortmentResp); err != nil {
+		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal EditAssortmentProductsResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&assortmentResp.Status) {
+		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+	}
+
+	for _, assortmentItem := range assortmentResp.BulkItems {
+		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
+			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+		}
+	}
+
+	return assortmentResp, nil
+}
+
+func (cli *Client) RemoveAssortmentProducts(ctx context.Context, filters map[string]string) (RemoveAssortmentProductResult, error) {
+	resp, err := cli.SendRequest(ctx, "removeAssortmentProducts", filters)
+	if err != nil {
+		return RemoveAssortmentProductResult{}, err
+	}
+	var res RemoveAssortmentProductResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return RemoveAssortmentProductResult{}, erro.NewFromError("failed to unmarshal RemoveAssortmentProductResults", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return RemoveAssortmentProductResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.RemoveAssortmentProductResults) > 0 {
+		return res.RemoveAssortmentProductResults[0], nil
+	}
+
+	return RemoveAssortmentProductResult{}, nil
+}
+
+func (cli *Client) RemoveAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (RemoveAssortmentProductResponseBulk, error) {
+	var assortmentResp RemoveAssortmentProductResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "removeAssortmentProducts",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return assortmentResp, err
+	}
+
+	if err := json.Unmarshal(body, &assortmentResp); err != nil {
+		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal RemoveAssortmentProductResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&assortmentResp.Status) {
+		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+	}
+
+	for _, assortmentItem := range assortmentResp.BulkItems {
+		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
+			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+		}
+	}
+
+	return assortmentResp, nil
+}

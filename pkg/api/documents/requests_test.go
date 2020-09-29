@@ -23,9 +23,11 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 					PurchaseDocuments: []PurchaseDocument{
 						{
 							ID: 123,
+							CurrencyRate: json.Number("1"),
 						},
 						{
 							ID: 124,
+							CurrencyRate: json.Number("2"),
 						},
 					},
 				},
@@ -34,6 +36,7 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 					PurchaseDocuments: []PurchaseDocument{
 						{
 							ID: 125,
+							CurrencyRate: json.Number("3"),
 						},
 					},
 				},
@@ -45,6 +48,8 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -78,9 +83,17 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 	assert.Equal(t, []PurchaseDocument{
 		{
 			ID: 123,
+			CurrencyRate: "1",
+			Paid: "0",
+			NetTotalForAccounting: "0",
+			TotalForAccounting: "0",
 		},
 		{
 			ID: 124,
+			CurrencyRate: "2",
+			Paid: "0",
+			NetTotalForAccounting: "0",
+			TotalForAccounting: "0",
 		},
 	}, bulkResp.BulkItems[0].PurchaseDocuments)
 
@@ -89,6 +102,10 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 	assert.Equal(t, []PurchaseDocument{
 		{
 			ID: 125,
+			CurrencyRate: "3",
+			Paid: "0",
+			NetTotalForAccounting: "0",
+			TotalForAccounting: "0",
 		},
 	}, bulkResp.BulkItems[1].PurchaseDocuments)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
@@ -103,9 +120,17 @@ func TestGetPurchaseDocuments(t *testing.T) {
 			PurchaseDocuments: []PurchaseDocument{
 				{
 					ID: 123,
+					CurrencyRate: "0",
+					Paid: "0",
+					NetTotalForAccounting: "0",
+					TotalForAccounting: "0",
 				},
 				{
 					ID: 124,
+					CurrencyRate: "0",
+					Paid: "0",
+					NetTotalForAccounting: "0",
+					TotalForAccounting: "0",
 				},
 			},
 		}
@@ -115,6 +140,8 @@ func TestGetPurchaseDocuments(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -133,9 +160,17 @@ func TestGetPurchaseDocuments(t *testing.T) {
 	assert.Equal(t, []PurchaseDocument{
 		{
 			ID: 123,
+			CurrencyRate: "0",
+			Paid: "0",
+			NetTotalForAccounting: "0",
+			TotalForAccounting: "0",
 		},
 		{
 			ID: 124,
+			CurrencyRate: "0",
+			Paid: "0",
+			NetTotalForAccounting: "0",
+			TotalForAccounting: "0",
 		},
 	}, actualDocuments)
 }

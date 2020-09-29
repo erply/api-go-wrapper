@@ -86,8 +86,14 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 
 	filters["requests"] = string(jsonRequests)
 
-	params := cli.headersFunc("")
-	params.Del("request")
+	var params url.Values
+	if cli.headersFunc != nil {
+		params = cli.headersFunc("")
+		params.Del("request")
+	} else {
+		params = make(url.Values)
+	}
+
 	setParams(params, filters)
 
 	req, err := getHTTPRequest(cli, strings.NewReader(params.Encode()))

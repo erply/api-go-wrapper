@@ -267,4 +267,82 @@ type (
 		Status    sharedCommon.Status             `json:"status"`
 		BulkItems []DeleteProductResponseBulkItem `json:"requests"`
 	}
+
+	SaveAssortmentResult struct {
+		AssortmentID int `json:"assortmentID"`
+	}
+
+	SaveAssortmentResponse struct {
+		Status                sharedCommon.Status    `json:"status"`
+		SaveAssortmentResults []SaveAssortmentResult `json:"records"`
+	}
+
+	SaveAssortmentResponseBulkItem struct {
+		Status                sharedCommon.StatusBulk `json:"status"`
+		SaveAssortmentResults []SaveAssortmentResult  `json:"records"`
+	}
+
+	SaveAssortmentResponseBulk struct {
+		Status    sharedCommon.Status              `json:"status"`
+		BulkItems []SaveAssortmentResponseBulkItem `json:"requests"`
+	}
+
+	AddAssortmentProductsResult struct {
+		ProductsAlreadyInAssortment string `json:"productsAlreadyInAssortment"`
+		NonExistingIDs              string `json:"nonExistingIDs"`
+	}
+
+	AddAssortmentProductsResponse struct {
+		Status                       sharedCommon.Status           `json:"status"`
+		AddAssortmentProductsResults []AddAssortmentProductsResult `json:"records"`
+	}
+
+	AddAssortmentProductsResponseBulkItem struct {
+		Status                       sharedCommon.StatusBulk       `json:"status"`
+		AddAssortmentProductsResults []AddAssortmentProductsResult `json:"records"`
+	}
+
+	AddAssortmentProductsResponseBulk struct {
+		Status    sharedCommon.Status                     `json:"status"`
+		BulkItems []AddAssortmentProductsResponseBulkItem `json:"requests"`
+	}
+
+	EditAssortmentProductsResult struct {
+		ProductsNotInAssortment string `json:"productsNotInAssortment"`
+	}
+
+	EditAssortmentProductsResponse struct {
+		Status                        sharedCommon.Status            `json:"status"`
+		EditAssortmentProductsResults []EditAssortmentProductsResult `json:"records"`
+	}
+
+	EditAssortmentProductsResponseBulkItem struct {
+		Status                        sharedCommon.StatusBulk        `json:"status"`
+		EditAssortmentProductsResults []EditAssortmentProductsResult `json:"records"`
+	}
+
+	EditAssortmentProductsResponseBulk struct {
+		Status    sharedCommon.Status                      `json:"status"`
+		BulkItems []EditAssortmentProductsResponseBulkItem `json:"requests"`
+	}
+
+	RemoveAssortmentProductResult struct {
+		DeletedIDs              string `json:"deletedIDs"`
+		ProductsNotInAssortment string `json:"productsNotInAssortment"`
+	}
+
+	RemoveAssortmentProductResponse struct {
+		Status                         sharedCommon.Status             `json:"status"`
+		RemoveAssortmentProductResults []RemoveAssortmentProductResult `json:"records"`
+	}
+
+	RemoveAssortmentProductResponseBulkItem struct {
+		Status                         sharedCommon.StatusBulk         `json:"status"`
+		RemoveAssortmentProductResults []RemoveAssortmentProductResult `json:"records"`
+	}
+
+	RemoveAssortmentProductResponseBulk struct {
+		Status    sharedCommon.Status                       `json:"status"`
+		BulkItems []RemoveAssortmentProductResponseBulkItem `json:"requests"`
+	}
 )

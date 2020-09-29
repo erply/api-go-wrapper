@@ -106,6 +106,8 @@ func TestGetProductsBulk(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -163,6 +165,8 @@ func TestGetSuppliersBulkResponseFailure(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -186,22 +190,22 @@ func TestGetSuppliersBulkResponseFailure(t *testing.T) {
 
 func TestGetProductsStockFileBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
-		assert.NoError(t, err)
-		if err != nil {
-			return
-		}
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":   "someclient",
+			"sessionKey":   "somesess",
+			"responseType": ResponseTypeCSV,
+		})
 
-		assert.Equal(t, "someclient", parsedRequest["clientCode"])
-		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
-		assert.Equal(t, ResponseTypeCSV, parsedRequest["responseType"])
-
-		requests := parsedRequest["requests"].([]map[string]interface{})
-		assert.Len(t, requests, 2)
-		assert.Equal(t, float64(1), requests[0]["warehouseID"])
-		assert.Equal(t, "getProductStock", requests[0]["requestName"])
-		assert.Equal(t, float64(2), requests[1]["warehouseID"])
-		assert.Equal(t, "getProductStock", requests[1]["requestName"])
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"warehouseID": float64(1),
+				"requestName": "getProductStock",
+			},
+			{
+				"warehouseID": float64(2),
+				"requestName": "getProductStock",
+			},
+		})
 
 		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
@@ -232,6 +236,8 @@ func TestGetProductsStockFileBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
@@ -282,6 +288,8 @@ func TestTestGetProductsStockFileBulkFailure(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
 	cli.Url = srv.URL
 
@@ -315,6 +323,8 @@ func TestSaveProduct(t *testing.T) {
 		assert.NoError(t, err)
 	}))
 
+	defer srv.Close()
+
 	inpt := map[string]string{
 		"groupID": "4",
 		"code":    "code10",
@@ -345,20 +355,12 @@ func TestSaveProductBulk(t *testing.T) {
 			return
 		}
 
-		clientCode := r.FormValue("clientCode")
-		assert.Equal(t, "someclient", clientCode)
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
 
-		sessKey := r.FormValue("sessionKey")
-		assert.Equal(t, "somesess", sessKey)
-
-		bulkRequestsRaw := r.FormValue("requests")
-
-		bulkRequests := []map[string]interface{}{}
-		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
-		if err != nil {
-			return
-		}
-		expectedBulkRequests := []map[string]interface{}{
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"requestName": "saveProduct",
 				"groupID":     "4",
@@ -374,8 +376,7 @@ func TestSaveProductBulk(t *testing.T) {
 				"groupID":     "4",
 				"code":        "code3",
 			},
-		}
-		assert.Equal(t, expectedBulkRequests, bulkRequests)
+		})
 
 		bulkResp := SaveProductResponseBulk{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
@@ -400,6 +401,8 @@ func TestSaveProductBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := []map[string]interface{}{
 		{
@@ -450,24 +453,22 @@ func TestDeleteProduct(t *testing.T) {
 		resp := DeleteProductResponse{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+			"request":    "deleteProduct",
+			"productID":  "100001021",
+		})
+
 		jsonRaw, err := json.Marshal(resp)
 		assert.NoError(t, err)
-
-		clientCode := r.FormValue("clientCode")
-		assert.Equal(t, "someclient", clientCode)
-
-		sessKey := r.FormValue("sessionKey")
-		assert.Equal(t, "somesess", sessKey)
-
-		requestName := r.FormValue("request")
-		assert.Equal(t, "deleteProduct", requestName)
-
-		productToDelete := r.FormValue("productID")
-		assert.Equal(t, "100001021", productToDelete)
 
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := map[string]string{
 		"productID": "100001021",
@@ -496,20 +497,12 @@ func TestDeleteProductBulk(t *testing.T) {
 			return
 		}
 
-		clientCode := r.FormValue("clientCode")
-		assert.Equal(t, "someclient", clientCode)
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
 
-		sessKey := r.FormValue("sessionKey")
-		assert.Equal(t, "somesess", sessKey)
-
-		bulkRequestsRaw := r.FormValue("requests")
-
-		bulkRequests := []map[string]interface{}{}
-		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
-		if err != nil {
-			return
-		}
-		expectedBulkRequests := []map[string]interface{}{
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"requestName": "deleteProduct",
 				"productID":   "123",
@@ -522,8 +515,7 @@ func TestDeleteProductBulk(t *testing.T) {
 				"requestName": "deleteProduct",
 				"productID":   "125",
 			},
-		}
-		assert.Equal(t, expectedBulkRequests, bulkRequests)
+		})
 
 		bulkResp := DeleteProductResponseBulk{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
@@ -545,6 +537,8 @@ func TestDeleteProductBulk(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 	}))
+
+	defer srv.Close()
 
 	inpt := []map[string]interface{}{
 		{
@@ -579,4 +573,611 @@ func TestDeleteProductBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
+}
+
+func TestSaveAssortment(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveAssortmentResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			SaveAssortmentResults: []SaveAssortmentResult{
+				{
+					AssortmentID: 123,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":      "someclient",
+			"sessionKey":      "somesess",
+			"request":         "saveAssortment",
+			"assortmentID":    "100001021",
+			"name":            "some name",
+			"code":            "some code",
+			"attributeName1":  "attributeName 1",
+			"attributeType1":  "attributeType 1",
+			"attributeValue1": "attributeValue 1",
+		})
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"assortmentID":    "100001021",
+		"name":            "some name",
+		"code":            "some code",
+		"attributeName1":  "attributeName 1",
+		"attributeType1":  "attributeType 1",
+		"attributeValue1": "attributeValue 1",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedAssortmentRes := SaveAssortmentResult{
+		AssortmentID: 123,
+	}
+	actualAssortmentRes, err := cl.SaveAssortment(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedAssortmentRes, actualAssortmentRes)
+}
+
+func TestSaveAssortmentBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"assortmentID": "123",
+				"name":         "name 123",
+				"requestName":  "saveAssortment",
+			},
+			{
+				"assortmentID": "",
+				"name":         "name 124",
+				"requestName":  "saveAssortment",
+			},
+			{
+				"assortmentID": "",
+				"name":         "name 125",
+				"code":         "code 125",
+				"requestName":  "saveAssortment",
+			},
+		})
+
+		bulkResp := SaveAssortmentResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveAssortmentResponseBulkItem{
+				{
+					Status: statusBulk,
+					SaveAssortmentResults: []SaveAssortmentResult{
+						{
+							AssortmentID: 123,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					SaveAssortmentResults: []SaveAssortmentResult{
+						{
+							AssortmentID: 124,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					SaveAssortmentResults: []SaveAssortmentResult{
+						{
+							AssortmentID: 125,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"assortmentID": "123",
+			"name":         "name 123",
+		},
+		{
+			"assortmentID": "",
+			"name":         "name 124",
+		},
+		{
+			"assortmentID": "",
+			"name":         "name 125",
+			"code":         "code 125",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveAssortmentBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].SaveAssortmentResults, 1)
+	assert.Equal(t, 123, bulkResp.BulkItems[0].SaveAssortmentResults[0].AssortmentID)
+	assert.Len(t, bulkResp.BulkItems[1].SaveAssortmentResults, 1)
+	assert.Equal(t, 124, bulkResp.BulkItems[1].SaveAssortmentResults[0].AssortmentID)
+	assert.Len(t, bulkResp.BulkItems[2].SaveAssortmentResults, 1)
+	assert.Equal(t, 125, bulkResp.BulkItems[2].SaveAssortmentResults[0].AssortmentID)
+}
+
+func TestAddAssortmentProducts(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":   "someclient",
+			"sessionKey":   "somesess",
+			"request":      "addAssortmentProducts",
+			"productIDs":   "1,2,3",
+			"assortmentID": "123",
+			"status":       "ACTIVE",
+		})
+
+		resp := AddAssortmentProductsResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			AddAssortmentProductsResults: []AddAssortmentProductsResult{
+				{
+					ProductsAlreadyInAssortment: "123",
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"productIDs":   "1,2,3",
+		"assortmentID": "123",
+		"status":       "ACTIVE",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedAssortmentRes := AddAssortmentProductsResult{
+		ProductsAlreadyInAssortment: "123",
+	}
+	actualAssortmentRes, err := cl.AddAssortmentProducts(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedAssortmentRes, actualAssortmentRes)
+}
+
+func TestAddAssortmentProductsBulk(t *testing.T) {
+	bulkRequestWasMade := false
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bulkRequestWasMade = true
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"productIDs":   "1,2,3",
+				"assortmentID": "assortment 123",
+				"status":       "ACTIVE",
+				"requestName":  "addAssortmentProducts",
+			},
+			{
+				"productIDs":   "4",
+				"assortmentID": "assortment 123",
+				"status":       "NOT_FOR_SALE",
+				"requestName":  "addAssortmentProducts",
+			},
+		})
+
+		bulkResp := AddAssortmentProductsResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []AddAssortmentProductsResponseBulkItem{
+				{
+					Status: statusBulk,
+					AddAssortmentProductsResults: []AddAssortmentProductsResult{
+						{},
+					},
+				},
+				{
+					Status: statusBulk,
+					AddAssortmentProductsResults: []AddAssortmentProductsResult{
+						{},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productIDs":   "1,2,3",
+			"assortmentID": "assortment 123",
+			"status":       "ACTIVE",
+		},
+		{
+			"productIDs":   "4",
+			"assortmentID": "assortment 123",
+			"status":       "NOT_FOR_SALE",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.AddAssortmentProductsBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.True(t, bulkRequestWasMade)
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].AddAssortmentProductsResults, 1)
+	assert.Equal(t, "", bulkResp.BulkItems[0].AddAssortmentProductsResults[0].ProductsAlreadyInAssortment)
+	assert.Len(t, bulkResp.BulkItems[0].AddAssortmentProductsResults, 1)
+	assert.Equal(t, "", bulkResp.BulkItems[0].AddAssortmentProductsResults[0].NonExistingIDs)
+	assert.Len(t, bulkResp.BulkItems[1].AddAssortmentProductsResults, 1)
+	assert.Equal(t, "", bulkResp.BulkItems[1].AddAssortmentProductsResults[0].ProductsAlreadyInAssortment)
+	assert.Len(t, bulkResp.BulkItems[1].AddAssortmentProductsResults, 1)
+	assert.Equal(t, "", bulkResp.BulkItems[1].AddAssortmentProductsResults[0].NonExistingIDs)
+}
+
+func TestEditAssortmentProducts(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := EditAssortmentProductsResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			EditAssortmentProductsResults: []EditAssortmentProductsResult{
+				{
+					ProductsNotInAssortment: "123",
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":   "someclient",
+			"sessionKey":   "somesess",
+			"request":      "editAssortmentProducts",
+			"productIDs":   "1,2,3",
+			"assortmentID": "123",
+			"status":       "ACTIVE",
+		})
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"productIDs":   "1,2,3",
+		"assortmentID": "123",
+		"status":       "ACTIVE",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedAssortmentRes := EditAssortmentProductsResult{
+		ProductsNotInAssortment: "123",
+	}
+	actualAssortmentRes, err := cl.EditAssortmentProducts(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedAssortmentRes, actualAssortmentRes)
+}
+
+func TestEditAssortmentProductsBulk(t *testing.T) {
+	bulkRequestWasMade := false
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bulkRequestWasMade = true
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"productIDs":   "1,2,3",
+				"assortmentID": "assortment 123",
+				"status":       "ACTIVE",
+				"requestName":  "editAssortmentProducts",
+			},
+			{
+				"productIDs":   "4",
+				"assortmentID": "assortment 123",
+				"requestName":  "editAssortmentProducts",
+			},
+		})
+
+		bulkResp := EditAssortmentProductsResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []EditAssortmentProductsResponseBulkItem{
+				{
+					Status: statusBulk,
+					EditAssortmentProductsResults: []EditAssortmentProductsResult{
+						{
+							ProductsNotInAssortment: "1",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					EditAssortmentProductsResults: []EditAssortmentProductsResult{
+						{},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productIDs":   "1,2,3",
+			"assortmentID": "assortment 123",
+			"status":       "ACTIVE",
+			"requestName":  "editAssortmentProducts",
+		},
+		{
+			"productIDs":   "4",
+			"assortmentID": "assortment 123",
+			"requestName":  "addAssortmentProducts",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.EditAssortmentProductsBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.True(t, bulkRequestWasMade)
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].EditAssortmentProductsResults, 1)
+	assert.Equal(t, "1", bulkResp.BulkItems[0].EditAssortmentProductsResults[0].ProductsNotInAssortment)
+	assert.Len(t, bulkResp.BulkItems[1].EditAssortmentProductsResults, 1)
+	assert.Equal(t, "", bulkResp.BulkItems[1].EditAssortmentProductsResults[0].ProductsNotInAssortment)
+}
+
+func TestRemoveAssortmentProducts(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := RemoveAssortmentProductResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			RemoveAssortmentProductResults: []RemoveAssortmentProductResult{
+				{
+					ProductsNotInAssortment: "123,124",
+					DeletedIDs:              "1,2,3",
+				},
+			},
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":   "someclient",
+			"sessionKey":   "somesess",
+			"request":      "removeAssortmentProducts",
+			"productIDs":   "1,2,3",
+			"assortmentID": "123",
+		})
+
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"productIDs":   "1,2,3",
+		"assortmentID": "123",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedAssortmentRes := RemoveAssortmentProductResult{
+		ProductsNotInAssortment: "123,124",
+		DeletedIDs:              "1,2,3",
+	}
+
+	actualAssortmentRes, err := cl.RemoveAssortmentProducts(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedAssortmentRes, actualAssortmentRes)
+}
+
+func TestRemoveAssortmentProductsBulk(t *testing.T) {
+	bulkRequestWasMade := false
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bulkRequestWasMade = true
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"productIDs":   "1,2,3",
+				"assortmentID": "assortment 123",
+				"requestName":  "removeAssortmentProducts",
+			},
+			{
+				"productIDs":   "4,5",
+				"assortmentID": "assortment 123",
+				"requestName":  "removeAssortmentProducts",
+			},
+		})
+
+		bulkResp := RemoveAssortmentProductResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []RemoveAssortmentProductResponseBulkItem{
+				{
+					Status: statusBulk,
+					RemoveAssortmentProductResults: []RemoveAssortmentProductResult{
+						{
+							DeletedIDs: "1,2,3",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					RemoveAssortmentProductResults: []RemoveAssortmentProductResult{
+						{
+							DeletedIDs: "4",
+							ProductsNotInAssortment: "5",
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productIDs":   "1,2,3",
+			"assortmentID": "assortment 123",
+		},
+		{
+			"productIDs":   "4,5",
+			"assortmentID": "assortment 123",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.RemoveAssortmentProductsBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.True(t, bulkRequestWasMade)
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].RemoveAssortmentProductResults, 1)
+	assert.Equal(t, "1,2,3", bulkResp.BulkItems[0].RemoveAssortmentProductResults[0].DeletedIDs)
+	assert.Equal(t, "", bulkResp.BulkItems[0].RemoveAssortmentProductResults[0].ProductsNotInAssortment)
+
+	assert.Len(t, bulkResp.BulkItems[1].RemoveAssortmentProductResults, 1)
+	assert.Equal(t, "4", bulkResp.BulkItems[1].RemoveAssortmentProductResults[0].DeletedIDs)
+	assert.Equal(t, "5", bulkResp.BulkItems[1].RemoveAssortmentProductResults[0].ProductsNotInAssortment)
 }

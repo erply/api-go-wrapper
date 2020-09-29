@@ -96,6 +96,30 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("GetProductStockFileBulk:\n%+v\n", prodStockFileBulk)
+
+	res, err := SaveAssortment(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveAssortment:\n%+v\n", res)
+
+	resBulk, err := SaveAssortmentBulk(apiClient)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SaveAssortmentBulk:\n%+v\n", resBulk)
+
+	AddAssortmentProducts(apiClient)
+
+	AddAssortmentProductsBulk(apiClient)
+
+	EditAssortmentProducts(apiClient)
+
+	EditAssortmentProductsBulk(apiClient)
+
+	RemoveAssortmentProducts(apiClient)
+
+	RemoveAssortmentProductsBulk(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -306,4 +330,180 @@ func DeleteProductBulk(cl *api.Client) (bulkResp products.DeleteProductResponseB
 	}
 
 	return
+}
+
+func SaveAssortment(cl *api.Client) (res products.SaveAssortmentResult, err error) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some assortment",
+		"code": "123",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err = prodCli.SaveAssortment(ctx, filter)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func SaveAssortmentBulk(cl *api.Client) (res products.SaveAssortmentResponseBulk, err error) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name":            "onetwothree",
+			"code":            "126",
+			"attributeName1":  "one",
+			"attributeType1":  "string",
+			"attributeValue1": "mine",
+		},
+		{
+			"name": "onefour",
+			"code": "127",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err = prodCli.SaveAssortmentBulk(ctx, filter, map[string]string{})
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func AddAssortmentProducts(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"productIDs":   "1",
+		"assortmentID": "4",
+		"status":       "ACTIVE",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.AddAssortmentProducts(ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("AddAssortmentProducts:\n%+v\n", res)
+}
+
+func AddAssortmentProductsBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"productIDs":   "1",
+			"assortmentID": "4",
+			"status":       "ACTIVE",
+		},
+		{
+			"productIDs":   "2",
+			"assortmentID": "4",
+			"status":       "ACTIVE",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.AddAssortmentProductsBulk(ctx, filter, map[string]string{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("AddAssortmentProductsBulk:\n%+v\n", res)
+}
+
+func EditAssortmentProducts(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"productIDs":   "1",
+		"assortmentID": "4",
+		"status":       "NOT_FOR_SALE",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.EditAssortmentProducts(ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("EditAssortmentProducts:\n%+v\n", res)
+}
+
+func EditAssortmentProductsBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"productIDs":   "1",
+			"assortmentID": "4",
+			"status":       "NO_LONGER_ORDERED",
+		},
+		{
+			"productIDs":   "2",
+			"assortmentID": "4",
+			"status":       "NO_LONGER_ORDERED",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.EditAssortmentProductsBulk(ctx, filter, map[string]string{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("EditAssortmentProductsBulk:\n%+v\n", res)
+}
+
+func RemoveAssortmentProducts(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"productIDs":   "1",
+		"assortmentID": "4",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.RemoveAssortmentProducts(ctx, filter)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("RemoveAssortmentProducts:\n%+v\n", res)
+}
+
+func RemoveAssortmentProductsBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"productIDs":   "2",
+			"assortmentID": "4",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.RemoveAssortmentProductsBulk(ctx, filter, map[string]string{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("RemoveAssortmentProductsBulk:\n%+v\n", res)
 }

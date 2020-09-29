@@ -39,6 +39,8 @@ func TestCustomerListingCountSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	customersClient := NewClient(baseClient)
@@ -60,6 +62,8 @@ func TestCustomerListingCountError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -83,6 +87,8 @@ func TestCustomerListingCountWithNoBulkItems(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -127,6 +133,8 @@ func TestCustomerListingReadSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	customersClient := NewClient(baseClient)
@@ -163,6 +171,8 @@ func TestCustomerListingReadError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -205,6 +215,8 @@ func TestCustomerListingReadSuccessIntegration(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL

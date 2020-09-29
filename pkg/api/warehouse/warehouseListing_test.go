@@ -41,6 +41,8 @@ func TestWarehouseListingCountSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	warehouseClient := NewClient(baseClient)
@@ -62,6 +64,8 @@ func TestWarehouseListingCountError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -85,6 +89,8 @@ func TestWarehouseListingCountWithNoBulkItems(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -129,6 +135,8 @@ func TestWarehouseListingReadSuccess(t *testing.T) {
 		}
 	}))
 
+	defer srv.Close()
+
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	warehouseClient := NewClient(baseClient)
@@ -165,6 +173,8 @@ func TestWarehouseListingReadError(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
@@ -207,6 +217,8 @@ func TestWarehouseListingReadSuccessIntegration(t *testing.T) {
 			return
 		}
 	}))
+
+	defer srv.Close()
 
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
