@@ -6,13 +6,14 @@ import (
 
 type (
 	VerifyUserResponse struct {
-		Status  common2.Status `json:"status"`
-		Records []Records      `json:"records"`
+		Status  common2.Status   `json:"status"`
+		Records []SessionKeyUser `json:"records"`
+	}
+	SwitchUserResponse struct {
+		Status  common2.Status   `json:"status"`
+		Records []SessionKeyUser `json:"records"`
 	}
 
-	Records struct {
-		SessionKey string `json:"sessionKey"`
-	}
 	verifyIdentityTokenResponse struct {
 		Status common2.Status `json:"status"`
 		Result SessionInfo    `json:"records"`
