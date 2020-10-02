@@ -102,7 +102,7 @@ func TestConvertingStructToMap(t *testing.T) {
 		"GLN":                 "gln222",
 		"added":               float64(1),
 		"address":             "Elm Str 11",
-		"attributes":          []interface {}{},
+		"attributes":          []interface{}{},
 		"bankAccountNumber":   "3413412434",
 		"bankIBAN":            "341t45243535",
 		"bankName":            "some swiss bank",

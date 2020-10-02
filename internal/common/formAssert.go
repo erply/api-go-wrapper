@@ -9,7 +9,7 @@ import (
 )
 
 func AssertFormValues(t *testing.T, r *http.Request, expectedValues map[string]interface{}) {
-	for expectedKey, expectedValue := range expectedValues{
+	for expectedKey, expectedValue := range expectedValues {
 		actualValue := r.FormValue(expectedKey)
 		assert.Equal(t, expectedValue, actualValue)
 	}
