@@ -43,6 +43,7 @@ type (
 		Announcement         string `json:"invoice_announcement_eng"`
 		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
 		DefaultLanguage      string `json:"default_language"`
+		Country              string `json:"country"`
 	}
 	//GetConfParametersResponse ...
 	GetConfParametersResponse struct {
