@@ -98,6 +98,7 @@ type (
 		ParentProductID    int                `json:"parentProductID"`
 		NonStockProduct    int                `json:"nonStockProduct"`
 		TaxFree            int                `json:"taxFree"`
+		ContainerID        int                `json:"containerID"`
 		Type               string             `json:"type"`
 		Warehouses         map[uint]StockInfo `json:"warehouses"`
 		Parameters         []Parameter        `json:"parameters"`
