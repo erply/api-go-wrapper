@@ -23,6 +23,6 @@ type Manager interface {
 	AddAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (AddAssortmentProductsResponseBulk, error)
 	EditAssortmentProducts(ctx context.Context, filters map[string]string) (EditAssortmentProductsResult, error)
 	EditAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (EditAssortmentProductsResponseBulk, error)
-	RemoveAssortmentProducts (ctx context.Context, filters map[string]string) (RemoveAssortmentProductResult, error)
+	RemoveAssortmentProducts(ctx context.Context, filters map[string]string) (RemoveAssortmentProductResult, error)
 	RemoveAssortmentProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (RemoveAssortmentProductResponseBulk, error)
 }

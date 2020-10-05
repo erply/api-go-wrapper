@@ -1125,7 +1125,7 @@ func TestRemoveAssortmentProductsBulk(t *testing.T) {
 					Status: statusBulk,
 					RemoveAssortmentProductResults: []RemoveAssortmentProductResult{
 						{
-							DeletedIDs: "4",
+							DeletedIDs:              "4",
 							ProductsNotInAssortment: "5",
 						},
 					},
