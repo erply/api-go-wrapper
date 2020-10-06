@@ -4,6 +4,7 @@ import "context"
 
 type Manager interface {
 	GetProducts(ctx context.Context, filters map[string]string) ([]Product, error)
+	GetProductsCount(ctx context.Context, filters map[string]string) (int, error)
 	GetProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsResponseBulk, error)
 	GetProductUnits(ctx context.Context, filters map[string]string) ([]ProductUnit, error)
 	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
