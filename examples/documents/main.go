@@ -2,50 +2,30 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/erply/api-go-wrapper/pkg/api/documents"
-	"net/http"
 	"time"
 )
 
 func main() {
-	username := flag.String("u", "", "username")
-	password := flag.String("p", "", "password")
-	clientCode := flag.String("cc", "", "client code")
-	flag.Parse()
-
-	sessionKey, err := auth.VerifyUser(*username, *password, *clientCode, http.DefaultClient)
-	if err != nil {
-		panic(err)
-	}
-
-	apiClient, err := api.NewClient(sessionKey, *clientCode, nil)
-	if err != nil {
-		panic(err)
-	}
+	apiClient, err := api.BuildClient()
+	common.Die(err)
 
 	purchaseDocuments, err := GetPurchaseDocuments(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	fmt.Printf("GetPurchaseDocuments: %+v\n", purchaseDocuments)
 
 	purchaseDocumentsBulk, err := GetPurchaseDocumentsBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	fmt.Printf("GetPurchaseDocumentsBulk: %+v\n", purchaseDocumentsBulk)
 
 	purchaseDocumentsParallel, err := GetPurchaseDocumentsInParallel(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	fmt.Printf("GetPurchaseDocumentsInParallel: %+v\n", purchaseDocumentsParallel)
 }

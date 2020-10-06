@@ -21,6 +21,10 @@ type (
 
 	AssignmentsManger interface {
 		SaveAssignment(ctx context.Context, filters map[string]string) (int64, error)
+		SaveVatRate(ctx context.Context, filters map[string]string) (*SaveVatRateResult, error)
+		SaveVatRateBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveVatRateResponseBulk, error)
+		SaveVatRateComponent(ctx context.Context, filters map[string]string) (*SaveVatRateComponentResult, error)
+		SaveVatRateComponentBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveVatRateComponentResponseBulk, error)
 	}
 
 	Manager interface {
