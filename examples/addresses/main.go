@@ -2,45 +2,27 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
-	"net/http"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"time"
 )
 
 func main() {
-	username := flag.String("u", "", "username")
-	password := flag.String("p", "", "password")
-	clientCode := flag.String("cc", "", "client code")
-	flag.Parse()
-
-	sessionKey, err := auth.VerifyUser(*username, *password, *clientCode, http.DefaultClient)
-	if err != nil {
-		panic(err)
-	}
-
-	apiClient, err := api.NewClient(sessionKey, *clientCode, nil)
-	if err != nil {
-		panic(err)
-	}
+	apiClient, err := api.BuildClient()
+	common.Die(err)
 
 	addresses, err := GetAddressesBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	fmt.Printf("%+v\n", addresses)
 
 	err = SaveAddressesBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 }
 
-func GetAddressesBulk(cl *api.Client) (addresses []common.Address, err error) {
+func GetAddressesBulk(cl *api.Client) (addresses []sharedCommon.Address, err error) {
 	addressCli := cl.AddressProvider
 
 	bulkFilters := []map[string]interface{}{

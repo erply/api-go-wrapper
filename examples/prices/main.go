@@ -2,96 +2,60 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
-	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	"github.com/erply/api-go-wrapper/pkg/api/prices"
-	"net/http"
 	"time"
 )
 
 func main() {
-	username := flag.String("u", "", "username")
-	password := flag.String("p", "", "password")
-	clientCode := flag.String("cc", "", "client code")
-	flag.Parse()
-
-	sessionKey, err := auth.VerifyUser(*username, *password, *clientCode, http.DefaultClient)
-	if err != nil {
-		panic(err)
-	}
-
-	apiClient, err := api.NewClient(sessionKey, *clientCode, nil)
-	if err != nil {
-		panic(err)
-	}
+	apiClient, err := api.BuildClient()
+	common.Die(err)
 
 	productsInPrice, err := GetProductsInPriceList(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("GetProductsInPriceList:\n%+v\n", productsInPrice)
 
 	bulkPrices, err := GetProductsInPriceListBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("GetProductsInPriceListBulk:\n%+v\n", bulkPrices)
 
 	supplierBulkPrices, err := GetSupplierPriceListsBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	supplierPrices, err := GetSupplierPriceLists(apiClient, "4644")
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 
 	fmt.Printf("BulkPrices:\n%+v\n", supplierBulkPrices)
 	fmt.Printf("SupplierPrices:\n%+v\n", supplierPrices)
 
 	bulkProductPrices, err := GetProductsInSupplierPriceListBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("BulkProductPrices:\n%+v\n", bulkProductPrices)
 
 	productPrices, err := GetProductsInSupplierPriceList(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
 
 	res, err := AddProductToSupplierPriceList(apiClient, "65661", "1", "100.23")
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
 
 	bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65659", "65660"}, []string{"1", "1"}, []string{"10.22", "111.00"})
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("ChangeProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
 
 	bulkResDel, err := DeleteProductsFromSupplierPriceListBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("DeleteProductsFromSupplierPriceListBulk:\n%+v\n", bulkResDel)
 
 	saveSupPriceResp, err := SaveSupplierPriceList(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("SaveSupplierPriceList:\n%+v\n", saveSupPriceResp)
 
 	saveSupPriceRespBulk, err := SaveSupplierPriceListBulk(apiClient)
-	if err != nil {
-		panic(err)
-	}
+	common.Die(err)
 	fmt.Printf("SaveSupplierPriceListBulk:\n%+v\n", saveSupPriceRespBulk)
 }
 

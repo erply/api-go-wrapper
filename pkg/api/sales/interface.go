@@ -17,6 +17,10 @@ type (
 
 	VatRateManager interface {
 		GetVatRates(ctx context.Context, filters map[string]string) (VatRates, error)
+		SaveVatRate(ctx context.Context, filters map[string]string) (*SaveVatRateResult, error)
+		SaveVatRateBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveVatRateResponseBulk, error)
+		SaveVatRateComponent(ctx context.Context, filters map[string]string) (*SaveVatRateComponentResult, error)
+		SaveVatRateComponentBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveVatRateComponentResponseBulk, error)
 	}
 
 	AssignmentsManger interface {

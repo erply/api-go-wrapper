@@ -115,3 +115,18 @@ func doRequest(req *http.Request, cli *Client) (*http.Response, error) {
 	resp, err := cli.httpClient.Do(req)
 	return resp, err
 }
+
+func ConvertSourceToJsonStrIfPossible(source interface{}) string {
+	data, err := json.Marshal(source)
+	if err != nil {
+		return fmt.Sprintf("%+v", source)
+	}
+
+	return string(data)
+}
+
+func Die(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
