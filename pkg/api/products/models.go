@@ -162,6 +162,14 @@ type (
 		LastModified    uint64              `json:"lastModified"`
 		SubGroups       []ProductGroup      `json:"subGroups"`
 		Attributes      []map[string]string `json:"attributes,omitempty"`
+		Images          []ProductGroupImage `json:"images"`
+	}
+
+	ProductGroupImage struct {
+		PictureID string `json:"pictureID"`
+		ThumbURL  string `json:"thumbURL"`
+		SmallURL  string `json:"smallURL"`
+		LargeURL  string `json:"largeURL"`
 	}
 
 	NameLanguages struct {
