@@ -118,7 +118,7 @@ type (
 		Free          float64 `json:"free"`
 		OrderPending  int     `json:"orderPending"`
 		ReorderPoint  int     `json:"reorderPoint"`
-		RestockLevel  int     `json:"restockLevel"`
+		RestockLevel  float64 `json:"restockLevel"`
 		FifoCost      float32 `json:"FIFOCost"`
 		PurchasePrice float32 `json:"purchasePrice"`
 	}
@@ -223,7 +223,7 @@ type (
 		LastPurchaseDate       string      `json:"lastPurchaseDate"`
 		LastSoldDate           string      `json:"lastSoldDate"`
 		ReorderPoint           int         `json:"reorderPoint"`
-		RestockLevel           int         `json:"restockLevel"`
+		RestockLevel           float64     `json:"restockLevel"`
 	}
 
 	GetProductStockFileResponse struct {
