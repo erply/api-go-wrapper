@@ -118,7 +118,7 @@ type (
 		Free          float64 `json:"free"`
 		OrderPending  int     `json:"orderPending"`
 		ReorderPoint  int     `json:"reorderPoint"`
-		RestockLevel  int     `json:"restockLevel"`
+		RestockLevel  float64 `json:"restockLevel"`
 		FifoCost      float32 `json:"FIFOCost"`
 		PurchasePrice float32 `json:"purchasePrice"`
 	}
@@ -162,6 +162,14 @@ type (
 		LastModified    uint64              `json:"lastModified"`
 		SubGroups       []ProductGroup      `json:"subGroups"`
 		Attributes      []map[string]string `json:"attributes,omitempty"`
+		Images          []ProductGroupImage `json:"images"`
+	}
+
+	ProductGroupImage struct {
+		PictureID string `json:"pictureID"`
+		ThumbURL  string `json:"thumbURL"`
+		SmallURL  string `json:"smallURL"`
+		LargeURL  string `json:"largeURL"`
 	}
 
 	NameLanguages struct {
@@ -215,7 +223,7 @@ type (
 		LastPurchaseDate       string      `json:"lastPurchaseDate"`
 		LastSoldDate           string      `json:"lastSoldDate"`
 		ReorderPoint           int         `json:"reorderPoint"`
-		RestockLevel           int         `json:"restockLevel"`
+		RestockLevel           float64     `json:"restockLevel"`
 	}
 
 	GetProductStockFileResponse struct {
