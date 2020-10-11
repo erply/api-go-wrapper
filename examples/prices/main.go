@@ -13,58 +13,58 @@ func main() {
 	apiClient, err := api.BuildClient()
 	common.Die(err)
 
-	//productsInPrice, err := GetProductsInPriceList(apiClient)
-	//common.Die(err)
-	//fmt.Printf("GetProductsInPriceList:\n%+v\n", productsInPrice)
-	//
-	//bulkPrices, err := GetProductsInPriceListBulk(apiClient)
-	//common.Die(err)
-	//fmt.Printf("GetProductsInPriceListBulk:\n%+v\n", bulkPrices)
-	//
-	//supplierBulkPrices, err := GetSupplierPriceListsBulk(apiClient)
-	//common.Die(err)
-	//
-	//supplierPrices, err := GetSupplierPriceLists(apiClient, "4644")
-	//common.Die(err)
-	//
-	//fmt.Printf("BulkPrices:\n%+v\n", supplierBulkPrices)
-	//fmt.Printf("SupplierPrices:\n%+v\n", supplierPrices)
-	//
-	//bulkProductPrices, err := GetProductsInSupplierPriceListBulk(apiClient)
-	//common.Die(err)
-	//fmt.Printf("BulkProductPrices:\n%+v\n", bulkProductPrices)
-	//
-	//productPrices, err := GetProductsInSupplierPriceList(apiClient)
-	//common.Die(err)
-	//fmt.Printf("ProductPrices:\n%+v\n", productPrices)
-	//
-	//res, err := AddProductToSupplierPriceList(apiClient, "65661", "1", "100.23")
-	//common.Die(err)
-	//fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
-	//
-	//bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65659", "65660"}, []string{"1", "1"}, []string{"10.22", "111.00"})
-	//common.Die(err)
-	//fmt.Printf("ChangeProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
-	//
-	//bulkResDel, err := DeleteProductsFromSupplierPriceListBulk(apiClient)
-	//common.Die(err)
-	//fmt.Printf("DeleteProductsFromSupplierPriceListBulk:\n%+v\n", bulkResDel)
-	//
-	//saveSupPriceResp, err := SaveSupplierPriceList(apiClient)
-	//common.Die(err)
-	//fmt.Printf("SaveSupplierPriceList:\n%+v\n", saveSupPriceResp)
-	//
-	//saveSupPriceRespBulk, err := SaveSupplierPriceListBulk(apiClient)
-	//common.Die(err)
-	//fmt.Printf("SaveSupplierPriceListBulk:\n%+v\n", saveSupPriceRespBulk)
+	productsInPrice, err := GetProductsInPriceList(apiClient)
+	common.Die(err)
+	fmt.Printf("GetProductsInPriceList:\n%+v\n", productsInPrice)
 
-	//SavePriceList(apiClient)
-	//SavePriceListBulk(apiClient)
-	//AddProductToPriceList(apiClient)
-	//EditProductToPriceList(apiClient)
-	//ChangeProductToPriceListBulk(apiClient)
+	bulkPrices, err := GetProductsInPriceListBulk(apiClient)
+	common.Die(err)
+	fmt.Printf("GetProductsInPriceListBulk:\n%+v\n", bulkPrices)
+
+	supplierBulkPrices, err := GetSupplierPriceListsBulk(apiClient)
+	common.Die(err)
+
+	supplierPrices, err := GetSupplierPriceLists(apiClient, "4644")
+	common.Die(err)
+
+	fmt.Printf("BulkPrices:\n%+v\n", supplierBulkPrices)
+	fmt.Printf("SupplierPrices:\n%+v\n", supplierPrices)
+
+	bulkProductPrices, err := GetProductsInSupplierPriceListBulk(apiClient)
+	common.Die(err)
+	fmt.Printf("BulkProductPrices:\n%+v\n", bulkProductPrices)
+
+	productPrices, err := GetProductsInSupplierPriceList(apiClient)
+	common.Die(err)
+	fmt.Printf("ProductPrices:\n%+v\n", productPrices)
+
+	res, err := AddProductToSupplierPriceList(apiClient, "65661", "1", "100.23")
+	common.Die(err)
+	fmt.Printf("AddProductToSupplierPriceList:\n%+v\n", res)
+
+	bulkRes, err := ChangeProductToSupplierPriceListBulk(apiClient, []string{"65659", "65660"}, []string{"1", "1"}, []string{"10.22", "111.00"})
+	common.Die(err)
+	fmt.Printf("ChangeProductToSupplierPriceListBulk:\n%+v\n", bulkRes)
+
+	bulkResDel, err := DeleteProductsFromSupplierPriceListBulk(apiClient)
+	common.Die(err)
+	fmt.Printf("DeleteProductsFromSupplierPriceListBulk:\n%+v\n", bulkResDel)
+
+	saveSupPriceResp, err := SaveSupplierPriceList(apiClient)
+	common.Die(err)
+	fmt.Printf("SaveSupplierPriceList:\n%+v\n", saveSupPriceResp)
+
+	saveSupPriceRespBulk, err := SaveSupplierPriceListBulk(apiClient)
+	common.Die(err)
+	fmt.Printf("SaveSupplierPriceListBulk:\n%+v\n", saveSupPriceRespBulk)
+
+	SavePriceList(apiClient)
+	SavePriceListBulk(apiClient)
+	AddProductToPriceList(apiClient)
+	EditProductToPriceList(apiClient)
+	ChangeProductToPriceListBulk(apiClient)
 	DeleteProductsFromPriceListBulk(apiClient)
-	//DeleteProductsFromPriceList(apiClient)
+	DeleteProductsFromPriceList(apiClient)
 }
 
 func ChangeProductToSupplierPriceListBulk(cl *api.Client, productIds, priceIds, prices []string) (prices.ChangeProductToSupplierPriceListResponseBulk, error) {
