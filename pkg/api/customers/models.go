@@ -258,4 +258,27 @@ type (
 		Status    sharedCommon.Status               `json:"status"`
 		BulkItems []DeleteSuppliersResponseBulkItem `json:"requests"`
 	}
+
+	AddCustomerRewardPointsResult struct {
+		TransactionID   int64 `json:"transactionID"`
+		CustomerID      int64 `json:"customerID"`
+		Points          int64 `json:"points"`
+		CreatedUnixTime int64 `json:"createdUnixTime"`
+		ExpiryUnixTime  int64 `json:"expiryUnixTime"`
+	}
+
+	AddCustomerRewardPointsResponse struct {
+		Status                         sharedCommon.Status             `json:"status"`
+		AddCustomerRewardPointsResults []AddCustomerRewardPointsResult `json:"records"`
+	}
+
+	AddCustomerRewardPointsResponseBulkItem struct {
+		Status                         sharedCommon.StatusBulk         `json:"status"`
+		AddCustomerRewardPointsResults []AddCustomerRewardPointsResult `json:"records"`
+	}
+
+	AddCustomerRewardPointsResponseBulk struct {
+		Status    sharedCommon.Status                       `json:"status"`
+		BulkItems []AddCustomerRewardPointsResponseBulkItem `json:"requests"`
+	}
 )

@@ -14,4 +14,6 @@ type Manager interface {
 	SaveSupplierBulk(ctx context.Context, suppliers []map[string]interface{}, attrs map[string]string) (SaveSuppliersResponseBulk, error)
 	DeleteSupplier(ctx context.Context, filters map[string]string) error
 	DeleteSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (DeleteSuppliersResponseBulk, error)
+	AddCustomerRewardPoints(ctx context.Context, filters map[string]string) (AddCustomerRewardPointsResult, error)
+	AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (AddCustomerRewardPointsResponseBulk, error)
 }

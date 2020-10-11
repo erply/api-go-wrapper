@@ -21,8 +21,10 @@ func main() {
 
 	customers2, err := GetCustomersInParallel(apiClient)
 	common.Die(err)
-
 	fmt.Printf("GetCustomersInParallel:\n%+v\n", customers2)
+
+	AddCustomerRewardPoints(apiClient)
+	AddCustomerRewardPointsBulk(apiClient)
 }
 
 func GetCustomersBulk(cl *api.Client) (custmrs customers.Customers, err error) {
@@ -87,4 +89,42 @@ func GetCustomersInParallel(cl *api.Client) (customers.Customers, error) {
 	}
 
 	return customrs, nil
+}
+
+func AddCustomerRewardPoints(cl *api.Client) {
+	cli := cl.CustomerManager
+
+	req := map[string]string{
+		"customerID": "12683",
+		"points":     "22",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.AddCustomerRewardPoints(ctx, req)
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func AddCustomerRewardPointsBulk(cl *api.Client) {
+	cli := cl.CustomerManager
+
+	req := []map[string]interface{}{
+		{
+			"customerID": "12683",
+			"points":     "2",
+		},
+		{
+			"customerID": "12733",
+			"points":     "2",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.AddCustomerRewardPointsBulk(ctx, req, map[string]string{})
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
 }
