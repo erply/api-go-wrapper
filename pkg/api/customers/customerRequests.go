@@ -135,3 +135,58 @@ func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string
 	}
 	return true, nil
 }
+
+
+func (cli *Client) AddCustomerRewardPoints(ctx context.Context, filters map[string]string) (AddCustomerRewardPointsResult, error) {
+	resp, err := cli.SendRequest(ctx, "addCustomerRewardPoints", filters)
+	if err != nil {
+		return AddCustomerRewardPointsResult{}, err
+	}
+	var res AddCustomerRewardPointsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return AddCustomerRewardPointsResult{}, erro.NewFromError("failed to unmarshal AddCustomerRewardPointsResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return AddCustomerRewardPointsResult{}, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.AddCustomerRewardPointsResults) > 0 {
+		return res.AddCustomerRewardPointsResults[0], nil
+	}
+
+	return AddCustomerRewardPointsResult{}, nil
+}
+
+func (cli *Client) AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (AddCustomerRewardPointsResponseBulk, error) {
+	var respBulk AddCustomerRewardPointsResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "addCustomerRewardPoints",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return respBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return respBulk, err
+	}
+
+	if err := json.Unmarshal(body, &respBulk); err != nil {
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal AddCustomerRewardPointsResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&respBulk.Status) {
+		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkItem := range respBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
+			return respBulk, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return respBulk, nil
+}

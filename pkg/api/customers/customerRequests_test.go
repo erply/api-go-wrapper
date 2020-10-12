@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -74,10 +74,10 @@ func TestCustomerManager(t *testing.T) {
 
 func TestGetCustomersBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusBulk := common2.StatusBulk{}
+		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
 		supplierResp := GetCustomersResponseBulk{
-			Status: common2.Status{ResponseStatus: "ok"},
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []GetCustomersResponseBulkItem{
 				{
 					Status: statusBulk,
@@ -136,9 +136,9 @@ func TestGetCustomersBulk(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, customersBulk.Status)
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, customersBulk.Status)
 
-	expectedStatus := common2.StatusBulk{}
+	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
 	assert.Equal(t, Customers{
@@ -190,4 +190,137 @@ func TestGetCustomersBulkResponseFailure(t *testing.T) {
 	if err == nil {
 		return
 	}
+}
+
+func TestAddCustomerRewardPoints(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "addCustomerRewardPoints", r.URL.Query().Get("request"))
+		assert.Equal(t, "1232131", r.URL.Query().Get("customerID"))
+		assert.Equal(t, "34456", r.URL.Query().Get("invoiceID"))
+		assert.Equal(t, "11", r.URL.Query().Get("points"))
+
+		resp := AddCustomerRewardPointsResponse{
+			Status:                         sharedCommon.Status{ResponseStatus: "ok"},
+			AddCustomerRewardPointsResults: []AddCustomerRewardPointsResult{{TransactionID: 999, CustomerID: 22}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"customerID": "1232131",
+		"invoiceID":  "34456",
+		"points":     "11",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	resp, err := cl.AddCustomerRewardPoints(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, int64(999), resp.TransactionID)
+	assert.Equal(t, int64(22), resp.CustomerID)
+}
+
+func TestAddCustomerRewardPointsBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "addCustomerRewardPoints",
+				"customerID":  "123",
+				"invoiceID":   "34456",
+				"points":      "22",
+			},
+			{
+				"requestName": "addCustomerRewardPoints",
+				"customerID":  "124",
+				"invoiceID":   "34457",
+				"points":      "12",
+			},
+		})
+
+		bulkResp := AddCustomerRewardPointsResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []AddCustomerRewardPointsResponseBulkItem{
+				{
+					Status:  statusBulk,
+					AddCustomerRewardPointsResults: []AddCustomerRewardPointsResult{{TransactionID: 3456}},
+				},
+				{
+					Status:  statusBulk,
+					AddCustomerRewardPointsResults: []AddCustomerRewardPointsResult{{TransactionID: 3457}},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"customerID":  "123",
+			"invoiceID":   "34456",
+			"points":      "22",
+		},
+		{
+			"customerID":  "124",
+			"invoiceID":   "34457",
+			"points":      "12",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.AddCustomerRewardPointsBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+	assert.Equal(t, []AddCustomerRewardPointsResult{{TransactionID: 3456}}, bulkResp.BulkItems[0].AddCustomerRewardPointsResults)
+	assert.Equal(t, []AddCustomerRewardPointsResult{{TransactionID: 3457}}, bulkResp.BulkItems[1].AddCustomerRewardPointsResults)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }

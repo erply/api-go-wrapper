@@ -151,3 +151,67 @@ type SaveSupplierPriceListResponseBulk struct {
 	Status    sharedCommon.Status             `json:"status"`
 	BulkItems []SaveSupplierPriceListBulkItem `json:"requests"`
 }
+
+type NotAddedPriceItem struct {
+	Type string `json:"type"`
+	ID   int    `json:"id"`
+}
+
+type SavePriceListResult struct {
+	PriceListID              int                 `json:"pricelistID"`
+	ItemsNotAddedToPriceList []NotAddedPriceItem `json:"itemsNotAddedToPriceList"`
+}
+
+type SavePriceListResultResponse struct {
+	Status               sharedCommon.Status   `json:"status"`
+	SavePriceListResults []SavePriceListResult `json:"records"`
+}
+
+type SavePriceListBulkItem struct {
+	Status  sharedCommon.StatusBulk `json:"status"`
+	Records []SavePriceListResult   `json:"records"`
+}
+
+type SavePriceListResponseBulk struct {
+	Status    sharedCommon.Status     `json:"status"`
+	BulkItems []SavePriceListBulkItem `json:"requests"`
+}
+
+type ChangeProductToPriceListResult struct {
+	PriceListProductID int `json:"priceListProductID"`
+}
+
+type ChangeProductToPriceListResponse struct {
+	Status                          sharedCommon.Status              `json:"status"`
+	ChangeProductToPriceListResults []ChangeProductToPriceListResult `json:"records"`
+}
+
+type ChangeProductToPriceListResultBulkItem struct {
+	Status  sharedCommon.StatusBulk          `json:"status"`
+	Records []ChangeProductToPriceListResult `json:"records"`
+}
+
+type ChangeProductToPriceListResponseBulk struct {
+	Status    sharedCommon.Status                      `json:"status"`
+	BulkItems []ChangeProductToPriceListResultBulkItem `json:"requests"`
+}
+
+type DeleteProductsFromPriceListResult struct {
+	DeletedIDs     string `json:"deletedIDs"`
+	NonExistingIDs string `json:"nonExistingIDs"`
+}
+
+type DeleteProductsFromPriceListResponse struct {
+	Status                             sharedCommon.Status                 `json:"status"`
+	DeleteProductsFromPriceListResults []DeleteProductsFromPriceListResult `json:"records"`
+}
+
+type DeleteProductsFromPriceListBulkItem struct {
+	Status  sharedCommon.StatusBulk             `json:"status"`
+	Records []DeleteProductsFromPriceListResult `json:"records"`
+}
+
+type DeleteProductsFromPriceListResponseBulk struct {
+	Status    sharedCommon.Status                   `json:"status"`
+	BulkItems []DeleteProductsFromPriceListBulkItem `json:"requests"`
+}
