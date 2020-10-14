@@ -23,6 +23,10 @@ func main() {
 	common.Die(err)
 
 	fmt.Printf("GetSalesDocumentsInParallel: %+v\n", saleDocumentsInParallel)
+
+	GetPaymentBulk(apiClient)
+
+	GetVatRatesBulk(apiClient)
 }
 
 func GetSalesDocumentsBulk(cl *api.Client) (docs []sales.SaleDocument, err error) {
@@ -94,4 +98,50 @@ func GetSalesDocumentsInParallel(cl *api.Client) ([]sales.SaleDocument, error) {
 
 	<-doneChan
 	return salesDocuments, err
+}
+
+func GetPaymentBulk(cl *api.Client) {
+	salesCLI := cl.SalesManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"recordsOnPage": 2,
+			"pageNo":        1,
+		},
+		{
+			"recordsOnPage": 2,
+			"pageNo":        2,
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := salesCLI.GetPaymentsBulk(ctx, bulkFilters, map[string]string{})
+	common.Die(err)
+
+	fmt.Println("GetPaymentsBulk:")
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
+}
+
+func GetVatRatesBulk(cl *api.Client) {
+	salesCLI := cl.SalesManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"recordsOnPage": 2,
+			"pageNo":        1,
+		},
+		{
+			"recordsOnPage": 2,
+			"pageNo":        2,
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := salesCLI.GetVatRatesBulk(ctx, bulkFilters, map[string]string{})
+	common.Die(err)
+
+	fmt.Println("GetVatRatesBulk:")
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
 }

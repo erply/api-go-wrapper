@@ -318,3 +318,129 @@ func TestSaveVatRateComponentBulk(t *testing.T) {
 	assert.Equal(t, 999, bulkResp.BulkItems[0].Records[0].VatRateComponentID)
 	assert.Equal(t, 998, bulkResp.BulkItems[1].Records[0].VatRateComponentID)
 }
+
+func TestGetVatRatesBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "getVatRates",
+				"id":          "1",
+			},
+			{
+				"requestName": "getVatRates",
+				"id":          "2",
+			},
+			{
+				"requestName": "getVatRates",
+				"id":          "3",
+			},
+		})
+
+		bulkResp := GetVatRatesResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []GetVatRatesBulkItem{
+				{
+					Status: statusBulk,
+					VatRates: []VatRate{
+						{
+							ID:   "1",
+							Name: "Name 1",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					VatRates: []VatRate{
+						{
+							ID:   "2",
+							Name: "Name 2",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					VatRates: []VatRate{
+						{
+							ID:   "3",
+							Name: "Name 3",
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.GetVatRatesBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"id": "1",
+			},
+			{
+				"id": "2",
+			},
+			{
+				"id": "3",
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, []VatRate{
+		{
+			ID: "1",
+			Name: "Name 1",
+		},
+	}, bulkResp.BulkItems[0].VatRates)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+
+	assert.Equal(t, []VatRate{
+		{
+			ID: "2",
+			Name: "Name 2",
+		},
+	}, bulkResp.BulkItems[1].VatRates)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+
+	assert.Equal(t, []VatRate{
+		{
+			ID: "3",
+			Name: "Name 3",
+		},
+	}, bulkResp.BulkItems[2].VatRates)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
+}

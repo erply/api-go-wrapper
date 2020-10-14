@@ -25,9 +25,19 @@ type (
 	}
 
 	//GetVatRatesResponse ...
-	getVatRatesResponse struct {
+	GetVatRatesResponse struct {
 		Status   sharedCommon.Status `json:"status"`
 		VatRates []VatRate           `json:"records"`
+	}
+
+	GetVatRatesBulkItem struct {
+		Status   sharedCommon.StatusBulk `json:"status"`
+		VatRates []VatRate               `json:"records"`
+	}
+
+	GetVatRatesResponseBulk struct {
+		Status    sharedCommon.Status   `json:"status"`
+		BulkItems []GetVatRatesBulkItem `json:"requests"`
 	}
 
 	SaveVatRateResult struct {
