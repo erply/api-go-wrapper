@@ -29,11 +29,16 @@ type (
 		SaveAssignment(ctx context.Context, filters map[string]string) (int64, error)
 	}
 
+	ReportsManager interface {
+		GetSalesReport(ctx context.Context, filters map[string]string)
+	}
+
 	Manager interface {
 		ProjectManager
 		DocumentManager
 		VatRateManager
 		AssignmentsManger
+		ReportsManager
 		//payment requests
 		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
