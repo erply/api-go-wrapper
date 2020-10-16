@@ -51,7 +51,7 @@ func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]
 	return res.ImportReports, nil
 }
 
-func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error) {
+func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]string) (*GetSalesDocumentResponse, error) {
 	resp, err := cli.SendRequest(ctx, "getSalesDocuments", filters)
 	if err != nil {
 		return nil, erro.NewFromError("GetSalesDocument request failed", err)
@@ -70,7 +70,7 @@ func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]str
 		return nil, nil
 	}
 
-	return res.SalesDocuments, nil
+	return res, nil
 }
 
 func (cli *Client) GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSaleDocumentResponseBulk, error) {
