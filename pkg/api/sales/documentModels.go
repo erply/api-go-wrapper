@@ -39,6 +39,7 @@ type (
 		PayerID int `json:"payerID"`
 
 		AddressID                int                 `json:"addressID"`
+		Address                  string              `json:"address"`
 		PayerAddressID           int                 `json:"payerAddressID"`
 		ShipToAddressID          string              `json:"shipToAddressID"`
 		ContactID                int                 `json:"contactID"`
