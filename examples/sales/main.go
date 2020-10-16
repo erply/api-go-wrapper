@@ -16,7 +16,6 @@ func main() {
 
 	saleDocuments, err := GetSalesDocumentsBulk(apiClient)
 	common.Die(err)
-
 	fmt.Printf("GetSalesDocumentsBulk: %+v\n", saleDocuments)
 
 	saleDocumentsInParallel, err := GetSalesDocumentsInParallel(apiClient)
