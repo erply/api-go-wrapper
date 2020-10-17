@@ -1,6 +1,7 @@
 package sales
 
 import (
+	"encoding/json"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
@@ -120,8 +121,8 @@ type (
 		LastModifierUsername            string              `json:"lastModifierUsername"`
 		Added                           int                 `json:"added"`
 		ReceiptLink                     string              `json:"receiptLink"`
-		AmountAddedToStoreCredit        float64             `json:"amountAddedToStoreCredit"`
-		AmountPaidWithStoreCredit       float64             `json:"amountPaidWithStoreCredit"`
+		AmountAddedToStoreCredit        json.Number         `json:"amountAddedToStoreCredit"`
+		AmountPaidWithStoreCredit       json.Number         `json:"amountPaidWithStoreCredit"`
 		ApplianceID                     int                 `json:"applianceID"`
 		ApplianceReference              string              `json:"applianceReference"`
 		AssignmentID                    int                 `json:"assignmentID"`
