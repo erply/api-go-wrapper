@@ -30,7 +30,7 @@ type (
 	}
 
 	ReportsManager interface {
-		GetSalesReport(ctx context.Context, filters map[string]string)
+		GetSalesReport(ctx context.Context, filters map[string]string) (*GetSalesReport, error)
 	}
 
 	Manager interface {
