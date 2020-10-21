@@ -46,6 +46,10 @@ func main() {
 	SaveWarehouse(apiClient)
 
 	SaveWarehouseBulk(apiClient)
+
+	SaveInventoryRegistration(apiClient)
+
+	SaveInventoryRegistrationBulk(apiClient)
 }
 
 func GetWarehousesBulk(cl *api.Client) (warehouses warehouse.Warehouses, err error) {
@@ -144,6 +148,44 @@ func SaveWarehouseBulk(cl *api.Client) {
 	defer cancel()
 
 	resp, err := cli.SaveWarehouseBulk(ctx, bulkItems, map[string]string{})
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveInventoryRegistration(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	req := map[string]string{
+		"warehouseID": "21",
+		"productID1": "39929",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveInventoryRegistration(ctx, req)
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveInventoryRegistrationBulk(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	bulkItems := []map[string]interface{}{
+		{
+			"warehouseID": "21",
+			"productID1": "33526",
+		},
+		{
+			"warehouseID": "21",
+			"productID1": "44582",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveInventoryRegistrationBulk(ctx, bulkItems, map[string]string{})
 	common.Die(err)
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
 }
