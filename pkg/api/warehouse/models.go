@@ -62,4 +62,23 @@ type (
 		Status    sharedCommon.Status     `json:"status"`
 		BulkItems []GetWarehousesBulkItem `json:"requests"`
 	}
+
+	SaveWarehouseResult struct {
+		WarehouseID int `json:"warehouseID"`
+	}
+
+	SaveWarehouseResponse struct {
+		Status  sharedCommon.Status   `json:"status"`
+		Results []SaveWarehouseResult `json:"records"`
+	}
+
+	SaveWarehouseBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Results []SaveWarehouseResult   `json:"records"`
+	}
+
+	SaveWarehouseResponseBulk struct {
+		Status    sharedCommon.Status     `json:"status"`
+		BulkItems []SaveWarehouseBulkItem `json:"requests"`
+	}
 )
