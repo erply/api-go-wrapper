@@ -34,4 +34,17 @@ type (
 		Status    sharedCommon.Status             `json:"status"`
 		BulkItems []SaveAddressesResponseBulkItem `json:"requests"`
 	}
+
+	DeleteAddressResponse struct {
+		Status               sharedCommon.Status   `json:"status"`
+	}
+
+	DeleteAddressBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+	}
+
+	DeleteAddressResponseBulk struct {
+		Status    sharedCommon.Status     `json:"status"`
+		BulkItems []DeleteAddressBulkItem `json:"requests"`
+	}
 )

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -45,14 +45,14 @@ func TestAddressManager(t *testing.T) {
 
 func TestGetAddressesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusBulk := common2.StatusBulk{}
+		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
 		supplierResp := GetAddressesResponseBulk{
-			Status: common2.Status{ResponseStatus: "ok"},
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []GetAddressesResponseBulkItem{
 				{
 					Status: statusBulk,
-					Addresses: common2.Addresses{
+					Addresses: sharedCommon.Addresses{
 						{
 							AddressID: 123,
 							Address:   "Some Address 123",
@@ -65,7 +65,7 @@ func TestGetAddressesBulk(t *testing.T) {
 				},
 				{
 					Status: statusBulk,
-					Addresses: common2.Addresses{
+					Addresses: sharedCommon.Addresses{
 						{
 							AddressID: 125,
 							Address:   "Some Address 125",
@@ -107,12 +107,12 @@ func TestGetAddressesBulk(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, suppliersBulk.Status)
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, suppliersBulk.Status)
 
-	expectedStatus := common2.StatusBulk{}
+	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
-	assert.Equal(t, common2.Addresses{
+	assert.Equal(t, sharedCommon.Addresses{
 		{
 			AddressID: 123,
 			Address:   "Some Address 123",
@@ -125,7 +125,7 @@ func TestGetAddressesBulk(t *testing.T) {
 
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[0].Status)
 
-	assert.Equal(t, common2.Addresses{
+	assert.Equal(t, sharedCommon.Addresses{
 		{
 			AddressID: 125,
 			Address:   "Some Address 125",
@@ -164,10 +164,10 @@ func TestGetAddressesBulkResponseFailure(t *testing.T) {
 
 func TestSaveAddressesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusBulk := common2.StatusBulk{}
+		statusBulk := sharedCommon.StatusBulk{}
 		statusBulk.ResponseStatus = "ok"
 		resp := SaveAddressesResponseBulk{
-			Status: common2.Status{ResponseStatus: "ok"},
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []SaveAddressesResponseBulkItem{
 				{
 					Status: statusBulk,
@@ -219,9 +219,9 @@ func TestSaveAddressesBulk(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, common2.Status{ResponseStatus: "ok"}, saveResp.Status)
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, saveResp.Status)
 
-	expectedStatus := common2.StatusBulk{}
+	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
 	assert.Len(t, saveResp.BulkItems, 2)
@@ -270,4 +270,122 @@ func TestSaveAddressesBulkResponseFailure(t *testing.T) {
 	if err == nil {
 		return
 	}
+}
+
+func TestDeleteAddresses(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "deleteAddress", r.URL.Query().Get("request"))
+		assert.Equal(t, "2223", r.URL.Query().Get("addressID"))
+
+		resp := DeleteAddressResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"addressID":         "2223",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	err := cl.DeleteAddress(context.Background(), inpt)
+	assert.NoError(t, err)
+}
+
+func TestDeleteAddressesBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		bulkRequestsRaw := r.FormValue("requests")
+
+		bulkRequests := []map[string]interface{}{}
+		err = json.Unmarshal([]byte(bulkRequestsRaw), &bulkRequests)
+		if err != nil {
+			return
+		}
+		expectedBulkRequests := []map[string]interface{}{
+			{
+				"requestName":         "deleteAddress",
+				"addressID": "3456",
+			},
+			{
+				"requestName":         "deleteAddress",
+				"addressID": "3457",
+			},
+		}
+		assert.Equal(t, expectedBulkRequests, bulkRequests)
+
+		bulkResp := DeleteAddressResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []DeleteAddressBulkItem{
+				{
+					Status:  statusBulk,
+				},
+				{
+					Status:  statusBulk,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"addressID": "3456",
+		},
+		{
+			"addressID": "3457",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.DeleteAddressBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
