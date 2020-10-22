@@ -20,6 +20,10 @@ func main() {
 
 	err = SaveAddressesBulk(apiClient)
 	common.Die(err)
+
+	DeleteAddress(apiClient)
+
+	DeleteAddressBulk(apiClient)
 }
 
 func GetAddressesBulk(cl *api.Client) (addresses []sharedCommon.Address, err error) {
@@ -74,6 +78,42 @@ func SaveAddressesBulk(cl *api.Client) (err error) {
 	}
 
 	fmt.Printf("%+v", bulkResponse)
+
+	return
+}
+
+func DeleteAddress(cl *api.Client) {
+	cli := cl.AddressProvider
+
+	req := map[string]string{
+		"addressID": "6320",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	err := cli.DeleteAddress(ctx, req)
+	common.Die(err)
+}
+
+func DeleteAddressBulk(cl *api.Client) {
+	addressProvider := cl.AddressProvider
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	addressesToDelete := []map[string]interface{}{
+		{
+			"addressID":     7238,
+		},
+		{
+			"addressID":     7239,
+		},
+	}
+	bulkResponse, err := addressProvider.DeleteAddressBulk(ctx, addressesToDelete, map[string]string{})
+	common.Die(err)
+
+	fmt.Printf("%s", common.ConvertSourceToJsonStrIfPossible(bulkResponse))
 
 	return
 }

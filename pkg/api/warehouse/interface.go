@@ -12,5 +12,8 @@ type (
 			GetWarehousesResponseBulk,
 			error,
 		)
+		SaveWarehouse(ctx context.Context, filters map[string]string) (*SaveWarehouseResult, error)
+		SaveWarehouseBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveWarehouseResponseBulk, error)
+		InventoryManager
 	}
 )

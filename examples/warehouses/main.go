@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
@@ -41,6 +42,14 @@ func main() {
 	}
 
 	fmt.Printf("GetWarehousesInParallel: %+v\n", warehouseFromParallel)
+
+	SaveWarehouse(apiClient)
+
+	SaveWarehouseBulk(apiClient)
+
+	SaveInventoryRegistration(apiClient)
+
+	SaveInventoryRegistrationBulk(apiClient)
 }
 
 func GetWarehousesBulk(cl *api.Client) (warehouses warehouse.Warehouses, err error) {
@@ -103,4 +112,80 @@ func GetWarehousesInParallel(cl *api.Client) (warehouse.Warehouses, error) {
 	}
 
 	return warehouses, nil
+}
+
+func SaveWarehouse(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	req := map[string]string{
+		"name": "warehouse 123",
+		"code": "123",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveWarehouse(ctx, req)
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveWarehouseBulk(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	bulkItems := []map[string]interface{}{
+		{
+			"name": "warehouse 124",
+			"code": "124",
+		},
+		{
+			"name": "warehouse 125",
+			"code": "125",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveWarehouseBulk(ctx, bulkItems, map[string]string{})
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveInventoryRegistration(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	req := map[string]string{
+		"warehouseID": "21",
+		"productID1": "39929",
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveInventoryRegistration(ctx, req)
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveInventoryRegistrationBulk(cl *api.Client) {
+	cli := cl.WarehouseManager
+
+	bulkItems := []map[string]interface{}{
+		{
+			"warehouseID": "21",
+			"productID1": "33526",
+		},
+		{
+			"warehouseID": "21",
+			"productID1": "44582",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveInventoryRegistrationBulk(ctx, bulkItems, map[string]string{})
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
 }
