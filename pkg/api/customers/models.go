@@ -83,6 +83,35 @@ type (
 		Username  string `json:"webshopUsername"`
 		LastLogin string `json:"webshopLastLogin"`
 	}
+
+	SaveCustomerResp struct {
+		CustomerID    int  `json:"customerID"`
+		AlreadyExists bool `json:"alreadyExists"`
+	}
+
+	SaveCustomerResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []SaveCustomerResp  `json:"records"`
+	}
+
+	SaveCustomerResponseBulk struct {
+		Status    sharedCommon.Status            `json:"status"`
+		BulkItems []SaveCustomerResponseBulkItem `json:"requests"`
+	}
+
+	DeleteCustomerResponse struct {
+		Status sharedCommon.Status `json:"status"`
+	}
+
+	DeleteCustomerResponseBulkItem struct {
+		Status sharedCommon.StatusBulk `json:"status"`
+	}
+
+	DeleteCustomersResponseBulk struct {
+		Status    sharedCommon.Status              `json:"status"`
+		BulkItems []DeleteCustomerResponseBulkItem `json:"requests"`
+	}
+
 	ContactPersons []ContactPerson
 	ContactPerson  struct {
 		ContactPersonID   int    `json:"contactPersonID"`
