@@ -7,6 +7,7 @@ import (
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -68,6 +69,40 @@ func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters ma
 		return nil, erro.NewFromError(fmt.Sprintf("%v request failed", apiMethod), err)
 	}
 	return resp, nil
+}
+
+type DestRespWithStatus interface {
+	GetStatus() *common.Status
+}
+
+func (cli *Client) Scan(ctx context.Context, apiMethod string, filters map[string]string, dest DestRespWithStatus) error {
+	resp, err := cli.SendRequest(ctx, apiMethod, filters)
+	if err != nil {
+		return erro.NewFromError(apiMethod +" request failed", err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return erro.NewFromError("unmarshalling of response has failed", err)
+	}
+
+	if err := json.Unmarshal(body, dest); err != nil {
+		return erro.NewFromError("unmarshalling of response failed", err)
+	}
+
+	status := dest.GetStatus()
+	if !IsJSONResponseOK(dest.GetStatus()) {
+		return erro.NewErplyErrorf(
+			status.ErrorCode.String(),
+			"request name: %s, error field: %s, response status: %s, body: %s",
+			status.Request,
+			status.ErrorField,
+			status.ResponseStatus,
+			string(body),
+		)
+	}
+
+	return nil
 }
 
 func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filters map[string]string) (*http.Response, error) {

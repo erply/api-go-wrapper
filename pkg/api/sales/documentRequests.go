@@ -30,18 +30,11 @@ func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]str
 	return res.ImportReports, nil
 }
 
-func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error) {
-	resp, err := cli.SendRequest(ctx, "savePurchaseDocument", filters)
-	if err != nil {
-		return nil, erro.NewFromError("savePurchaseDocument"+" request failed", err)
-	}
+func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]string) (resp PurchaseDocImportReports, err error) {
 	res := &SavePurchaseDocumentResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling savePurchaseDocumentResponse failed", err)
-	}
-
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewErplyError(res.Status.ErrorCode.String(), res.Status.Request+res.Status.ErrorField+": "+res.Status.ResponseStatus)
+	err = cli.Scan(ctx, "savePurchaseDocument", filters, res)
+	if err != nil {
+		return
 	}
 
 	if len(res.ImportReports) == 0 {
@@ -50,6 +43,45 @@ func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]
 
 	return res.ImportReports, nil
 }
+
+func (cli *Client) SavePurchaseDocumentBulk(
+	ctx context.Context,
+	bulkFilters []map[string]interface{},
+	baseFilters map[string]string,
+) (respBulk SavePurchaseDocumentResponseBulk, err error) {
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "savePurchaseDocument",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return respBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return respBulk, err
+	}
+
+	if err := json.Unmarshal(body, &respBulk); err != nil {
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SavePurchaseDocumentResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&respBulk.Status) {
+		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range respBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+		}
+	}
+
+	return respBulk, nil
+}
+
 func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error) {
 	resp, err := cli.SendRequest(ctx, "getSalesDocuments", filters)
 	if err != nil {

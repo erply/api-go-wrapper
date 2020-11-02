@@ -354,4 +354,61 @@ type (
 		Status    sharedCommon.Status                       `json:"status"`
 		BulkItems []RemoveAssortmentProductResponseBulkItem `json:"requests"`
 	}
+
+	SaveProductCategoryResult struct {
+		ProductCategoryID int `json:"productCategoryID"`
+	}
+
+	SaveProductCategoryResponse struct {
+		Status                     sharedCommon.Status         `json:"status"`
+		SaveProductCategoryResults []SaveProductCategoryResult `json:"records"`
+	}
+
+	SaveProductCategoryResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk     `json:"status"`
+		Records []SaveProductCategoryResult `json:"records"`
+	}
+
+	SaveProductCategoryResponseBulk struct {
+		Status    sharedCommon.Status                   `json:"status"`
+		BulkItems []SaveProductCategoryResponseBulkItem `json:"requests"`
+	}
+
+	SaveBrandResult struct {
+		BrandID int `json:"brandID"`
+	}
+
+	SaveBrandResultResponse struct {
+		Status           sharedCommon.Status `json:"status"`
+		SaveBrandResults []SaveBrandResult   `json:"records"`
+	}
+
+	SaveBrandResultResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []SaveBrandResult       `json:"records"`
+	}
+
+	SaveBrandResponseBulk struct {
+		Status    sharedCommon.Status               `json:"status"`
+		BulkItems []SaveBrandResultResponseBulkItem `json:"requests"`
+	}
+
+	SaveProductPriorityGroupResult struct {
+		PriorityGroupID int `json:"priorityGroupID"`
+	}
+
+	SaveProductPriorityGroupResponse struct {
+		Status                          sharedCommon.Status              `json:"status"`
+		SaveProductPriorityGroupResults []SaveProductPriorityGroupResult `json:"records"`
+	}
+
+	SaveProductPriorityGroupBulkItem struct {
+		Status  sharedCommon.StatusBulk          `json:"status"`
+		Records []SaveProductPriorityGroupResult `json:"records"`
+	}
+
+	SaveProductPriorityGroupResponseBulk struct {
+		Status    sharedCommon.Status                `json:"status"`
+		BulkItems []SaveProductPriorityGroupBulkItem `json:"requests"`
+	}
 )

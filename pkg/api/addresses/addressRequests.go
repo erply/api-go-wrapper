@@ -10,19 +10,12 @@ import (
 	"io/ioutil"
 )
 
-func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) ([]sharedCommon.Address, error) {
-	resp, err := cli.SendRequest(ctx, "getAddresses", filters)
-	if err != nil {
-		return nil, erro.NewFromError("GetAddresses request failed", err)
-	}
-
+func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) (addrs []sharedCommon.Address, err error) {
 	res := &Response{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetAddressesResponse failed", err)
-	}
 
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+	err = cli.Scan(ctx, "getAddresses", filters, res)
+	if err != nil {
+		return
 	}
 
 	return res.Addresses, nil

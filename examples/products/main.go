@@ -73,6 +73,18 @@ func main() {
 	RemoveAssortmentProducts(apiClient)
 
 	RemoveAssortmentProductsBulk(apiClient)
+
+	SaveProductCategory(apiClient)
+
+	SaveProductCategoryBulk(apiClient)
+
+	SaveBrand(apiClient)
+
+	SaveBrandBulk(apiClient)
+
+	SaveProductPriorityGroup(apiClient)
+
+	SaveProductPriorityGroupBulk(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -444,4 +456,119 @@ func RemoveAssortmentProductsBulk(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Printf("RemoveAssortmentProductsBulk:\n%+v\n", res)
+}
+
+func SaveProductCategory(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some prod category",
+		"code": "123",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductCategory(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveProductCategoryBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductCategoryBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveBrand(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some brand",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveBrand(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveBrandBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveBrandBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveProductPriorityGroup(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some prio group",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductPriorityGroup(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveProductPriorityGroupBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductPriorityGroupBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
 }
