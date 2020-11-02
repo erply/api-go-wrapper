@@ -354,4 +354,23 @@ type (
 		Status    sharedCommon.Status                       `json:"status"`
 		BulkItems []RemoveAssortmentProductResponseBulkItem `json:"requests"`
 	}
+
+	SaveProductCategoryResult struct {
+		ProductCategoryID int `json:"productCategoryID"`
+	}
+
+	SaveProductCategoryResponse struct {
+		Status                     sharedCommon.Status         `json:"status"`
+		SaveProductCategoryResults []SaveProductCategoryResult `json:"records"`
+	}
+
+	SaveProductCategoryResponseBulkItem struct {
+		Status  sharedCommon.StatusBulk     `json:"status"`
+		Records []SaveProductCategoryResult `json:"records"`
+	}
+
+	SaveProductCategoryResponseBulk struct {
+		Status    sharedCommon.Status                   `json:"status"`
+		BulkItems []SaveProductCategoryResponseBulkItem `json:"requests"`
+	}
 )

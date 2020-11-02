@@ -1181,3 +1181,155 @@ func TestRemoveAssortmentProductsBulk(t *testing.T) {
 	assert.Equal(t, "4", bulkResp.BulkItems[1].RemoveAssortmentProductResults[0].DeletedIDs)
 	assert.Equal(t, "5", bulkResp.BulkItems[1].RemoveAssortmentProductResults[0].ProductsNotInAssortment)
 }
+
+func TestSaveProductCategory(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveProductCategoryResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			SaveProductCategoryResults: []SaveProductCategoryResult{
+				{
+					ProductCategoryID: 123,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":        "someclient",
+			"sessionKey":        "somesess",
+			"request":           "saveProductCategory",
+			"productCategoryID": "100001021",
+			"name":              "some name",
+		})
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"productCategoryID": "100001021",
+		"name":              "some name",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedProdCategoryResp := SaveProductCategoryResult{
+		ProductCategoryID: 123,
+	}
+	prodCategoryRes, err := cl.SaveProductCategory(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedProdCategoryResp, prodCategoryRes)
+}
+
+func TestSaveProductCategoryBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"productCategoryID": "123",
+				"name":         "name 123",
+				"requestName":  "saveProductCategory",
+			},
+			{
+				"name":         "name 124",
+				"requestName":  "saveProductCategory",
+			},
+			{
+				"name":         "name 125",
+				"requestName":  "saveProductCategory",
+			},
+		})
+
+		bulkResp := SaveProductCategoryResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveProductCategoryResponseBulkItem{
+				{
+					Status: statusBulk,
+					Records: []SaveProductCategoryResult{
+						{
+							ProductCategoryID: 123,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SaveProductCategoryResult{
+						{
+							ProductCategoryID: 124,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SaveProductCategoryResult{
+						{
+							ProductCategoryID: 125,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productCategoryID": "123",
+			"name":         "name 123",
+		},
+		{
+			"name":         "name 124",
+		},
+		{
+			"name":         "name 125",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveProductCategoryBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 123, bulkResp.BulkItems[0].Records[0].ProductCategoryID)
+	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
+	assert.Equal(t, 124, bulkResp.BulkItems[1].Records[0].ProductCategoryID)
+	assert.Len(t, bulkResp.BulkItems[2].Records, 1)
+	assert.Equal(t, 125, bulkResp.BulkItems[2].Records[0].ProductCategoryID)
+}
