@@ -190,3 +190,111 @@ func (cli *Client) AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters 
 
 	return respBulk, nil
 }
+
+func (cli *Client) SaveCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (SaveCustomerResponseBulk, error) {
+	var saveCustomerResponseBulk SaveCustomerResponseBulk
+
+	if len(customerMap) > common2.MaxBulkRequestsCount {
+		return saveCustomerResponseBulk, fmt.Errorf("cannot save more than %d customers in one request", common2.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(customerMap))
+	for _, customer := range customerMap {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveCustomer",
+			Filters:    customer,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, attrs)
+	if err != nil {
+		return saveCustomerResponseBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return saveCustomerResponseBulk, err
+	}
+
+	if err := json.Unmarshal(body, &saveCustomerResponseBulk); err != nil {
+		return saveCustomerResponseBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveCustomerResponseBulk from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&saveCustomerResponseBulk.Status) {
+		return saveCustomerResponseBulk, erro.NewErplyError(saveCustomerResponseBulk.Status.ErrorCode.String(), saveCustomerResponseBulk.Status.Request+": "+saveCustomerResponseBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkItem := range saveCustomerResponseBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
+			return saveCustomerResponseBulk, erro.NewErplyError(
+				bulkItem.Status.ErrorCode.String(),
+				fmt.Sprintf("%+v", bulkItem.Status),
+			)
+		}
+	}
+
+	return saveCustomerResponseBulk, nil
+}
+
+func (cli *Client) DeleteCustomer(ctx context.Context, filters map[string]string) error {
+	resp, err := cli.SendRequest(ctx, "deleteCustomer", filters)
+	if err != nil {
+		return err
+	}
+
+	var res DeleteCustomerResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return erro.NewFromError("failed to unmarshal DeleteCustomerResponse ", err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return erro.NewFromResponseStatus(&res.Status)
+	}
+
+	return nil
+}
+
+func (cli *Client) DeleteCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (DeleteCustomersResponseBulk, error) {
+	var deleteCustomersResponse DeleteCustomersResponseBulk
+
+	if len(customerMap) > common2.MaxBulkRequestsCount {
+		return deleteCustomersResponse, fmt.Errorf("cannot delete more than %d customers in one request", common2.MaxBulkRequestsCount)
+	}
+
+	bulkInputs := make([]common.BulkInput, 0, len(customerMap))
+	for _, filter := range customerMap {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "deleteCustomer",
+			Filters:    filter,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, attrs)
+	if err != nil {
+		return deleteCustomersResponse, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return deleteCustomersResponse, err
+	}
+
+	if err := json.Unmarshal(body, &deleteCustomersResponse); err != nil {
+		return deleteCustomersResponse, fmt.Errorf("ERPLY API: failed to unmarshal DeleteCustomersResponseBulk from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&deleteCustomersResponse.Status) {
+		return deleteCustomersResponse, erro.NewErplyError(deleteCustomersResponse.Status.ErrorCode.String(), deleteCustomersResponse.Status.Request+": "+deleteCustomersResponse.Status.ResponseStatus)
+	}
+
+	for _, bulkItem := range deleteCustomersResponse.BulkItems {
+		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
+			return deleteCustomersResponse, erro.NewErplyError(
+				bulkItem.Status.ErrorCode.String(),
+				fmt.Sprintf("%+v", bulkItem.Status),
+			)
+		}
+	}
+
+	return deleteCustomersResponse, nil
+}

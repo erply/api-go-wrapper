@@ -324,3 +324,211 @@ func TestAddCustomerRewardPointsBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
+
+func TestSaveCustomersBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "saveCustomer",
+				"companyName":  "Some comp",
+				"firstName":   "Max",
+			},
+			{
+				"requestName": "saveCustomer",
+				"companyName":  "Some comp 2",
+				"firstName":   "Hans",
+			},
+		})
+
+		bulkResp := SaveCustomerResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveCustomerResponseBulkItem{
+				{
+					Status:  statusBulk,
+					Records: []SaveCustomerResp{{CustomerID: 3456}},
+				},
+				{
+					Status:  statusBulk,
+					Records: []SaveCustomerResp{{CustomerID: 3457}},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"companyName":  "Some comp",
+			"firstName":   "Max",
+		},
+		{
+			"companyName":  "Some comp 2",
+			"firstName":   "Hans",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveCustomerBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+	assert.Equal(t, []SaveCustomerResp{{CustomerID: 3456}}, bulkResp.BulkItems[0].Records)
+	assert.Equal(t, []SaveCustomerResp{{CustomerID: 3457}}, bulkResp.BulkItems[1].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func TestDeleteCustomersBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "deleteCustomer",
+				"customerID":  float64(123),
+			},
+			{
+				"requestName": "deleteCustomer",
+				"customerID":   float64(124),
+			},
+		})
+
+		bulkResp := DeleteCustomersResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []DeleteCustomerResponseBulkItem{
+				{
+					Status:  statusBulk,
+				},
+				{
+					Status:  statusBulk,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"customerID":  123,
+		},
+		{
+			"customerID":  124,
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.DeleteCustomerBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+}
+
+func TestDeleteCustomer(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := DeleteSupplierResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
+			"setContentType": "1",
+			"request":        "deleteCustomer",
+			"sessionKey":     "somesess",
+			"customerID":     "100000046",
+			"clientCode":     "someclient",
+		}, reqItems)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	err := suppliersClient.DeleteCustomer(
+		context.Background(),
+		map[string]string{
+			"customerID": "100000046",
+		},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+}

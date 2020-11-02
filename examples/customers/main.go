@@ -25,6 +25,9 @@ func main() {
 
 	AddCustomerRewardPoints(apiClient)
 	AddCustomerRewardPointsBulk(apiClient)
+	SaveCustomerBulk(apiClient)
+	DeleteCustomer(apiClient)
+	DeleteCustomerBulk(apiClient)
 }
 
 func GetCustomersBulk(cl *api.Client) (custmrs customers.Customers, err error) {
@@ -127,4 +130,66 @@ func AddCustomerRewardPointsBulk(cl *api.Client) {
 	resp, err := cli.AddCustomerRewardPointsBulk(ctx, req, map[string]string{})
 	common.Die(err)
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func SaveCustomerBulk(cl *api.Client) {
+	cli := cl.CustomerManager
+
+	req := []map[string]interface{}{
+		{
+			"companyName": "Some Company 1",
+		},
+		{
+			"companyName": "Some Company 2",
+		},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	resp, err := cli.SaveCustomerBulk(ctx, req, map[string]string{})
+	common.Die(err)
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(resp))
+}
+
+func DeleteCustomer(cl *api.Client) {
+	supplierCli := cl.CustomerManager
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	ids := map[string]string{
+		"customerID": "13379",
+	}
+	err := supplierCli.DeleteCustomer(ctx, ids)
+	common.Die(err)
+
+	fmt.Printf("Deleted customer %s", common.ConvertSourceToJsonStrIfPossible(ids))
+
+	return
+}
+
+func DeleteCustomerBulk(cl *api.Client) {
+	supplierCli := cl.CustomerManager
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	ids := []map[string]interface{}{
+		{
+			"customerID": "13380",
+		},
+		{
+			"customerID": "13381",
+		},
+		{
+			"customerID": "13382",
+		},
+	}
+	bulkResponse, err := supplierCli.DeleteCustomerBulk(ctx, ids, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResponse))
+
+	return
 }

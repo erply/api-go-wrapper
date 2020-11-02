@@ -78,6 +78,7 @@ func SaveSupplierBulk(cl *api.Client) (err error) {
 	return
 }
 
+
 func DeleteSupplierBulk(cl *api.Client) (err error) {
 	supplierCli := cl.CustomerManager
 
