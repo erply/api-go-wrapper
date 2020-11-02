@@ -1243,16 +1243,16 @@ func TestSaveProductCategoryBulk(t *testing.T) {
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"productCategoryID": "123",
-				"name":         "name 123",
-				"requestName":  "saveProductCategory",
+				"name":              "name 123",
+				"requestName":       "saveProductCategory",
 			},
 			{
-				"name":         "name 124",
-				"requestName":  "saveProductCategory",
+				"name":        "name 124",
+				"requestName": "saveProductCategory",
 			},
 			{
-				"name":         "name 125",
-				"requestName":  "saveProductCategory",
+				"name":        "name 125",
+				"requestName": "saveProductCategory",
 			},
 		})
 
@@ -1297,13 +1297,13 @@ func TestSaveProductCategoryBulk(t *testing.T) {
 	inpt := []map[string]interface{}{
 		{
 			"productCategoryID": "123",
-			"name":         "name 123",
+			"name":              "name 123",
 		},
 		{
-			"name":         "name 124",
+			"name": "name 124",
 		},
 		{
-			"name":         "name 125",
+			"name": "name 125",
 		},
 	}
 
@@ -1332,4 +1332,122 @@ func TestSaveProductCategoryBulk(t *testing.T) {
 	assert.Equal(t, 124, bulkResp.BulkItems[1].Records[0].ProductCategoryID)
 	assert.Len(t, bulkResp.BulkItems[2].Records, 1)
 	assert.Equal(t, 125, bulkResp.BulkItems[2].Records[0].ProductCategoryID)
+}
+
+func TestSaveBrand(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveBrandResultResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			SaveBrandResults: []SaveBrandResult{
+				{
+					BrandID: 123,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+			"request":    "saveBrand",
+			"brandID":    "100001021",
+			"name":       "some name",
+		})
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"brandID": "100001021",
+		"name":    "some name",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedRes := SaveBrandResult{
+		BrandID: 123,
+	}
+	actualRes, err := cl.SaveBrand(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedRes, actualRes)
+}
+
+func TestSaveBrandBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"brandID": "123",
+				"name":              "name 123",
+				"requestName":       "saveBrand",
+			},
+		})
+
+		bulkResp := SaveBrandResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveBrandResultResponseBulkItem{
+				{
+					Status: statusBulk,
+					Records: []SaveBrandResult{
+						{
+							BrandID: 123,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"brandID": "123",
+			"name":              "name 123",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveBrandBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 1)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 123, bulkResp.BulkItems[0].Records[0].BrandID)
 }

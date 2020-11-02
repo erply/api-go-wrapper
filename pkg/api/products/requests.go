@@ -597,3 +597,61 @@ func (cli *Client) SaveProductCategoryBulk(
 
 	return respBulk, nil
 }
+
+
+func (cli *Client) SaveBrand(ctx context.Context, filters map[string]string) (result SaveBrandResult, err error) {
+	resp, err := cli.SendRequest(ctx, "saveBrand", filters)
+	if err != nil {
+		return result, err
+	}
+	var res SaveBrandResultResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return result, erro.NewFromError("failed to unmarshal SaveBrandResultResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return result, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.SaveBrandResults) > 0 {
+		return res.SaveBrandResults[0], nil
+	}
+
+	return result, nil
+}
+
+func (cli *Client) SaveBrandBulk(
+	ctx context.Context,
+	bulkFilters []map[string]interface{},
+	baseFilters map[string]string,
+) (respBulk SaveBrandResponseBulk, err error) {
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveBrand",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return respBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return respBulk, err
+	}
+
+	if err := json.Unmarshal(body, &respBulk); err != nil {
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveBrandResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&respBulk.Status) {
+		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range respBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+		}
+	}
+
+	return respBulk, nil
+}

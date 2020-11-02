@@ -77,6 +77,10 @@ func main() {
 	SaveProductCategory(apiClient)
 
 	SaveProductCategoryBulk(apiClient)
+
+	SaveBrand(apiClient)
+
+	SaveBrandBulk(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -484,6 +488,44 @@ func SaveProductCategoryBulk(cl *api.Client) {
 	defer cancel()
 
 	res, err := prodCli.SaveProductCategoryBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveBrand(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some brand",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveBrand(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveBrandBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveBrandBulk(ctx, filter, map[string]string{})
 	common.Die(err)
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))

@@ -32,4 +32,10 @@ type Manager interface {
 		bulkFilters []map[string]interface{},
 		baseFilters map[string]string,
 	) (respBulk SaveProductCategoryResponseBulk, err error)
+	SaveBrand(ctx context.Context, filters map[string]string) (result SaveBrandResult, err error)
+	SaveBrandBulk(
+		ctx context.Context,
+		bulkFilters []map[string]interface{},
+		baseFilters map[string]string,
+	) (respBulk SaveBrandResponseBulk, err error)
 }
