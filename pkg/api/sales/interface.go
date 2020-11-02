@@ -14,6 +14,11 @@ type (
 		GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSaleDocumentResponseBulk, error)
 		DeleteDocument(ctx context.Context, filters map[string]string) error
 		SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
+		SavePurchaseDocumentBulk(
+			ctx context.Context,
+			bulkFilters []map[string]interface{},
+			baseFilters map[string]string,
+		) (respBulk SavePurchaseDocumentResponseBulk, err error)
 	}
 
 	VatRateManager interface {

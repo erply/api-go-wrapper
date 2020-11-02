@@ -28,6 +28,9 @@ func main() {
 	common.Die(err)
 
 	fmt.Printf("GetPurchaseDocumentsInParallel: %+v\n", purchaseDocumentsParallel)
+
+	SavePurchaseDocument(apiClient)
+	SavePurchaseDocumentBulk(apiClient)
 }
 
 func GetPurchaseDocumentsBulk(cl *api.Client) (docs []documents.PurchaseDocument, err error) {
@@ -117,4 +120,77 @@ func GetPurchaseDocumentsInParallel(cl *api.Client) ([]documents.PurchaseDocumen
 
 	<-doneChan
 	return purchaseDocuments, err
+}
+
+func SaveBrandBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveBrandBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SavePurchaseDocument(cl *api.Client) {
+	docCli := cl.SalesManager
+
+	filter := map[string]string{
+		"warehouseID":  "1",
+		"currencyCode": "EUR",
+		"no":           "123",
+		"supplierID":   "13383",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := docCli.SavePurchaseDocument(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SavePurchaseDocumentBulk(cl *api.Client) {
+	prodCli := cl.SalesManager
+
+	filter := []map[string]interface{}{
+		{
+			"warehouseID":  "1",
+			"currencyCode": "EUR",
+			"no":           "124",
+			"supplierID":   "13383",
+		},
+		{
+			"warehouseID":  "2",
+			"currencyCode": "EUR",
+			"no":           "125",
+			"supplierID":   "13383",
+		},
+		{
+			"warehouseID":  "3",
+			"currencyCode": "EUR",
+			"no":           "126",
+			"supplierID":   "13383",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SavePurchaseDocumentBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
 }

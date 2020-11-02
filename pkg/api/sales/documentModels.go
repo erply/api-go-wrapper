@@ -187,9 +187,12 @@ type (
 	PurchaseDocImportReports []PurchaseDocImportReport
 	PurchaseDocImportReport  struct {
 		InvoiceID    int     `json:"invoiceID"`
-		CustomNumber string  `json:"customNumber"`
-		Rounding     int     `json:"rounding"`
+		InvoiceRegNo string  `json:"invoiceRegNo"`
+		InvoiceNo    string  `json:"invoiceNo"`
+		InvoiceLink  string  `json:"invoiceLink"`
+		Vat          float64 `json:"vat"`
 		Total        float64 `json:"total"`
+		Net          float64 `json:"net"`
 	}
 
 	SavePurchaseDocumentResponse struct {
@@ -206,4 +209,18 @@ type (
 		Status    sharedCommon.Status       `json:"status"`
 		BulkItems []GetSaleDocumentBulkItem `json:"requests"`
 	}
+
+	SavePurchaseDocumentBulkItem struct {
+		Status  sharedCommon.StatusBulk  `json:"status"`
+		Records PurchaseDocImportReports `json:"records"`
+	}
+
+	SavePurchaseDocumentResponseBulk struct {
+		Status    sharedCommon.Status            `json:"status"`
+		BulkItems []SavePurchaseDocumentBulkItem `json:"requests"`
+	}
 )
+
+func (spdr SavePurchaseDocumentResponse) GetStatus() *sharedCommon.Status {
+	return &spdr.Status
+}

@@ -48,3 +48,7 @@ type (
 		BulkItems []DeleteAddressBulkItem `json:"requests"`
 	}
 )
+
+func (r Response) GetStatus() *sharedCommon.Status {
+	return &r.Status
+}

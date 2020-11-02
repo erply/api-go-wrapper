@@ -20,6 +20,10 @@ func NewErplyError(status, msg string) *ErplyError {
 	return &ErplyError{Status: status, Message: msg}
 }
 
+func NewErplyErrorf(status, msg string, args ...interface{}) *ErplyError {
+	return &ErplyError{Status: status, Message: fmt.Sprintf(msg, args...)}
+}
+
 func NewFromResponseStatus(status *common.Status) *ErplyError {
 	var s string
 	if status.ErrorField != "" {
