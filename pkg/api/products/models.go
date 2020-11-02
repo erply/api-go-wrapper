@@ -392,4 +392,23 @@ type (
 		Status    sharedCommon.Status               `json:"status"`
 		BulkItems []SaveBrandResultResponseBulkItem `json:"requests"`
 	}
+
+	SaveProductPriorityGroupResult struct {
+		PriorityGroupID int `json:"priorityGroupID"`
+	}
+
+	SaveProductPriorityGroupResponse struct {
+		Status                          sharedCommon.Status              `json:"status"`
+		SaveProductPriorityGroupResults []SaveProductPriorityGroupResult `json:"records"`
+	}
+
+	SaveProductPriorityGroupBulkItem struct {
+		Status  sharedCommon.StatusBulk          `json:"status"`
+		Records []SaveProductPriorityGroupResult `json:"records"`
+	}
+
+	SaveProductPriorityGroupResponseBulk struct {
+		Status    sharedCommon.Status                `json:"status"`
+		BulkItems []SaveProductPriorityGroupBulkItem `json:"requests"`
+	}
 )

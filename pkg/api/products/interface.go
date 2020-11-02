@@ -38,4 +38,10 @@ type Manager interface {
 		bulkFilters []map[string]interface{},
 		baseFilters map[string]string,
 	) (respBulk SaveBrandResponseBulk, err error)
+	SaveProductPriorityGroup(ctx context.Context, filters map[string]string) (result SaveProductPriorityGroupResult, err error)
+	SaveProductPriorityGroupBulk(
+		ctx context.Context,
+		bulkFilters []map[string]interface{},
+		baseFilters map[string]string,
+	) (respBulk SaveProductPriorityGroupResponseBulk, err error)
 }
