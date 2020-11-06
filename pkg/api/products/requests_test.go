@@ -1394,9 +1394,9 @@ func TestSaveBrandBulk(t *testing.T) {
 
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
-				"brandID": "123",
-				"name":              "name 123",
-				"requestName":       "saveBrand",
+				"brandID":     "123",
+				"name":        "name 123",
+				"requestName": "saveBrand",
 			},
 		})
 
@@ -1425,7 +1425,7 @@ func TestSaveBrandBulk(t *testing.T) {
 	inpt := []map[string]interface{}{
 		{
 			"brandID": "123",
-			"name":              "name 123",
+			"name":    "name 123",
 		},
 	}
 
@@ -1479,7 +1479,7 @@ func TestSaveProductPriorityGroup(t *testing.T) {
 	defer srv.Close()
 
 	inpt := map[string]string{
-		"name":    "some name",
+		"name": "some name",
 	}
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
@@ -1511,12 +1511,12 @@ func TestSaveProductPriorityGroupBulk(t *testing.T) {
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"priorityGroupID": "123",
-				"name":              "name 123",
-				"requestName":       "saveProductPriorityGroup",
+				"name":            "name 123",
+				"requestName":     "saveProductPriorityGroup",
 			},
 			{
-				"name":              "name 124",
-				"requestName":       "saveProductPriorityGroup",
+				"name":        "name 124",
+				"requestName": "saveProductPriorityGroup",
 			},
 		})
 
@@ -1553,10 +1553,10 @@ func TestSaveProductPriorityGroupBulk(t *testing.T) {
 	inpt := []map[string]interface{}{
 		{
 			"priorityGroupID": "123",
-			"name":              "name 123",
+			"name":            "name 123",
 		},
 		{
-			"name":              "name 124",
+			"name": "name 124",
 		},
 	}
 
@@ -1585,4 +1585,266 @@ func TestSaveProductPriorityGroupBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
 	assert.Equal(t, 124, bulkResp.BulkItems[1].Records[0].PriorityGroupID)
+}
+
+func TestSaveProductGroup(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveProductGroupResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			SaveProductGroupResults: []SaveProductGroupResult{
+				{
+					ProductGroupID: 123,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+			"request":    "saveProductGroup",
+			"name":       "some name",
+		})
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"name": "some name",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	expectedRes := SaveProductGroupResult{
+		ProductGroupID: 123,
+	}
+	actualRes, err := cl.SaveProductGroup(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+	assert.Equal(t, expectedRes, actualRes)
+}
+
+func TestSaveProductGroupBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"productGroupID": "123",
+				"name":           "name 123",
+				"requestName":    "saveProductGroup",
+			},
+			{
+				"name":        "name 124",
+				"requestName": "saveProductGroup",
+			},
+		})
+
+		bulkResp := SaveProductGroupResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SaveProductGroupBulkItem{
+				{
+					Status: statusBulk,
+					Records: []SaveProductGroupResult{
+						{
+							ProductGroupID: 123,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SaveProductGroupResult{
+						{
+							ProductGroupID: 124,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productGroupID": "123",
+			"name":           "name 123",
+		},
+		{
+			"name": "name 124",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SaveProductGroupBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 123, bulkResp.BulkItems[0].Records[0].ProductGroupID)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
+	assert.Equal(t, 124, bulkResp.BulkItems[1].Records[0].ProductGroupID)
+}
+
+func TestDeleteProductGroup(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := DeleteProductGroupResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+			"request":    "deleteProductGroup",
+			"productGroupID":  "100001021",
+		})
+
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"productGroupID": "100001021",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	err := cl.DeleteProductGroup(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+}
+
+func TestDeleteProductGroupBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		if err != nil {
+			return
+		}
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "deleteProductGroup",
+				"productGroupID":   "123",
+			},
+			{
+				"requestName": "deleteProductGroup",
+				"productGroupID":   "124",
+			},
+			{
+				"requestName": "deleteProductGroup",
+				"productGroupID":   "125",
+			},
+		})
+
+		bulkResp := DeleteProductGroupResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []DeleteProductGroupResponseBulkItem{
+				{
+					Status: statusBulk,
+				},
+				{
+					Status: statusBulk,
+				},
+				{
+					Status: statusBulk,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"productGroupID": "123",
+		},
+		{
+			"productGroupID": "124",
+		},
+		{
+			"productGroupID": "125",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.DeleteProductGroupBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
 }

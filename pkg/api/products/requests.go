@@ -711,3 +711,111 @@ func (cli *Client) SaveProductPriorityGroupBulk(
 
 	return respBulk, nil
 }
+
+func (cli *Client) SaveProductGroup(ctx context.Context, filters map[string]string) (result SaveProductGroupResult, err error) {
+	resp, err := cli.SendRequest(ctx, "saveProductGroup", filters)
+	if err != nil {
+		return result, err
+	}
+	var res SaveProductGroupResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return result, erro.NewFromError("failed to unmarshal SaveProductGroupResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return result, erro.NewFromResponseStatus(&res.Status)
+	}
+	if len(res.SaveProductGroupResults) > 0 {
+		return res.SaveProductGroupResults[0], nil
+	}
+
+	return result, nil
+}
+
+func (cli *Client) SaveProductGroupBulk(
+	ctx context.Context,
+	bulkFilters []map[string]interface{},
+	baseFilters map[string]string,
+) (respBulk SaveProductGroupResponseBulk, err error) {
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "saveProductGroup",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return respBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return respBulk, err
+	}
+
+	if err := json.Unmarshal(body, &respBulk); err != nil {
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductGroupResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&respBulk.Status) {
+		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range respBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+		}
+	}
+
+	return respBulk, nil
+}
+
+
+func (cli *Client) DeleteProductGroup(ctx context.Context, filters map[string]string) error {
+	resp, err := cli.SendRequest(ctx, "deleteProductGroup", filters)
+	if err != nil {
+		return err
+	}
+	var res DeleteProductGroupResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return erro.NewFromError("failed to unmarshal DeleteProductGroupResponse", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return erro.NewFromResponseStatus(&res.Status)
+	}
+	return nil
+}
+
+func (cli *Client) DeleteProductGroupBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductGroupResponseBulk, error) {
+	var deleteRespBulk DeleteProductGroupResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "deleteProductGroup",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return deleteRespBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return deleteRespBulk, err
+	}
+
+	if err := json.Unmarshal(body, &deleteRespBulk); err != nil {
+		return deleteRespBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductGroupResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&deleteRespBulk.Status) {
+		return deleteRespBulk, erro.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range deleteRespBulk.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return deleteRespBulk, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return deleteRespBulk, nil
+}

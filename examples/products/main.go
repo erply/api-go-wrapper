@@ -85,6 +85,14 @@ func main() {
 	SaveProductPriorityGroup(apiClient)
 
 	SaveProductPriorityGroupBulk(apiClient)
+
+	SaveProductGroup(apiClient)
+
+	SaveProductGroupBulk(apiClient)
+
+	DeleteProductGroup(apiClient)
+
+	DeleteProductGroupBulk(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
@@ -571,4 +579,79 @@ func SaveProductPriorityGroupBulk(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveProductGroup(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"name": "some product group",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductGroup(ctx, filter)
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func SaveProductGroupBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"name": "onetwothree",
+		},
+		{
+			"name": "onefour",
+		},
+		{
+			"name": "twor",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.SaveProductGroupBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+
+func DeleteProductGroup(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := map[string]string{
+		"productGroupID": "105",
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	err := prodCli.DeleteProductGroup(ctx, filter)
+	common.Die(err)
+}
+
+func DeleteProductGroupBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"productGroupID": "106",
+		},
+		{
+			"productGroupID": "107",
+		},
+		{
+			"productGroupID": "108",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := prodCli.DeleteProductGroupBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
 }
