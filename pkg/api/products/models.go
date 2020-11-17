@@ -38,6 +38,14 @@ type (
 		DimensionValueID int    `json:"dimensionValueID"`
 	}
 
+	VariationDescription struct {
+		Name        string `json:"name"`
+		Value       string `json:"value"`
+		Order       int    `json:"order"`
+		DimensionID int    `json:"dimensionID"`
+		VariationID int    `json:"variationID"`
+	}
+
 	ProductVariaton struct {
 		ProductID  string              `json:"productID"`
 		Name       string              `json:"name"`
@@ -46,78 +54,220 @@ type (
 		Dimensions []ProductDimensions `json:"dimensions"`
 	}
 
+	ProductPackage struct {
+		PackageID          int     `json:"packageID"`
+		PackageType        string  `json:"packageType"`
+		PackageTypeID      int     `json:"packageTypeID"`
+		PackageAmount      float64 `json:"packageAmount"`
+		PackageCode        string  `json:"packageCode"`
+		PackageNetWeight   float64 `json:"packageNetWeight"`
+		PackageGrossWeight float64 `json:"packageGrossWeight"`
+		PackageLength      float64 `json:"packageLength"`
+		PackageWidth       float64 `json:"packageWidth"`
+		PackageHeight      float64 `json:"packageHeight"`
+	}
+
+	ProductFile struct {
+		FileID            int    `json:"fileID"`
+		Name              string `json:"name"`
+		TypeID            int    `json:"typeID"`
+		TypeName          string `json:"typeName"`
+		IsInformationFile int    `json:"isInformationFile"`
+		FileURL           string `json:"fileURL"`
+		External          int    `json:"external"`
+		HostingProvider   string `json:"hostingProvider"`
+	}
+
+	ProductComponent struct {
+		ComponentID int     `json:"componentID"`
+		Amount      float64 `json:"amount"`
+	}
+
+	PriceCalculationStep struct {
+		PriceListID   int     `json:"priceListID"`
+		PriceListName string  `json:"priceListName"`
+		Price         float64 `json:"price"`
+		Discount      float64 `json:"discount"`
+		Type          string  `json:"type"`
+		Percentage    float64 `json:"percentage"`
+	}
+
 	//Payload ...
 	Product struct {
 		ProductID int `json:"productID"`
 		Active    int `json:"active"`
 		NameLanguages
-		Code               string             `json:"code"`
-		Code2              string             `json:"code2"`
-		Code3              *string            `json:"code3"`
-		GroupID            uint               `json:"groupID"`
-		Price              float64            `json:"price"`
-		DisplayedInWebshop byte               `json:"displayedInWebshop"`
-		BrandID            uint               `json:"brandID"`
-		Description        string             `json:"description"`
-		DescriptionLong    string             `json:"longdesc"`
-		DescriptionEng     string             `json:"descriptionENG"`
-		DescriptionLongEng string             `json:"longdescENG"`
-		DescriptionSpa     string             `json:"descriptionSPA"`
-		DescriptionLongSpa string             `json:"longdescSPA"`
-		DescriptionEst     string             `json:"descriptionEST"`
-		DescriptionLongEst string             `json:"longdescEST"`
-		DescriptionGer     string             `json:"descriptionGER"`
-		DescriptionLongGer string             `json:"longdescGER"`
-		DescriptionSwe     string             `json:"descriptionSWE"`
-		DescriptionLongSwe string             `json:"longdescSWE"`
-		DescriptionFin     string             `json:"descriptionFIN"`
-		DescriptionLongFin string             `json:"longdescFIN"`
-		DescriptionRus     string             `json:"descriptionRUS"`
-		DescriptionLongRus string             `json:"longdescRUS"`
-		DescriptionLat     string             `json:"descriptionLAT"`
-		DescriptionLongLat string             `json:"longdescLAT"`
-		DescriptionLit     string             `json:"descriptionLIT"`
-		DescriptionLongLit string             `json:"longdescLIT"`
-		DescriptionGre     string             `json:"descriptionGRE"`
-		DescriptionLongGre string             `json:"longdescGRE"`
-		Added              uint64             `json:"added"`
-		LastModified       uint64             `json:"lastModified"`
-		Vatrate            float64            `json:"vatrate"`
-		PriceWithVat       float32            `json:"priceWithVat"`
-		GrossWeight        string             `json:"grossWeight"`
-		NetWeight          string             `json:"netWeight"`
-		UnitName           *string            `json:"unitName"`
-		BrandName          string             `json:"brandName"`
-		GroupName          string             `json:"groupName"`
-		CategoryId         uint               `json:"categoryID"`
-		CategoryName       string             `json:"categoryName"`
-		Status             string             `json:"status"`
-		SupplierID         int                `json:"supplierID"`
-		Images             []ProductImage     `json:"images"`
-		ProductVariations  []string           `json:"productVariations"` // Variations of matrix product
-		ParentProductID    int                `json:"parentProductID"`
-		NonStockProduct    int                `json:"nonStockProduct"`
-		TaxFree            int                `json:"taxFree"`
-		ContainerID        int                `json:"containerID"`
-		Type               string             `json:"type"`
-		Warehouses         map[uint]StockInfo `json:"warehouses"`
-		Parameters         []Parameter        `json:"parameters"`
-		RelatedProducts    []string           `json:"relatedProducts"`
-		VariationList      []ProductVariaton  `json:"variationList"`
+		Code                         string                 `json:"code"`
+		Code2                        string                 `json:"code2"`
+		Code3                        *string                `json:"code3"`
+		SupplierCode                 string                 `json:"supplierCode"`
+		Code5                        *string                `json:"code5"`
+		Code6                        *string                `json:"code6"`
+		Code7                        *string                `json:"code7"`
+		Code8                        *string                `json:"code8"`
+		GroupID                      uint                   `json:"groupID"`
+		Price                        float64                `json:"price"`
+		Cost                         float64                `json:"cost"`
+		FifoCost                     float64                `json:"FIFOCost"`
+		DisplayedInWebshop           byte                   `json:"displayedInWebshop"`
+		BrandID                      uint                   `json:"brandID"`
+		Description                  string                 `json:"description"`
+		DescriptionLong              string                 `json:"longdesc"`
+		DescriptionEng               string                 `json:"descriptionENG"`
+		DescriptionLongEng           string                 `json:"longdescENG"`
+		DescriptionSpa               string                 `json:"descriptionSPA"`
+		DescriptionLongSpa           string                 `json:"longdescSPA"`
+		DescriptionEst               string                 `json:"descriptionEST"`
+		DescriptionLongEst           string                 `json:"longdescEST"`
+		DescriptionGer               string                 `json:"descriptionGER"`
+		DescriptionLongGer           string                 `json:"longdescGER"`
+		DescriptionSwe               string                 `json:"descriptionSWE"`
+		DescriptionLongSwe           string                 `json:"longdescSWE"`
+		DescriptionFin               string                 `json:"descriptionFIN"`
+		DescriptionLongFin           string                 `json:"longdescFIN"`
+		DescriptionRus               string                 `json:"descriptionRUS"`
+		DescriptionLongRus           string                 `json:"longdescRUS"`
+		DescriptionLat               string                 `json:"descriptionLAT"`
+		DescriptionLongLat           string                 `json:"longdescLAT"`
+		DescriptionLit               string                 `json:"descriptionLIT"`
+		DescriptionLongLit           string                 `json:"longdescLIT"`
+		DescriptionGre               string                 `json:"descriptionGRE"`
+		DescriptionLongGre           string                 `json:"longdescGRE"`
+		AddedByUsername              string                 `json:"addedByUsername"`
+		LastModifiedByUsername       string                 `json:"lastModifiedByUsername"`
+		Added                        uint64                 `json:"added"`
+		LastModified                 uint64                 `json:"lastModified"`
+		VatrateID                    uint64                 `json:"vatrateID"`
+		Vatrate                      float64                `json:"vatrate"`
+		PriceWithVat                 float64                `json:"priceWithVat"`
+		BackbarCharges               float64                `json:"backbarCharges"`
+		PurchasePrice                float64                `json:"purchasePrice"`
+		PriceListPrice               float64                `json:"priceListPrice"`
+		PriceListPriceWithVat        float64                `json:"priceListPriceWithVat"`
+		GrossWeight                  string                 `json:"grossWeight"`
+		NetWeight                    string                 `json:"netWeight"`
+		UnitName                     *string                `json:"unitName"`
+		BrandName                    string                 `json:"brandName"`
+		GroupName                    string                 `json:"groupName"`
+		CategoryId                   uint                   `json:"categoryID"`
+		UnitID                       uint                   `json:"unitID"`
+		CategoryName                 string                 `json:"categoryName"`
+		Status                       string                 `json:"status"`
+		SupplierID                   int                    `json:"supplierID"`
+		HasQuickSelectButton         int                    `json:"hasQuickSelectButton"`
+		IsGiftCard                   int                    `json:"isGiftCard"`
+		IsRegularGiftCard            int                    `json:"isRegularGiftCard"`
+		PriorityGroupID              string                 `json:"priorityGroupID"`
+		CountryOfOriginID            string                 `json:"countryOfOriginID"`
+		LocationInWarehouseID        string                 `json:"locationInWarehouseID"`
+		NonDiscountable              int                    `json:"nonDiscountable"`
+		NonRefundable                int                    `json:"nonRefundable"`
+		SupplierName                 string                 `json:"supplierName"`
+		ManufacturerName             string                 `json:"manufacturerName"`
+		Images                       []ProductImage         `json:"images"`
+		ProductVariations            []string               `json:"productVariations"` // Variations of matrix product
+		ParentProductID              int                    `json:"parentProductID"`
+		NonStockProduct              int                    `json:"nonStockProduct"`
+		CashierMustEnterPrice        int                    `json:"cashierMustEnterPrice"`
+		TaxFree                      int                    `json:"taxFree"`
+		ContainerID                  int                    `json:"containerID"`
+		Width                        string                 `json:"width"`
+		Height                       string                 `json:"height"`
+		Length                       string                 `json:"length"`
+		LengthInMinutes              int                    `json:"lengthInMinutes"`
+		SetupTimeInMinutes           int                    `json:"setupTimeInMinutes"`
+		CleanupTimeInMinutes         int                    `json:"cleanupTimeInMinutes"`
+		WalkInService                int                    `json:"walkInService"`
+		RewardPointsNotAllowed       int                    `json:"rewardPointsNotAllowed"`
+		Volume                       string                 `json:"volume"`
+		ReorderMultiple              int                    `json:"reorderMultiple"`
+		ExtraField1ID                int                    `json:"extraField1ID"`
+		ExtraField2ID                int                    `json:"extraField2ID"`
+		ExtraField3ID                int                    `json:"extraField3ID"`
+		ExtraField4ID                int                    `json:"extraField4ID"`
+		Type                         string                 `json:"type"`
+		DeliveryTime                 string                 `json:"deliveryTime"`
+		ContainerName                string                 `json:"containerName"`
+		ContainerCode                string                 `json:"containerCode"`
+		ContainerAmount              string                 `json:"containerAmount"`
+		PackagingType                string                 `json:"packagingType"`
+		LocationInWarehouse          string                 `json:"locationInWarehouse"`
+		LocationInWarehouseName      string                 `json:"locationInWarehouseName"`
+		LocationInWarehouseText      string                 `json:"locationInWarehouseText"`
+		ExtraField1Title             string                 `json:"extraField1Title"`
+		ExtraField1Code              string                 `json:"extraField1Code"`
+		ExtraField1Name              string                 `json:"extraField1Name"`
+		ExtraField2Name              string                 `json:"extraField2Name"`
+		ExtraField3Title             string                 `json:"extraField3Title"`
+		ExtraField2Title             string                 `json:"extraField2Title"`
+		ExtraField2Code              string                 `json:"extraField2Code"`
+		ExtraField3Code              string                 `json:"extraField3Code"`
+		ExtraField3Name              string                 `json:"extraField3Name"`
+		ExtraField4Title             string                 `json:"extraField4Title"`
+		ExtraField4Code              string                 `json:"extraField4Code"`
+		ExtraField4Name              string                 `json:"extraField4Name"`
+		SalesPackageClearBrownGlass  string                 `json:"salesPackageClearBrownGlass"`
+		SalesPackageGreenOtherGlass  string                 `json:"salesPackageGreenOtherGlass"`
+		SalesPackagePlasticPpPe      string                 `json:"salesPackagePlasticPpPe"`
+		SalesPackagePlasticPet       string                `json:"salesPackagePlasticPet"`
+		SalesPackageMetalFe          string                `json:"salesPackageMetalFe"`
+		SalesPackageMetalAl          string                `json:"salesPackageMetalAl"`
+		SalesPackageOtherMetal       string                `json:"salesPackageOtherMetal"`
+		SalesPackageCardboard        string                `json:"salesPackageCardboard"`
+		SalesPackageWood             string                `json:"salesPackageWood"`
+		GroupPackagePaper            string                `json:"groupPackagePaper"`
+		GroupPackagePlastic          string                `json:"groupPackagePlastic"`
+		GroupPackageMetal            string                `json:"groupPackageMetal"`
+		GroupPackageWood             string                `json:"groupPackageWood"`
+		TransportPackageWood         string                `json:"transportPackageWood"`
+		TransportPackagePlastic      string                `json:"transportPackagePlastic"`
+		TransportPackageCardboard    string                `json:"transportPackageCardboar"`
+		RegistryNumber               string                 `json:"registryNumber"`
+		AlcoholPercentage            string                 `json:"alcoholPercentage"`
+		Batches                      string                 `json:"batches"`
+		ExciseDeclaration            string                 `json:"exciseDeclaration"`
+		ExciseFermentedProductUnder6 string                 `json:"exciseFermentedProductUnder6"`
+		ExciseWineOver6              string                 `json:"exciseWineOver6"`
+		ExciseFermentedProductOver6  string                 `json:"exciseFermentedProductOver6"`
+		ExciseIntermediateProduct    string                 `json:"exciseIntermediateProduct"`
+		ExciseOtherAlcohol           string                 `json:"exciseOtherAlcohol"`
+		ExcisePackaging              string                 `json:"excisePackaging"`
+		Warehouses                   map[uint]StockInfo     `json:"warehouses"`
+		Parameters                   []Parameter            `json:"parameters"`
+		RelatedProducts              []string               `json:"relatedProducts"`
+		VariationList                []ProductVariaton      `json:"variationList"`
+		VariationDescriptions        []VariationDescription `json:"variationDescription"`
+		ProductPackages              []ProductPackage       `json:"productPackages"`
+		ReplacementProducts          []string               `json:"replacementProducts"`
+		RelatedFiles                 []ProductFile          `json:"relatedFiles"`
+		ProductComponents            []ProductComponent     `json:"productComponents"`
+		PriceCalculationSteps        []PriceCalculationStep `json:"priceCalculationSteps"`
+		sharedCommon.Attributes
+		sharedCommon.LongAttributes
+	}
+
+	Option struct {
+		ID              int     `json:"optionID"`
+		Name            string  `json:"optionName"`
+		AdditionalPrice float64 `json:"optionAdditionalPrice"`
 	}
 
 	Parameter struct {
-		ID      string `json:"parameterID"`
-		Name    string `json:"parameterName"`
-		Type    string `json:"parameterType"`
-		GroupID string `json:"parameterGroupID"`
-		Value   string `json:"parameterValue"`
+		ID      string   `json:"parameterID"`
+		Name    string   `json:"parameterName"`
+		Type    string   `json:"parameterType"`
+		GroupID string   `json:"parameterGroupID"`
+		Value   string   `json:"parameterValue"`
+		Options []Option `json:"parameterOptions"`
 	}
+
 	StockInfo struct {
 		WarehouseID   uint    `json:"warehouseID"`
 		Free          float64 `json:"free"`
 		OrderPending  int     `json:"orderPending"`
 		ReorderPoint  int     `json:"reorderPoint"`
+		Reserved      int     `json:"reserved"`
+		TotalInStock  int     `json:"totalInStock"`
 		RestockLevel  float64 `json:"restockLevel"`
 		FifoCost      float32 `json:"FIFOCost"`
 		PurchasePrice float32 `json:"purchasePrice"`

@@ -33,12 +33,9 @@ func main() {
 	common.Die(err)
 	fmt.Printf("GetProductGroups:\n%+v\n", prodGroups)
 
-	prods, err := GetProductsBulk(apiClient)
-	common.Die(err)
+	GetProductsBulk(apiClient)
 
-	fmt.Printf("GetProductsBulk:\n%+v\n", prods)
-
-	prods, err = GetProductsInParallel(apiClient)
+	prods, err := GetProductsInParallel(apiClient)
 	common.Die(err)
 	fmt.Printf("GetProductsInParallel:\n%+v\n", prods)
 
@@ -95,35 +92,29 @@ func main() {
 	DeleteProductGroupBulk(apiClient)
 }
 
-func GetProductsBulk(cl *api.Client) (prods []products.Product, err error) {
+func GetProductsBulk(cl *api.Client) {
 	prodCli := cl.ProductManager
 
 	bulkFilters := []map[string]interface{}{
 		{
-			"code": "266844",
-		},
-		{
-			"code": "437423",
-		},
-		{
-			"code": "87001",
+			"recordsOnPage": "10",
+			"pageNo": "1",
+			"getAllLanguages": "1",
+			"getFIFOCost": "1",
+			"getMatrixVariations": "1",
+			"getPackageInfo": "1",
+			"getPriceCalculationSteps": 1,
+			"getPackagingMaterials": "1",
+			"getParameters": "1",
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
 	bulkResp, err := prodCli.GetProductsBulk(ctx, bulkFilters, map[string]string{})
-	if err != nil {
-		return
-	}
+	common.Die(err)
 
-	for _, bulkItem := range bulkResp.BulkItems {
-		for _, prod := range bulkItem.Products {
-			prods = append(prods, prod)
-		}
-	}
-
-	return
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
 }
 
 func GetProductsInParallel(cl *api.Client) ([]products.Product, error) {
@@ -618,7 +609,6 @@ func SaveProductGroupBulk(cl *api.Client) {
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
 }
-
 
 func DeleteProductGroup(cl *api.Client) {
 	prodCli := cl.ProductManager

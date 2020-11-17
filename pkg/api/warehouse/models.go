@@ -44,11 +44,7 @@ type (
 		DefaultCustomerGroupID int         `json:"defaultCustomerGroupID"`
 		IsOfflineInventory     int         `json:"isOfflineInventory"`
 		TimeZone               string      `json:"timeZone"`
-		Attributes             []struct {
-			AttributeName  string `json:"attributeName"`
-			AttributeType  string `json:"attributeType"`
-			AttributeValue string `json:"attributeValue"`
-		} `json:"attributes"`
+		sharedCommon.Attributes
 	}
 
 	Warehouses []Warehouse
