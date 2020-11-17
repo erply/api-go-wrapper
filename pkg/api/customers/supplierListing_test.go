@@ -87,7 +87,7 @@ func TestListingCountSuccess(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	supplierClient := NewClient(baseClient)
-	supplierDataProvider := NewListingDataProvider(supplierClient)
+	supplierDataProvider := NewSupplierListingDataProvider(supplierClient)
 
 	actualCount, err := supplierDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval", "pageNo": 1, "recordsOnPage": 1})
 	assert.NoError(t, err)
@@ -111,7 +111,7 @@ func TestListingCountError(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	suppliersClient := NewClient(baseClient)
-	suppliersDataProvider := NewListingDataProvider(suppliersClient)
+	suppliersDataProvider := NewSupplierListingDataProvider(suppliersClient)
 
 	actualCount, err := suppliersDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.Error(t, err)
@@ -136,7 +136,7 @@ func TestListingCountWithNoBulkItems(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	suppliersClient := NewClient(baseClient)
-	suppliersDataProvider := NewListingDataProvider(suppliersClient)
+	suppliersDataProvider := NewSupplierListingDataProvider(suppliersClient)
 
 	actualCount, err := suppliersDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.NoError(t, err)
@@ -181,7 +181,7 @@ func TestReadSuccess(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	suppliersClient := NewClient(baseClient)
-	suppliersDataProvider := NewListingDataProvider(suppliersClient)
+	suppliersDataProvider := NewSupplierListingDataProvider(suppliersClient)
 
 	actualProdIDs := make([]int, 0, 5)
 	err := suppliersDataProvider.Read(
@@ -220,7 +220,7 @@ func TestReadError(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	suppliersClient := NewClient(baseClient)
-	suppliersDataProvider := NewListingDataProvider(suppliersClient)
+	suppliersDataProvider := NewSupplierListingDataProvider(suppliersClient)
 
 	err := suppliersDataProvider.Read(
 		context.Background(),
@@ -264,7 +264,7 @@ func TestReadSuccessIntegration(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	suppliersClient := NewClient(baseClient)
-	suppliersDataProvider := NewListingDataProvider(suppliersClient)
+	suppliersDataProvider := NewSupplierListingDataProvider(suppliersClient)
 
 	lister := sharedCommon.NewLister(
 		sharedCommon.ListingSettings{

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"time"
 )
@@ -13,10 +14,10 @@ func main() {
 	apiClient, err := api.BuildClient()
 	common.Die(err)
 
-	addresses, err := GetAddressesBulk(apiClient)
+	addrs, err := GetAddressesBulk(apiClient)
 	common.Die(err)
 
-	fmt.Printf("%+v\n", addresses)
+	fmt.Printf("%+v\n", addrs)
 
 	err = SaveAddressesBulk(apiClient)
 	common.Die(err)
@@ -24,6 +25,8 @@ func main() {
 	DeleteAddress(apiClient)
 
 	DeleteAddressBulk(apiClient)
+
+	CheckAddressListing(apiClient)
 }
 
 func GetAddressesBulk(cl *api.Client) (addresses []sharedCommon.Address, err error) {
@@ -116,4 +119,36 @@ func DeleteAddressBulk(cl *api.Client) {
 	fmt.Printf("%s", common.ConvertSourceToJsonStrIfPossible(bulkResponse))
 
 	return
+}
+
+func CheckAddressListing(cl *api.Client) {
+	addressesDataProvider := addresses.NewAddressListingDataProvider(cl.AddressProvider)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
+		},
+		addressesDataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	addressesChan := lister.Get(ctx, map[string]interface{}{
+		"recordsOnPage": 1,
+	})
+
+	addrs := make([]sharedCommon.Address, 0)
+	for addr := range addressesChan {
+		common.Die(addr.Err)
+		addrs = append(addrs, addr.Payload.(sharedCommon.Address))
+	}
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(addrs))
 }
