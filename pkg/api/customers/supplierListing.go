@@ -8,7 +8,7 @@ type SupplierListingDataProvider struct {
 	erplyAPI Manager
 }
 
-func NewListingDataProvider(erplyClient Manager) *SupplierListingDataProvider {
+func NewSupplierListingDataProvider(erplyClient Manager) *SupplierListingDataProvider {
 	return &SupplierListingDataProvider{
 		erplyAPI: erplyClient,
 	}

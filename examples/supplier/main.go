@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	sharedCommon "github.com/erply/api-go-wrapper/internal/common"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
 	"github.com/erply/api-go-wrapper/pkg/api/customers"
 	"time"
@@ -23,6 +24,8 @@ func main() {
 
 	err = DeleteSupplierBulk(apiClient)
 	sharedCommon.Die(err)
+
+	CheckSupplierListing(apiClient)
 }
 
 func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error) {
@@ -101,4 +104,36 @@ func DeleteSupplierBulk(cl *api.Client) (err error) {
 	fmt.Printf("%+v", bulkResponse)
 
 	return
+}
+
+func CheckSupplierListing(cl *api.Client) {
+	supplierDataProvider := customers.NewSupplierListingDataProvider(cl.CustomerManager)
+
+	lister := common.NewLister(
+		common.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
+		},
+		supplierDataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	supplierChan := lister.Get(ctx, map[string]interface{}{
+		"changedSince": time.Date(2020, 9, 1, 0, 0, 0, 0, time.UTC).Unix(),
+	})
+
+	suppliersSlice := make([]customers.Supplier, 0)
+	for sup := range supplierChan {
+		sharedCommon.Die(sup.Err)
+		suppliersSlice = append(suppliersSlice, sup.Payload.(customers.Supplier))
+	}
+
+	fmt.Println(sharedCommon.ConvertSourceToJsonStrIfPossible(suppliersSlice))
 }
