@@ -3,11 +3,6 @@ package sales
 import sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 
 type (
-	PaymentAttribute struct {
-		AttributeName  string `json:"attributeName"`
-		AttributeType  string `json:"attributeType"`
-		AttributeValue string `json:"attributeValue"`
-	}
 	PaymentStatus string
 	PaymentType   string
 

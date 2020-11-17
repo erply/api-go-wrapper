@@ -39,46 +39,45 @@ type (
 		//Payer if invoice_client_is_payer = 0
 		PayerID int `json:"payerID"`
 
-		AddressID                       int                 `json:"addressID"`
-		Address                         string              `json:"address"`
-		PayerAddressID                  int                 `json:"payerAddressID"`
-		ShipToAddressID                 string              `json:"shipToAddressID"`
-		ContactID                       int                 `json:"contactID"`
-		EmployeeID                      int                 `json:"employeeID"`
-		PaymentDays                     string              `json:"paymentDays"`
-		Confirmed                       string              `json:"confirmed"`
-		Notes                           string              `json:"notes"`
-		InternalNotes                   string              `json:"internalNotes"`
-		LastModified                    int                 `json:"lastModified"`
-		PackingUnitsDescription         string              `json:"packingUnitsDescription"`
-		InventoryTransactionDate        string              `json:"inventoryTransactionDate"`
-		CurrencyCode                    string              `json:"currencyCode"`
-		ContactName                     string              `json:"contactName"`
-		ClientName                      string              `json:"clientName"`
-		ClientCardNumber                string              `json:"clientCardNumber"`
-		Type                            string              `json:"type"`
-		InvoiceState                    string              `json:"invoiceState"`
-		PaymentType                     string              `json:"paymentType"`
-		BaseDocuments                   []BaseDocument      `json:"baseDocuments"`
-		FollowUpDocuments               []BaseDocument      `json:"followUpDocuments"`
-		NetTotal                        float64             `json:"netTotal"`
-		VatTotal                        float64             `json:"vatTotal"`
-		VatTotalsByTaxRates             VatTotalsByTaxRates `json:"vatTotalsByTaxRate"`
-		Rounding                        float64             `json:"rounding"`
-		Total                           float64             `json:"total"`
-		Paid                            string              `json:"paid"`
-		PrintDiscounts                  int                 `json:"printDiscounts"`
-		ReferenceNumber                 string              `json:"referenceNumber"`
-		CustomReferenceNumber           string              `json:"customReferenceNumber"`
-		PaymentStatus                   string              `json:"paymentStatus"`
-		Penalty                         string              `json:"penalty"`
-		InvoiceLink                     string              `json:"invoiceLink"`
-		EmployeeName                    string              `json:"employeeName"`
-		TransportTypeName               string              `json:"transportTypeName"`
-		ShipToName                      string              `json:"shipToName"`
-		ShippingDate                    string              `json:"shippingDate"`
-		InvoiceRows                     []InvoiceRow        `json:"rows"`
-		Attributes                      []PaymentAttribute  `json:"attributes"`
+		AddressID                int                 `json:"addressID"`
+		Address                  string              `json:"address"`
+		PayerAddressID           int                 `json:"payerAddressID"`
+		ShipToAddressID          string              `json:"shipToAddressID"`
+		ContactID                int                 `json:"contactID"`
+		EmployeeID               int                 `json:"employeeID"`
+		PaymentDays              string              `json:"paymentDays"`
+		Confirmed                string              `json:"confirmed"`
+		Notes                    string              `json:"notes"`
+		InternalNotes            string              `json:"internalNotes"`
+		PackingUnitsDescription  string              `json:"packingUnitsDescription"`
+		InventoryTransactionDate string              `json:"inventoryTransactionDate"`
+		CurrencyCode             string              `json:"currencyCode"`
+		ContactName              string              `json:"contactName"`
+		ClientName               string              `json:"clientName"`
+		ClientCardNumber         string              `json:"clientCardNumber"`
+		Type                     string              `json:"type"`
+		InvoiceState             string              `json:"invoiceState"`
+		PaymentType              string              `json:"paymentType"`
+		BaseDocuments            []BaseDocument      `json:"baseDocuments"`
+		FollowUpDocuments        []BaseDocument      `json:"followUpDocuments"`
+		NetTotal                 float64             `json:"netTotal"`
+		VatTotal                 float64             `json:"vatTotal"`
+		VatTotalsByTaxRates      VatTotalsByTaxRates `json:"vatTotalsByTaxRate"`
+		Rounding                 float64             `json:"rounding"`
+		Total                    float64             `json:"total"`
+		Paid                     string              `json:"paid"`
+		PrintDiscounts           int                 `json:"printDiscounts"`
+		ReferenceNumber          string              `json:"referenceNumber"`
+		CustomReferenceNumber    string              `json:"customReferenceNumber"`
+		PaymentStatus            string              `json:"paymentStatus"`
+		Penalty                  string              `json:"penalty"`
+		InvoiceLink              string              `json:"invoiceLink"`
+		EmployeeName             string              `json:"employeeName"`
+		TransportTypeName        string              `json:"transportTypeName"`
+		ShipToName               string              `json:"shipToName"`
+		ShippingDate             string              `json:"shippingDate"`
+		InvoiceRows              []InvoiceRow        `json:"rows"`
+		sharedCommon.Attributes
 		ExportInvoiceType               string              `json:"exportInvoiceType"`
 		PointOfSaleID                   int                 `json:"pointOfSaleID"`
 		PricelistID                     string              `json:"pricelistID"`
@@ -118,6 +117,7 @@ type (
 		EuInvoiceType                   string              `json:"euInvoiceType"`
 		DeliveryTermsLocation           string              `json:"deliveryTermsLocation"`
 		DeliveryOnlyWhenAllItemsInStock int                 `json:"deliveryOnlyWhenAllItemsInStock"`
+		LastModified                    int                 `json:"lastModified"`
 		LastModifierUsername            string              `json:"lastModifierUsername"`
 		Added                           int                 `json:"added"`
 		ReceiptLink                     string              `json:"receiptLink"`
