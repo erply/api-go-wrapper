@@ -26,6 +26,8 @@ func main() {
 	GetPaymentBulk(apiClient)
 
 	GetVatRatesBulk(apiClient)
+
+	SaveSalesDocumentBulk(apiClient)
 }
 
 func GetSalesDocumentsBulk(cl *api.Client) (docs []sales.SaleDocument, err error) {
@@ -142,5 +144,31 @@ func GetVatRatesBulk(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Println("GetVatRatesBulk:")
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
+}
+
+func SaveSalesDocumentBulk(cl *api.Client) {
+	salesCLI := cl.SalesManager
+
+	bulkFilters := []map[string]interface{}{
+		{
+			"type":         sales.SaleDocumentTypeOrder,
+			"currencyCode": "EUR",
+			"date":         time.Now().Format("2006-01-02"),
+			"time":         "14:59:00",
+			"productID1": "1",
+			"itemName": "black box",
+			"vatrateID": "1",
+			"amount": "1",
+			"price": "22.22",
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	bulkResp, err := salesCLI.SaveSalesDocumentBulk(ctx, bulkFilters, map[string]string{})
+	common.Die(err)
+
+	fmt.Println("SaveSalesDocumentBulk:")
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
 }
