@@ -134,6 +134,16 @@ type Employee struct {
 	Added        uint64 `json:"added"`
 }
 
+type GetEmployeesResponseBulkItem struct {
+	Status    sharedCommon.StatusBulk `json:"status"`
+	Employees []Employee              `json:"records"`
+}
+
+type GetEmployeesResponseBulk struct {
+	Status    sharedCommon.Status            `json:"status"`
+	BulkItems []GetEmployeesResponseBulkItem `json:"requests"`
+}
+
 type EmployeeWarehouse struct {
 	Id uint `json:"id"`
 }

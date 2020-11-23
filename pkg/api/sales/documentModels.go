@@ -173,17 +173,38 @@ type (
 		SalesDocuments []SaleDocument      `json:"records"`
 	}
 	SaleDocImportReports []SaleDocImportReport
-	SaleDocImportReport  struct {
-		InvoiceID    int     `json:"invoiceID"`
-		InvoiceNo    string  `json:"invoiceNo"`
-		CustomNumber string  `json:"customNumber"`
-		InvoiceLink  string  `json:"invoiceLink"`
-		ReceiptLink  string  `json:"receiptLink"`
-		Net          float64 `json:"net"`
-		Vat          float64 `json:"vat"`
-		Rounding     float64 `json:"rounding"`
-		Total        float64 `json:"total"`
+
+	SaveInvoiceRow struct {
+		RowID       int     `json:"rowID"`
+		StableRowID int     `json:"stableRowID"`
+		ProductID   int     `json:"productID"`
+		ServiceID   int     `json:"serviceID"`
+		Amount      string `json:"amount"`
 	}
+
+	SaleDocImportReport struct {
+		InvoiceID    int              `json:"invoiceID"`
+		InvoiceNo    string           `json:"invoiceNo"`
+		CustomNumber string           `json:"customNumber"`
+		InvoiceLink  string           `json:"invoiceLink"`
+		ReceiptLink  string           `json:"receiptLink"`
+		Net          float64          `json:"net"`
+		Vat          float64          `json:"vat"`
+		Rounding     float64          `json:"rounding"`
+		Total        float64          `json:"total"`
+		Rows         []SaveInvoiceRow `json:"rows"`
+	}
+
+	SaveSalesDocumentBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records SaleDocImportReports    `json:"records"`
+	}
+
+	SaveSalesDocumentResponseBulk struct {
+		Status    sharedCommon.Status         `json:"status"`
+		BulkItems []SaveSalesDocumentBulkItem `json:"requests"`
+	}
+
 	PurchaseDocImportReports []PurchaseDocImportReport
 	PurchaseDocImportReport  struct {
 		InvoiceID    int     `json:"invoiceID"`

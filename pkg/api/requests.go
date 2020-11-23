@@ -8,6 +8,7 @@ import (
 	"github.com/erply/api-go-wrapper/internal/common"
 	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -17,6 +18,7 @@ type Manager interface {
 	GetCountries(ctx context.Context, filters map[string]string) ([]Country, error)
 	GetUserRights(ctx context.Context, filters map[string]string) ([]UserRights, error)
 	GetEmployees(ctx context.Context, filters map[string]string) ([]Employee, error)
+	GetEmployeesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetEmployeesResponseBulk, error)
 	GetBusinessAreas(ctx context.Context, filters map[string]string) ([]BusinessArea, error)
 	GetCurrencies(ctx context.Context, filters map[string]string) ([]Currency, error)
 	SaveEvent(ctx context.Context, filters map[string]string) (int, error)
@@ -78,6 +80,41 @@ func (c *Client) GetEmployees(ctx context.Context, filters map[string]string) ([
 		return nil, erro.NewFromResponseStatus(&res.Status)
 	}
 	return res.Employees, nil
+}
+
+func (cli *Client) GetEmployeesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetEmployeesResponseBulk, error) {
+	var bulkResp GetEmployeesResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getEmployees",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.commonClient.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	if err := json.Unmarshal(body, &bulkResp); err != nil {
+		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetEmployeesResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&bulkResp.Status) {
+		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+	}
+
+	for _, bulkItem := range bulkResp.BulkItems {
+		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
+			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return bulkResp, nil
 }
 
 // GetBusinessAreas will list business areas according to specified filters.

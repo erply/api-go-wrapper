@@ -9,6 +9,11 @@ type (
 	}
 	DocumentManager interface {
 		SaveSalesDocument(ctx context.Context, filters map[string]string) (SaleDocImportReports, error)
+		SaveSalesDocumentBulk(
+			ctx context.Context,
+			bulkFilters []map[string]interface{},
+			baseFilters map[string]string,
+		) (respBulk SaveSalesDocumentResponseBulk, err error)
 		GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error)
 		GetSalesDocumentsWithStatus(ctx context.Context, filters map[string]string) (*GetSalesDocumentResponse, error)
 		GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSaleDocumentResponseBulk, error)
