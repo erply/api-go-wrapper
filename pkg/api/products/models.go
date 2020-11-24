@@ -30,6 +30,16 @@ type (
 		ProductGroups []ProductGroup      `json:"records"`
 	}
 
+	GetProductPriorityGroups struct {
+		Status        sharedCommon.Status `json:"status"`
+		Records []struct {
+			PriorityGroupID   int    `json:"priorityGroupID"`
+			PriorityGroupName string `json:"priorityGroupName"`
+			Added             int    `json:"added"`
+			LastModified      int    `json:"lastModified"`
+		} `json:"records"`
+	}
+
 	ProductDimensions struct {
 		Name             string `json:"name"`
 		Value            string `json:"value"`

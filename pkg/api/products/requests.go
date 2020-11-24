@@ -58,6 +58,21 @@ func (cli *Client) GetProductsCount(ctx context.Context, filters map[string]stri
 	return res.Status.RecordsTotal, nil
 }
 
+func (cli *Client) GetProductPriorityGroups(ctx context.Context, filters map[string]string) (GetProductPriorityGroups, error) {
+	var res GetProductPriorityGroups
+	resp, err := cli.SendRequest(ctx, "getProductPriorityGroups", filters)
+	if err != nil {
+		return res, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return res, erro.NewFromError("failed to unmarshal GetProductPriorityGroups", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return res, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res, nil
+}
+
 // GetProductsBulk will list products according to specified filters sending a bulk request to fetch more products than the default limit
 func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsResponseBulk, error) {
 	var productsResp GetProductsResponseBulk

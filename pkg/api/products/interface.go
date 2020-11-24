@@ -10,6 +10,7 @@ type Manager interface {
 	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
 	GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
 	GetBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
+	GetProductPriorityGroups(ctx context.Context, filters map[string]string) (GetProductPriorityGroups, error)
 	GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
 	GetProductStock(ctx context.Context, filters map[string]string) ([]GetProductStock, error)
 	GetProductStockFile(ctx context.Context, filters map[string]string) ([]GetProductStockFile, error)
