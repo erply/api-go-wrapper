@@ -31,7 +31,7 @@ type (
 	}
 
 	GetProductPriorityGroups struct {
-		Status        sharedCommon.Status `json:"status"`
+		Status  sharedCommon.Status `json:"status"`
 		Records []struct {
 			PriorityGroupID   int    `json:"priorityGroupID"`
 			PriorityGroupName string `json:"priorityGroupName"`
@@ -219,19 +219,19 @@ type (
 		SalesPackageClearBrownGlass  string                 `json:"salesPackageClearBrownGlass"`
 		SalesPackageGreenOtherGlass  string                 `json:"salesPackageGreenOtherGlass"`
 		SalesPackagePlasticPpPe      string                 `json:"salesPackagePlasticPpPe"`
-		SalesPackagePlasticPet       string                `json:"salesPackagePlasticPet"`
-		SalesPackageMetalFe          string                `json:"salesPackageMetalFe"`
-		SalesPackageMetalAl          string                `json:"salesPackageMetalAl"`
-		SalesPackageOtherMetal       string                `json:"salesPackageOtherMetal"`
-		SalesPackageCardboard        string                `json:"salesPackageCardboard"`
-		SalesPackageWood             string                `json:"salesPackageWood"`
-		GroupPackagePaper            string                `json:"groupPackagePaper"`
-		GroupPackagePlastic          string                `json:"groupPackagePlastic"`
-		GroupPackageMetal            string                `json:"groupPackageMetal"`
-		GroupPackageWood             string                `json:"groupPackageWood"`
-		TransportPackageWood         string                `json:"transportPackageWood"`
-		TransportPackagePlastic      string                `json:"transportPackagePlastic"`
-		TransportPackageCardboard    string                `json:"transportPackageCardboar"`
+		SalesPackagePlasticPet       string                 `json:"salesPackagePlasticPet"`
+		SalesPackageMetalFe          string                 `json:"salesPackageMetalFe"`
+		SalesPackageMetalAl          string                 `json:"salesPackageMetalAl"`
+		SalesPackageOtherMetal       string                 `json:"salesPackageOtherMetal"`
+		SalesPackageCardboard        string                 `json:"salesPackageCardboard"`
+		SalesPackageWood             string                 `json:"salesPackageWood"`
+		GroupPackagePaper            string                 `json:"groupPackagePaper"`
+		GroupPackagePlastic          string                 `json:"groupPackagePlastic"`
+		GroupPackageMetal            string                 `json:"groupPackageMetal"`
+		GroupPackageWood             string                 `json:"groupPackageWood"`
+		TransportPackageWood         string                 `json:"transportPackageWood"`
+		TransportPackagePlastic      string                 `json:"transportPackagePlastic"`
+		TransportPackageCardboard    string                 `json:"transportPackageCardboar"`
 		RegistryNumber               string                 `json:"registryNumber"`
 		AlcoholPercentage            string                 `json:"alcoholPercentage"`
 		Batches                      string                 `json:"batches"`
@@ -400,9 +400,19 @@ type (
 		GetProductStockFiles []GetProductStockFile   `json:"records"`
 	}
 
+	GetProductStockResponseBulkItem struct {
+		Status          sharedCommon.StatusBulk `json:"status"`
+		GetProductStock []GetProductStock       `json:"records"`
+	}
+
 	GetProductStockFileResponseBulk struct {
 		Status    sharedCommon.Status                   `json:"status"`
 		BulkItems []GetProductStockFileResponseBulkItem `json:"requests"`
+	}
+
+	GetProductStockResponseBulk struct {
+		Status    sharedCommon.Status               `json:"status"`
+		BulkItems []GetProductStockResponseBulkItem `json:"requests"`
 	}
 
 	SaveProductResult struct {
