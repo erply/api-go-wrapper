@@ -58,6 +58,21 @@ func (cli *Client) GetProductsCount(ctx context.Context, filters map[string]stri
 	return res.Status.RecordsTotal, nil
 }
 
+func (cli *Client) GetProductPriorityGroups(ctx context.Context, filters map[string]string) (GetProductPriorityGroups, error) {
+	var res GetProductPriorityGroups
+	resp, err := cli.SendRequest(ctx, "getProductPriorityGroups", filters)
+	if err != nil {
+		return res, err
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return res, erro.NewFromError("failed to unmarshal GetProductPriorityGroups", err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return res, erro.NewFromResponseStatus(&res.Status)
+	}
+	return res, nil
+}
+
 // GetProductsBulk will list products according to specified filters sending a bulk request to fetch more products than the default limit
 func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsResponseBulk, error) {
 	var productsResp GetProductsResponseBulk
@@ -288,6 +303,43 @@ func (cli *Client) GetProductStockFile(ctx context.Context, filters map[string]s
 	}
 	return res.GetProductStockFile, nil
 }
+
+func (cli *Client) GetProductStockBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockResponseBulk, error) {
+	var productsStockResp GetProductStockResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getProductStock",
+			Filters:    bulkFilterMap,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return productsStockResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return productsStockResp, err
+	}
+
+	if err := json.Unmarshal(body, &productsStockResp); err != nil {
+		return productsStockResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductStockFileResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&productsStockResp.Status) {
+		return productsStockResp, erro.NewErplyError(productsStockResp.Status.ErrorCode.String(), productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus)
+	}
+
+	for _, prodBulkItem := range productsStockResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return productsStockResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+		}
+	}
+
+	return productsStockResp, nil
+}
+
 
 func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error) {
 	var productsStockResp GetProductStockFileResponseBulk

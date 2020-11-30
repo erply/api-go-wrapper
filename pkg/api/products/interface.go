@@ -10,10 +10,12 @@ type Manager interface {
 	GetProductCategories(ctx context.Context, filters map[string]string) ([]ProductCategory, error)
 	GetProductBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
 	GetBrands(ctx context.Context, filters map[string]string) ([]ProductBrand, error)
+	GetProductPriorityGroups(ctx context.Context, filters map[string]string) (GetProductPriorityGroups, error)
 	GetProductGroups(ctx context.Context, filters map[string]string) ([]ProductGroup, error)
 	GetProductStock(ctx context.Context, filters map[string]string) ([]GetProductStock, error)
 	GetProductStockFile(ctx context.Context, filters map[string]string) ([]GetProductStockFile, error)
 	GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error)
+	GetProductStockBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockResponseBulk, error)
 	SaveProduct(ctx context.Context, filters map[string]string) (SaveProductResult, error)
 	SaveProductBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SaveProductResponseBulk, error)
 	DeleteProduct(ctx context.Context, filters map[string]string) error
