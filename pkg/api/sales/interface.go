@@ -51,6 +51,7 @@ type (
 		ReportsManager
 		//payment requests
 		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
+		SavePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SavePaymentsResponseBulk, error)
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 		GetPaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetPaymentsResponseBulk, error)
 

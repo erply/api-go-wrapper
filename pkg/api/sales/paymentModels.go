@@ -68,4 +68,18 @@ type (
 		Status    sharedCommon.Status   `json:"status"`
 		BulkItems []GetPaymentsBulkItem `json:"requests"`
 	}
+
+	SavePaymentID struct {
+		PaymentID int `json:"paymentID"`
+	}
+
+	SavePaymentsBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []SavePaymentID         `json:"records"`
+	}
+
+	SavePaymentsResponseBulk struct {
+		Status    sharedCommon.Status    `json:"status"`
+		BulkItems []SavePaymentsBulkItem `json:"requests"`
+	}
 )
