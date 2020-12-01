@@ -117,7 +117,7 @@ type (
 		EuInvoiceType                   string              `json:"euInvoiceType"`
 		DeliveryTermsLocation           string              `json:"deliveryTermsLocation"`
 		DeliveryOnlyWhenAllItemsInStock int                 `json:"deliveryOnlyWhenAllItemsInStock"`
-		LastModified                    int                 `json:"lastModified"`
+		LastModified                    int64               `json:"lastModified"`
 		LastModifierUsername            string              `json:"lastModifierUsername"`
 		Added                           int                 `json:"added"`
 		ReceiptLink                     string              `json:"receiptLink"`
@@ -175,10 +175,10 @@ type (
 	SaleDocImportReports []SaleDocImportReport
 
 	SaveInvoiceRow struct {
-		RowID       int     `json:"rowID"`
-		StableRowID int     `json:"stableRowID"`
-		ProductID   int     `json:"productID"`
-		ServiceID   int     `json:"serviceID"`
+		RowID       int    `json:"rowID"`
+		StableRowID int    `json:"stableRowID"`
+		ProductID   int    `json:"productID"`
+		ServiceID   int    `json:"serviceID"`
 		Amount      string `json:"amount"`
 	}
 
