@@ -44,6 +44,7 @@ type (
 		InvoiceClientIsPayer string `json:"invoice_client_is_payer"`
 		DefaultLanguage      string `json:"default_language"`
 		Country              string `json:"country"`
+		CSVSeparator         string `json:"csv_field_separator"`
 	}
 	//GetConfParametersResponse ...
 	GetConfParametersResponse struct {
