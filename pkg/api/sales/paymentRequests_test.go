@@ -173,3 +173,123 @@ func TestGetPaymentsBulk(t *testing.T) {
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
 }
+
+func TestSavePaymentsBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"requestName": "savePayment",
+				"customerID":   "1",
+			},
+			{
+				"requestName": "savePayment",
+				"customerID":   "2",
+			},
+			{
+				"requestName": "savePayment",
+				"customerID":   "3",
+			},
+		})
+
+		bulkResp := SavePaymentsResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []SavePaymentsBulkItem{
+				{
+					Status: statusBulk,
+					Records: []SavePaymentID{
+						{
+							PaymentID: 1,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SavePaymentID{
+						{
+							PaymentID: 2,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []SavePaymentID{
+						{
+							PaymentID: 3,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.SavePaymentsBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"customerID": "1",
+			},
+			{
+				"customerID": "2",
+			},
+			{
+				"customerID": "3",
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 3)
+
+	assert.Equal(t, []SavePaymentID{
+		{
+			PaymentID: 1,
+		},
+	}, bulkResp.BulkItems[0].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+
+	assert.Equal(t, []SavePaymentID{
+		{
+			PaymentID: 2,
+		},
+	}, bulkResp.BulkItems[1].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
+
+	assert.Equal(t, []SavePaymentID{
+		{
+			PaymentID: 3,
+		},
+	}, bulkResp.BulkItems[2].Records)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
+}
