@@ -1952,3 +1952,195 @@ func TestGetProductPriorityGroupBulk(t *testing.T) {
 	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[1].Records[0].Added)
 	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[1].Records[0].LastModified)
 }
+
+func TestGetProductGroupsBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "1",
+				"requestName":"getProductGroups",
+			},
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "2",
+				"requestName":"getProductGroups",
+			},
+		})
+
+		bulkResp := GetProductGroupResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductGroupBulkItem{
+				{
+					Status: statusBulk,
+					Records: []ProductGroup{
+						{
+							ID:   1,
+							NameLanguages: NameLanguages{
+								Name: "Prod Group 1",
+							},
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []ProductGroup{
+						{
+							ID:   2,
+							NameLanguages: NameLanguages{
+								Name: "Prod Group 2",
+							},
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "1",
+		},
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "2",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.GetProductGroupsBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 1, bulkResp.BulkItems[0].Records[0].ID)
+	assert.Equal(t, "Prod Group 1", bulkResp.BulkItems[0].Records[0].Name)
+
+	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
+	assert.Equal(t, 2, bulkResp.BulkItems[1].Records[0].ID)
+	assert.Equal(t, "Prod Group 2", bulkResp.BulkItems[1].Records[0].Name)
+}
+
+func TestGetProductCategoriesBulk(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "1",
+				"requestName":"getProductCategories",
+			},
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "2",
+				"requestName":"getProductCategories",
+			},
+		})
+
+		bulkResp := GetProductCategoryResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductCategoryBulkItem{
+				{
+					Status: statusBulk,
+					Records: []ProductCategory{
+						{
+							ProductCategoryID:   1,
+							ProductCategoryName: "Product category 1",
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []ProductCategory{
+						{
+							ProductCategoryID:   2,
+							ProductCategoryName: "Product category 2",
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "1",
+		},
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "2",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.GetProductCategoriesBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 1, bulkResp.BulkItems[0].Records[0].ProductCategoryID)
+	assert.Equal(t, "Product category 1", bulkResp.BulkItems[0].Records[0].ProductCategoryName)
+
+	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
+	assert.Equal(t, 2, bulkResp.BulkItems[1].Records[0].ProductCategoryID)
+	assert.Equal(t, "Product category 2", bulkResp.BulkItems[1].Records[0].ProductCategoryName)
+}

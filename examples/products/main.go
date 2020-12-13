@@ -94,6 +94,14 @@ func main() {
 	GetProductPriorityGroupBulk(apiClient)
 
 	GetProductPriorityGroupsInParallel(apiClient)
+
+	GetProductGroupBulk(apiClient)
+
+	GetProductGroupsInParallel(apiClient)
+
+	GetProductCategoriesBulk(apiClient)
+
+	GetProductCategoriesInParallel(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) {
@@ -705,4 +713,126 @@ func GetProductPriorityGroupsInParallel(cl *api.Client) {
 	}
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(prioGroups))
+}
+
+func GetProductGroupBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"recordsOnPage": 5,
+			"pageNo": 3,
+		},
+		{
+			"recordsOnPage": 5,
+			"pageNo": 4,
+		},
+		{
+			"recordsOnPage": 5,
+			"pageNo": 5,
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.GetProductGroupsBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func GetProductGroupsInParallel(cl *api.Client) {
+	dataProvider := products.NewProductGroupsListingDataProvider(cl.ProductManager)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
+		},
+		dataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	prioGroupChan := lister.Get(ctx, map[string]interface{}{
+		"recordsOnPage": 10,
+		"pageNo": 1,
+	})
+
+	groups := make([]products.ProductGroup, 0)
+	for prodGroup := range prioGroupChan {
+		if prodGroup.Err != nil {
+			common.Die(prodGroup.Err)
+		}
+		groups = append(groups, prodGroup.Payload.(products.ProductGroup))
+	}
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(groups))
+}
+
+func GetProductCategoriesBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"recordsOnPage": 5,
+			"pageNo": 1,
+		},
+		{
+			"recordsOnPage": 5,
+			"pageNo": 2,
+		},
+		{
+			"recordsOnPage": 5,
+			"pageNo": 3,
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.GetProductCategoriesBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
+func GetProductCategoriesInParallel(cl *api.Client) {
+	dataProvider := products.NewProductCategoriesListingDataProvider(cl.ProductManager)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
+		},
+		dataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	prioGroupChan := lister.Get(ctx, map[string]interface{}{
+		"recordsOnPage": 10,
+		"pageNo": 1,
+	})
+
+	categories := make([]products.ProductCategory, 0)
+	for prodGroup := range prioGroupChan {
+		if prodGroup.Err != nil {
+			common.Die(prodGroup.Err)
+		}
+		categories = append(categories, prodGroup.Payload.(products.ProductCategory))
+	}
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(categories))
 }

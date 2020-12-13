@@ -299,11 +299,12 @@ type (
 	}
 
 	ProductCategory struct {
-		ProductCategoryID   uint   `json:"productCategoryID"`
-		ParentCategoryID    uint   `json:"parentCategoryID"`
+		ProductCategoryID   int   `json:"productCategoryID"`
+		ParentCategoryID    int   `json:"parentCategoryID"`
 		ProductCategoryName string `json:"productCategoryName"`
 		Added               uint64 `json:"added"`
 		LastModified        uint64 `json:"lastModified"`
+		sharedCommon.Attributes
 	}
 
 	ProductBrand struct {
@@ -313,18 +314,24 @@ type (
 		LastModified uint64 `json:"lastModified"`
 	}
 
+	VatRateRef struct {
+		WarehouseID int `json:"warehouseID"`
+		VatrateID   int `json:"vatrateID"`
+	}
+
 	ProductGroup struct {
-		ID uint `json:"productGroupID"`
+		ID int `json:"productGroupID"`
 		NameLanguages
-		ShowInWebshop   string              `json:"showInWebshop"`
-		NonDiscountable byte                `json:"nonDiscountable"`
-		PositionNo      int                 `json:"positionNo"`
-		ParentGroupID   string              `json:"parentGroupID"`
-		Added           uint64              `json:"added"`
-		LastModified    uint64              `json:"lastModified"`
-		SubGroups       []ProductGroup      `json:"subGroups"`
-		Attributes      []map[string]string `json:"attributes,omitempty"`
-		Images          []ProductGroupImage `json:"images"`
+		ShowInWebshop   string            `json:"showInWebshop"`
+		NonDiscountable int            `json:"nonDiscountable"`
+		PositionNo      int            `json:"positionNo"`
+		ParentGroupID   string            `json:"parentGroupID"`
+		Added           uint64         `json:"added"`
+		LastModified    uint64         `json:"lastModified"`
+		SubGroups       []ProductGroup `json:"subGroups"`
+		sharedCommon.Attributes
+		Images      []ProductGroupImage `json:"images"`
+		VatRateRefs []VatRateRef        `json:"vatrates"`
 	}
 
 	ProductGroupImage struct {
@@ -624,5 +631,25 @@ type (
 	GetProductPriorityGroupResponseBulk struct {
 		Status    sharedCommon.Status               `json:"status"`
 		BulkItems []GetProductPriorityGroupBulkItem `json:"requests"`
+	}
+
+	GetProductCategoryBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []ProductCategory       `json:"records"`
+	}
+
+	GetProductCategoryResponseBulk struct {
+		Status    sharedCommon.Status          `json:"status"`
+		BulkItems []GetProductCategoryBulkItem `json:"requests"`
+	}
+
+	GetProductGroupBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []ProductGroup          `json:"records"`
+	}
+
+	GetProductGroupResponseBulk struct {
+		Status    sharedCommon.Status       `json:"status"`
+		BulkItems []GetProductGroupBulkItem `json:"requests"`
 	}
 )
