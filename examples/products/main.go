@@ -90,6 +90,10 @@ func main() {
 	DeleteProductGroup(apiClient)
 
 	DeleteProductGroupBulk(apiClient)
+
+	GetProductPriorityGroupBulk(apiClient)
+
+	GetProductPriorityGroupsInParallel(apiClient)
 }
 
 func GetProductsBulk(cl *api.Client) {
@@ -572,6 +576,28 @@ func SaveProductPriorityGroupBulk(cl *api.Client) {
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
 }
 
+func GetProductPriorityGroupBulk(cl *api.Client) {
+	prodCli := cl.ProductManager
+
+	filter := []map[string]interface{}{
+		{
+			"recordsOnPage": 5,
+			"pageNo": 1,
+		},
+		{
+			"recordsOnPage": 5,
+			"pageNo": 2,
+		},
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	res, err := prodCli.GetProductPriorityGroupBulk(ctx, filter, map[string]string{})
+	common.Die(err)
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(res))
+}
+
 func SaveProductGroup(cl *api.Client) {
 	prodCli := cl.ProductManager
 
@@ -644,4 +670,39 @@ func DeleteProductGroupBulk(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResp))
+}
+
+func GetProductPriorityGroupsInParallel(cl *api.Client) {
+	dataProvider := products.NewPrioGroupListingDataProvider(cl.ProductManager)
+
+	lister := sharedCommon.NewLister(
+		sharedCommon.ListingSettings{
+			MaxRequestsCountPerSecond: 5,
+			StreamBufferLength:        10,
+			MaxItemsPerRequest:        300,
+			MaxFetchersCount:          10,
+		},
+		dataProvider,
+		func(sleepTime time.Duration) {
+			time.Sleep(sleepTime)
+		},
+	)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
+	defer cancel()
+
+	prioGroupChan := lister.Get(ctx, map[string]interface{}{
+		"recordsOnPage": 10,
+		"pageNo": 1,
+	})
+
+	prioGroups := make([]products.ProductPriorityGroup, 0)
+	for prodPrioGroup := range prioGroupChan {
+		if prodPrioGroup.Err != nil {
+			common.Die(prodPrioGroup.Err)
+		}
+		prioGroups = append(prioGroups, prodPrioGroup.Payload.(products.ProductPriorityGroup))
+	}
+
+	fmt.Println(common.ConvertSourceToJsonStrIfPossible(prioGroups))
 }

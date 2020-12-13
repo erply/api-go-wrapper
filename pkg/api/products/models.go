@@ -30,14 +30,16 @@ type (
 		ProductGroups []ProductGroup      `json:"records"`
 	}
 
+	ProductPriorityGroup struct {
+		PriorityGroupID   int    `json:"priorityGroupID"`
+		PriorityGroupName string `json:"priorityGroupName"`
+		Added             int64  `json:"added"`
+		LastModified      int64  `json:"lastModified"`
+	}
+
 	GetProductPriorityGroups struct {
-		Status  sharedCommon.Status `json:"status"`
-		Records []struct {
-			PriorityGroupID   int    `json:"priorityGroupID"`
-			PriorityGroupName string `json:"priorityGroupName"`
-			Added             int    `json:"added"`
-			LastModified      int    `json:"lastModified"`
-		} `json:"records"`
+		Status  sharedCommon.Status    `json:"status"`
+		Records []ProductPriorityGroup `json:"records"`
 	}
 
 	ProductDimensions struct {
@@ -612,5 +614,15 @@ type (
 	DeleteProductGroupResponseBulk struct {
 		Status    sharedCommon.Status                  `json:"status"`
 		BulkItems []DeleteProductGroupResponseBulkItem `json:"requests"`
+	}
+
+	GetProductPriorityGroupBulkItem struct {
+		Status  sharedCommon.StatusBulk `json:"status"`
+		Records []ProductPriorityGroup  `json:"records"`
+	}
+
+	GetProductPriorityGroupResponseBulk struct {
+		Status    sharedCommon.Status               `json:"status"`
+		BulkItems []GetProductPriorityGroupBulkItem `json:"requests"`
 	}
 )

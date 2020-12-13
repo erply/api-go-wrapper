@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 //works
@@ -1729,10 +1730,10 @@ func TestDeleteProductGroup(t *testing.T) {
 		}
 
 		common.AssertFormValues(t, r, map[string]interface{}{
-			"clientCode": "someclient",
-			"sessionKey": "somesess",
-			"request":    "deleteProductGroup",
-			"productGroupID":  "100001021",
+			"clientCode":     "someclient",
+			"sessionKey":     "somesess",
+			"request":        "deleteProductGroup",
+			"productGroupID": "100001021",
 		})
 
 		jsonRaw, err := json.Marshal(resp)
@@ -1778,16 +1779,16 @@ func TestDeleteProductGroupBulk(t *testing.T) {
 
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
-				"requestName": "deleteProductGroup",
-				"productGroupID":   "123",
+				"requestName":    "deleteProductGroup",
+				"productGroupID": "123",
 			},
 			{
-				"requestName": "deleteProductGroup",
-				"productGroupID":   "124",
+				"requestName":    "deleteProductGroup",
+				"productGroupID": "124",
 			},
 			{
-				"requestName": "deleteProductGroup",
-				"productGroupID":   "125",
+				"requestName":    "deleteProductGroup",
+				"productGroupID": "125",
 			},
 		})
 
@@ -1847,4 +1848,107 @@ func TestDeleteProductGroupBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
+}
+
+func TestGetProductPriorityGroupBulk(t *testing.T) {
+	nowTimeStamp := time.Now().Unix()
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
+
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "1",
+				"requestName":"getProductPriorityGroups",
+			},
+			{
+				"recordsOnPage": "10",
+				"pageNo":        "2",
+				"requestName":"getProductPriorityGroups",
+			},
+		})
+
+		bulkResp := GetProductPriorityGroupResponseBulk{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			BulkItems: []GetProductPriorityGroupBulkItem{
+				{
+					Status: statusBulk,
+					Records: []ProductPriorityGroup{
+						{
+							PriorityGroupID:   1,
+							PriorityGroupName: "Some group",
+							Added:             nowTimeStamp,
+							LastModified:      nowTimeStamp,
+						},
+					},
+				},
+				{
+					Status: statusBulk,
+					Records: []ProductPriorityGroup{
+						{
+							PriorityGroupID:   2,
+							PriorityGroupName: "Some group 2",
+							Added:             nowTimeStamp,
+							LastModified:      nowTimeStamp,
+						},
+					},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(bulkResp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := []map[string]interface{}{
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "1",
+		},
+		{
+			"recordsOnPage": "10",
+			"pageNo":        "2",
+		},
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	bulkResp, err := cl.GetProductPriorityGroupBulk(context.Background(), inpt, map[string]string{})
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, bulkResp.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Len(t, bulkResp.BulkItems, 2)
+
+	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
+	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
+	assert.Equal(t, 1, bulkResp.BulkItems[0].Records[0].PriorityGroupID)
+	assert.Equal(t, "Some group", bulkResp.BulkItems[0].Records[0].PriorityGroupName)
+	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[0].Records[0].Added)
+	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[0].Records[0].LastModified)
+
+	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
+	assert.Equal(t, 2, bulkResp.BulkItems[1].Records[0].PriorityGroupID)
+	assert.Equal(t, "Some group 2", bulkResp.BulkItems[1].Records[0].PriorityGroupName)
+	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[1].Records[0].Added)
+	assert.Equal(t, nowTimeStamp, bulkResp.BulkItems[1].Records[0].LastModified)
 }

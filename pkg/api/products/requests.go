@@ -340,7 +340,6 @@ func (cli *Client) GetProductStockBulk(ctx context.Context, bulkFilters []map[st
 	return productsStockResp, nil
 }
 
-
 func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductStockFileResponseBulk, error) {
 	var productsStockResp GetProductStockFileResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
@@ -764,6 +763,46 @@ func (cli *Client) SaveProductPriorityGroupBulk(
 	return respBulk, nil
 }
 
+func (cli *Client) GetProductPriorityGroupBulk(
+	ctx context.Context,
+	bulkFilters []map[string]interface{},
+	baseFilters map[string]string,
+) (respBulk GetProductPriorityGroupResponseBulk, err error) {
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getProductPriorityGroups",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return respBulk, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return respBulk, err
+	}
+
+	bodyStr := string(body)
+
+	if err := json.Unmarshal(body, &respBulk); err != nil {
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPriorityGroupResponseBulk from '%s': %v", bodyStr, err)
+	}
+	if !common.IsJSONResponseOK(&respBulk.Status) {
+		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+	}
+
+	for _, bulkRespItem := range respBulk.BulkItems {
+		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
+			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+		}
+	}
+
+	return respBulk, nil
+}
+
 func (cli *Client) SaveProductGroup(ctx context.Context, filters map[string]string) (result SaveProductGroupResult, err error) {
 	resp, err := cli.SendRequest(ctx, "saveProductGroup", filters)
 	if err != nil {
@@ -820,7 +859,6 @@ func (cli *Client) SaveProductGroupBulk(
 
 	return respBulk, nil
 }
-
 
 func (cli *Client) DeleteProductGroup(ctx context.Context, filters map[string]string) error {
 	resp, err := cli.SendRequest(ctx, "deleteProductGroup", filters)
