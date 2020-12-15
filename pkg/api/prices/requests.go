@@ -231,6 +231,29 @@ func (cli *Client) GetProductsInPriceList(ctx context.Context, filters map[strin
 	return res.PriceLists, nil
 }
 
+func (cli *Client) GetProductsInPriceListWithStatus(ctx context.Context, filters map[string]string) (GetProductsInPriceListResponse, error) {
+	resp, err := cli.SendRequest(ctx, "getProductsInPriceList", filters)
+	if err != nil {
+		return GetProductsInPriceListResponse{}, err
+	}
+	var res GetProductsInPriceListResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return res, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return res, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsInPriceListResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return res, erro.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}
+
+
 func (cli *Client) GetProductsInPriceListBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsInPriceListResponseBulk, error) {
 	var bulkResp GetProductsInPriceListResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
