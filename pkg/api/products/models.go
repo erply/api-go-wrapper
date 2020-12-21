@@ -199,7 +199,7 @@ type (
 		DeliveryTime                 string                 `json:"deliveryTime"`
 		ContainerName                string                 `json:"containerName"`
 		ContainerCode                string                 `json:"containerCode"`
-		ContainerAmount              string                 `json:"containerAmount"`
+		ContainerAmount              json.Number            `json:"containerAmount"`
 		PackagingType                string                 `json:"packagingType"`
 		LocationInWarehouse          string                 `json:"locationInWarehouse"`
 		LocationInWarehouseName      string                 `json:"locationInWarehouseName"`
