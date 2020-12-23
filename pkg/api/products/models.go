@@ -201,7 +201,7 @@ type (
 		DeliveryTime                 string                 `json:"deliveryTime"`
 		ContainerName                string                 `json:"containerName"`
 		ContainerCode                string                 `json:"containerCode"`
-		ContainerAmount              string                 `json:"containerAmount"`
+		ContainerAmount              json.Number            `json:"containerAmount"`
 		PackagingType                string                 `json:"packagingType"`
 		LocationInWarehouse          string                 `json:"locationInWarehouse"`
 		LocationInWarehouseName      string                 `json:"locationInWarehouseName"`
@@ -274,15 +274,15 @@ type (
 	}
 
 	StockInfo struct {
-		WarehouseID   uint    `json:"warehouseID"`
-		Free          float64 `json:"free"`
-		OrderPending  int     `json:"orderPending"`
-		ReorderPoint  int     `json:"reorderPoint"`
-		Reserved      int     `json:"reserved"`
-		TotalInStock  int     `json:"totalInStock"`
-		RestockLevel  float64 `json:"restockLevel"`
-		FifoCost      float32 `json:"FIFOCost"`
-		PurchasePrice float32 `json:"purchasePrice"`
+		WarehouseID   uint        `json:"warehouseID"`
+		Free          float64     `json:"free"`
+		OrderPending  int         `json:"orderPending"`
+		ReorderPoint  int         `json:"reorderPoint"`
+		Reserved      json.Number `json:"reserved"`
+		TotalInStock  json.Number `json:"totalInStock"`
+		RestockLevel  float64     `json:"restockLevel"`
+		FifoCost      float32     `json:"FIFOCost"`
+		PurchasePrice float32     `json:"purchasePrice"`
 	}
 
 	ProductImage struct {
