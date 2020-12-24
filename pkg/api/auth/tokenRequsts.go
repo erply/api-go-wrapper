@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 //VerifyIdentityToken ...
@@ -23,11 +23,11 @@ func (cli *Client) VerifyIdentityToken(ctx context.Context, jwt string) (*Sessio
 	}
 	res := &verifyIdentityTokenResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError(fmt.Sprintf("unmarshaling %s response failed", method), err)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("unmarshaling %s response failed", method), err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return &res.Result, nil
@@ -39,15 +39,15 @@ func (cli *Client) GetIdentityToken(ctx context.Context) (*IdentityToken, error)
 
 	resp, err := cli.SendRequest(ctx, method, map[string]string{})
 	if err != nil {
-		return nil, erro.NewFromError(fmt.Sprintf("%s request failed", method), err)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("%s request failed", method), err, 0)
 	}
 	res := &getIdentityTokenResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError(fmt.Sprintf("unmarshaling %s response failed", method), err)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("unmarshaling %s response failed", method), err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return &res.Result, nil
@@ -64,10 +64,10 @@ func (cli *Client) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
-		return nil, erro.NewFromError("error decoding GetJWTToken response", err)
+		return nil, sharedCommon.NewFromError("error decoding GetJWTToken response", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return &res.Records, nil
@@ -84,10 +84,10 @@ func (cli *PartnerClient) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
-		return nil, erro.NewFromError("error decoding GetJWTToken response", err)
+		return nil, sharedCommon.NewFromError("error decoding GetJWTToken response", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return &res.Records, nil

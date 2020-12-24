@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ import (
 	"time"
 )
 
-func sendRequestGroup(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, productGroupIDs [][]int) error {
+func sendRequestGroup(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, productGroupIDs [][]int) error {
 	bulkResp := GetProductGroupResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
@@ -100,7 +99,7 @@ func TestProdGroupListingCountSuccess(t *testing.T) {
 
 func TestProdGroupListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequestGroup(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendRequestGroup(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -119,7 +118,7 @@ func TestProdGroupListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -210,7 +209,7 @@ func TestProdGroupReadSuccess(t *testing.T) {
 
 func TestProdGroupReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequestGroup(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendRequestGroup(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -234,7 +233,7 @@ func TestProdGroupReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestProdGroupReadSuccessIntegration(t *testing.T) {

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ import (
 	"time"
 )
 
-func sendRequestPriorityGroup(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, productPrioGroupIDs [][]int) error {
+func sendRequestPriorityGroup(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, productPrioGroupIDs [][]int) error {
 	bulkResp := GetProductPriorityGroupResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
@@ -98,7 +97,7 @@ func TestProdPrioGroupListingCountSuccess(t *testing.T) {
 
 func TestProdPrioGroupListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequestPriorityGroup(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendRequestPriorityGroup(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -117,7 +116,7 @@ func TestProdPrioGroupListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -210,7 +209,7 @@ func TestProdPrioGroupReadSuccess(t *testing.T) {
 
 func TestProdPrioGroupReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequestPriorityGroup(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendRequestPriorityGroup(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -234,7 +233,7 @@ func TestProdPrioGroupReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestProdPrioGroupReadSuccessIntegration(t *testing.T) {

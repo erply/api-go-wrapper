@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -58,7 +57,7 @@ func TestWarehouseListingCountSuccess(t *testing.T) {
 
 func TestWarehouseListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendWarehouseRequest(w, errors.MalformedRequest, 0, [][]string{{"1"}})
+		err := sendWarehouseRequest(w, sharedCommon.MalformedRequest, 0, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -77,7 +76,7 @@ func TestWarehouseListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -167,7 +166,7 @@ func TestWarehouseListingReadSuccess(t *testing.T) {
 
 func TestWarehouseListingReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendWarehouseRequest(w, errors.MalformedRequest, 10, [][]string{{"1"}})
+		err := sendWarehouseRequest(w, sharedCommon.MalformedRequest, 10, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -191,7 +190,7 @@ func TestWarehouseListingReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestWarehouseListingReadSuccessIntegration(t *testing.T) {
@@ -267,7 +266,7 @@ mainLoop:
 	return actualWarehouseCodes
 }
 
-func sendWarehouseRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, warehouseCodeBulk [][]string) error {
+func sendWarehouseRequest(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, warehouseCodeBulk [][]string) error {
 	bulkResp := GetWarehousesResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}

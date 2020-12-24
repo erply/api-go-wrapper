@@ -138,25 +138,15 @@ func TestGetProductsBulk(t *testing.T) {
 	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
-	assert.Equal(t, []Product{
-		{
-			ProductID: 123,
-			Code:      "Some Payload 123",
-		},
-		{
-			ProductID: 124,
-			Code:      "Some Payload 124",
-		},
-	}, productsBulk.BulkItems[0].Products)
+	assert.Equal(t, 123, productsBulk.BulkItems[0].Products[0].ProductID)
+	assert.Equal(t, 124, productsBulk.BulkItems[0].Products[1].ProductID)
+	assert.Equal(t, "Some Payload 123", productsBulk.BulkItems[0].Products[0].Code)
+	assert.Equal(t, "Some Payload 124", productsBulk.BulkItems[0].Products[1].Code)
+	assert.Equal(t, 125, productsBulk.BulkItems[1].Products[0].ProductID)
+	assert.Equal(t, "Some Payload 125", productsBulk.BulkItems[1].Products[0].Code)
 
 	assert.Equal(t, expectedStatus, productsBulk.BulkItems[0].Status)
 
-	assert.Equal(t, []Product{
-		{
-			ProductID: 125,
-			Code:      "Some Payload 125",
-		},
-	}, productsBulk.BulkItems[1].Products)
 	assert.Equal(t, expectedStatus, productsBulk.BulkItems[1].Status)
 }
 

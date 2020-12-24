@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 )
 
 //VerifyUser will give you session key
@@ -24,7 +24,7 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 
 	req, err := http.NewRequest("POST", requestUrl, nil)
 	if err != nil {
-		return "", erro.NewFromError("failed to build HTTP request", err)
+		return "", sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 
 	req.URL.RawQuery = params.Encode()
@@ -32,15 +32,15 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return "", erro.NewFromError("failed to build VerifyUser request", err)
+		return "", sharedCommon.NewFromError("failed to build VerifyUser request", err, 0)
 	}
 
 	res := &VerifyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", erro.NewFromError("failed to decode VerifyUserResponse", err)
+		return "", sharedCommon.NewFromError("failed to decode VerifyUserResponse", err, 0)
 	}
 	if len(res.Records) < 1 {
-		return "", erro.NewFromError("VerifyUser: no records in response", nil)
+		return "", sharedCommon.NewFromError("VerifyUser: no records in response", nil, res.Status.ErrorCode)
 	}
 	return res.Records[0].SessionKey, nil
 }
@@ -55,22 +55,22 @@ func VerifyUserV2(ctx context.Context, filters map[string]string, clientCode str
 	params.Add("request", "verifyUser")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return "", erro.NewFromError("failed to build HTTP request", err)
+		return "", sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 	req.URL.RawQuery = params.Encode()
 	req.Header.Add("Accept", "application/json")
 	resp, err := cli.Do(req)
 
 	if err != nil {
-		return "", erro.NewFromError("failed to build VerifyUser request", err)
+		return "", sharedCommon.NewFromError("failed to build VerifyUser request", err, 0)
 	}
 	res := &VerifyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return "", erro.NewFromError("failed to decode VerifyUserResponse", err)
+		return "", sharedCommon.NewFromError("failed to decode VerifyUserResponse", err, 0)
 	}
 
 	if res.Status.ErrorCode != 0 {
-		return "", erro.NewFromResponseStatus(&res.Status)
+		return "", sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Records[0].SessionKey, nil
 }
@@ -84,22 +84,22 @@ func VerifyUserV3(ctx context.Context, filters map[string]string, clientCode str
 	params.Add("request", "verifyUser")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 	req.URL.RawQuery = params.Encode()
 	req.Header.Add("Accept", "application/json")
 	resp, err := cli.Do(req)
 
 	if err != nil {
-		return nil, erro.NewFromError("failed to build VerifyUser request", err)
+		return nil, sharedCommon.NewFromError("failed to build VerifyUser request", err, 0)
 	}
 	res := &VerifyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to decode VerifyUserResponse", err)
+		return nil, sharedCommon.NewFromError("failed to decode VerifyUserResponse", err, 0)
 	}
 
 	if res.Status.ErrorCode != 0 {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res, nil
 }
@@ -121,22 +121,22 @@ func VerifyUserFull(ctx context.Context, username, password, clientCode string, 
 	params.Add("request", "verifyUser")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 	req.URL.RawQuery = params.Encode()
 	req.Header.Add("Accept", "application/json")
 	resp, err := cli.Do(req)
 
 	if err != nil {
-		return nil, erro.NewFromError("failed to build VerifyUser request", err)
+		return nil, sharedCommon.NewFromError("failed to build VerifyUser request", err, 0)
 	}
 	res := &VerifyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to decode VerifyUserResponse", err)
+		return nil, sharedCommon.NewFromError("failed to decode VerifyUserResponse", err, 0)
 	}
 
 	if res.Status.ErrorCode != 0 {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.Records) < 1 {
 		return nil, errors.New("verifyUser: no records in response")
@@ -161,22 +161,22 @@ func SwitchUser(ctx context.Context, sessionKey, pin, clientCode string, inputPa
 	params.Add("request", "switchUser")
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 	req.URL.RawQuery = params.Encode()
 	req.Header.Add("Accept", "application/json")
 	resp, err := cli.Do(req)
 
 	if err != nil {
-		return nil, erro.NewFromError("failed to build SwitchUser request", err)
+		return nil, sharedCommon.NewFromError("failed to build SwitchUser request", err, 0)
 	}
 	res := &SwitchUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to decode SwitchUserResponse", err)
+		return nil, sharedCommon.NewFromError("failed to decode SwitchUserResponse", err, 0)
 	}
 
 	if res.Status.ErrorCode != 0 {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.Records) < 1 {
 		return nil, errors.New("switchUser: no records in response")
@@ -199,7 +199,7 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 
 	req, err := http.NewRequest("POST", requestUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 
 	req.URL.RawQuery = params.Encode()
@@ -207,7 +207,7 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, erro.NewFromError("failed to call getSessionKeyUser request", err)
+		return nil, sharedCommon.NewFromError("failed to call getSessionKeyUser request", err, 0)
 	}
 	defer resp.Body.Close()
 
@@ -225,10 +225,10 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 
 	res := &SessionKeyUserResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to decode SessionKeyUserResponse", err)
+		return nil, sharedCommon.NewFromError("failed to decode SessionKeyUserResponse", err, 0)
 	}
 	if len(res.Records) < 1 {
-		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
+		return nil, sharedCommon.NewFromError("getSessionKeyUser: no records in response", nil, 0)
 	}
 	return &res.Records[0], nil
 }
@@ -243,7 +243,7 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 
 	req, err := http.NewRequest("POST", requestUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 	}
 
 	req.URL.RawQuery = params.Encode()
@@ -251,7 +251,7 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, erro.NewFromError("failed to call getSessionKeyInfo request", err)
+		return nil, sharedCommon.NewFromError("failed to call getSessionKeyInfo request", err, 0)
 	}
 	resp.Body.Close()
 
@@ -269,10 +269,10 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 
 	res := &SessionKeyInfoResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to decode SessionKeyInfoResponse", err)
+		return nil, sharedCommon.NewFromError("failed to decode SessionKeyInfoResponse", err, 0)
 	}
 	if len(res.Records) < 1 {
-		return nil, erro.NewFromError("getSessionKeyUser: no records in response", nil)
+		return nil, sharedCommon.NewFromError("getSessionKeyUser: no records in response", nil, res.Status.ErrorCode)
 	}
 	return &res.Records[0], nil
 }

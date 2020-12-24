@@ -139,22 +139,12 @@ func TestGetPurchaseDocumentsBulk(t *testing.T) {
 	expectedStatus := sharedCommon.StatusBulk{}
 	expectedStatus.ResponseStatus = "ok"
 
-	assert.Equal(t, []SaleDocument{
-		{
-			ID: 123,
-		},
-		{
-			ID: 124,
-		},
-	}, bulkResp.BulkItems[0].SaleDocuments)
+	assert.Equal(t, 123, bulkResp.BulkItems[0].SaleDocuments[0].ID)
+	assert.Equal(t, 124, bulkResp.BulkItems[0].SaleDocuments[1].ID)
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 
-	assert.Equal(t, []SaleDocument{
-		{
-			ID: 125,
-		},
-	}, bulkResp.BulkItems[1].SaleDocuments)
+	assert.Equal(t, 125, bulkResp.BulkItems[1].SaleDocuments[0].ID)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
 

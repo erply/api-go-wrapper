@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
@@ -46,12 +45,12 @@ func (cli *Client) GetAddressesBulk(ctx context.Context, bulkFilters []map[strin
 	}
 
 	if !common.IsJSONResponseOK(&addrResp.Status) {
-		return addrResp, erro.NewErplyError(addrResp.Status.ErrorCode.String(), addrResp.Status.Request+": "+addrResp.Status.ResponseStatus)
+		return addrResp, sharedCommon.NewErplyError(addrResp.Status.ErrorCode.String(), addrResp.Status.Request+": "+addrResp.Status.ResponseStatus, addrResp.Status.ErrorCode)
 	}
 
 	for _, addrBulkItem := range addrResp.BulkItems {
 		if !common.IsJSONResponseOK(&addrBulkItem.Status.Status) {
-			return addrResp, erro.NewErplyError(addrBulkItem.Status.ErrorCode.String(), addrBulkItem.Status.Request+": "+addrBulkItem.Status.ResponseStatus)
+			return addrResp, sharedCommon.NewErplyError(addrBulkItem.Status.ErrorCode.String(), addrBulkItem.Status.Request+": "+addrBulkItem.Status.ResponseStatus, addrResp.Status.ErrorCode)
 		}
 	}
 
@@ -62,19 +61,19 @@ func (cli *Client) SaveAddress(ctx context.Context, filters map[string]string) (
 	method := "saveAddress"
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return nil, erro.NewFromError(method+": request failed", err)
+		return nil, sharedCommon.NewFromError(method+": request failed", err, 0)
 	}
 	res := &Response{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError(method+": JSON unmarshal failed", err)
+		return nil, sharedCommon.NewFromError(method+": JSON unmarshal failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Addresses) == 0 {
-		return nil, erro.NewFromError(method+": no records in response", nil)
+		return nil, sharedCommon.NewFromError(method+": no records in response", nil, res.Status.ErrorCode)
 	}
 
 	return res.Addresses, nil
@@ -84,15 +83,15 @@ func (cli *Client) DeleteAddress(ctx context.Context, filters map[string]string)
 	method := "deleteAddress"
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return erro.NewFromError(method+": request failed", err)
+		return sharedCommon.NewFromError(method+": request failed", err, 0)
 	}
 	res := &DeleteAddressResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError(method+": JSON unmarshal failed", err)
+		return sharedCommon.NewFromError(method+": JSON unmarshal failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return nil
@@ -132,21 +131,21 @@ func (cli *Client) DeleteAddressBulk(
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
 
 	return bulkResp, nil
 }
-
 
 func (cli *Client) SaveAddressesBulk(ctx context.Context, addrMap []map[string]interface{}, attrs map[string]string) (SaveAddressesResponseBulk, error) {
 	var saveAddressesResponseBulk SaveAddressesResponseBulk
@@ -178,14 +177,19 @@ func (cli *Client) SaveAddressesBulk(ctx context.Context, addrMap []map[string]i
 	}
 
 	if !common.IsJSONResponseOK(&saveAddressesResponseBulk.Status) {
-		return saveAddressesResponseBulk, erro.NewErplyError(saveAddressesResponseBulk.Status.ErrorCode.String(), saveAddressesResponseBulk.Status.Request+": "+saveAddressesResponseBulk.Status.ResponseStatus)
+		return saveAddressesResponseBulk, sharedCommon.NewErplyError(
+			saveAddressesResponseBulk.Status.ErrorCode.String(),
+			saveAddressesResponseBulk.Status.Request+": "+saveAddressesResponseBulk.Status.ResponseStatus,
+			saveAddressesResponseBulk.Status.ErrorCode,
+		)
 	}
 
 	for _, addrBulkItem := range saveAddressesResponseBulk.BulkItems {
 		if !common.IsJSONResponseOK(&addrBulkItem.Status.Status) {
-			return saveAddressesResponseBulk, erro.NewErplyError(
+			return saveAddressesResponseBulk, sharedCommon.NewErplyError(
 				addrBulkItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", addrBulkItem.Status),
+				saveAddressesResponseBulk.Status.ErrorCode,
 			)
 		}
 	}

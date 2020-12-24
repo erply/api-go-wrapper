@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ import (
 	"time"
 )
 
-func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, documentsIDBulk [][]int) error {
+func sendRequest(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, documentsIDBulk [][]int) error {
 	bulkResp := GetPurchaseDocumentResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
@@ -99,7 +98,7 @@ func TestListingCountSuccess(t *testing.T) {
 
 func TestListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendRequest(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -118,7 +117,7 @@ func TestListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -208,7 +207,7 @@ func TestReadSuccess(t *testing.T) {
 
 func TestReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendRequest(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -232,7 +231,7 @@ func TestReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestReadSuccessIntegration(t *testing.T) {

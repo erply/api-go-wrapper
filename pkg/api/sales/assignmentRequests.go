@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 //GetVatRatesByVatRateID ...
@@ -15,11 +15,11 @@ func (cli *Client) SaveAssignment(ctx context.Context, filters map[string]string
 	}
 	res := &saveAssignment{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return 0, erro.NewFromError("unmarshaling saveAssignment failed", err)
+		return 0, sharedCommon.NewFromError("unmarshaling saveAssignment failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return 0, erro.NewFromResponseStatus(&res.Status)
+		return 0, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.Records[0].AssignmentID, nil

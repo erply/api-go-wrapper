@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -13,16 +13,16 @@ func (cli *Client) GetProductUnits(ctx context.Context, filters map[string]strin
 
 	resp, err := cli.SendRequest(ctx, "getProductUnits", filters)
 	if err != nil {
-		return nil, erro.NewFromError("GetProductUnits request failed", err)
+		return nil, sharedCommon.NewFromError("GetProductUnits request failed", err, 0)
 	}
 
 	res := &GetProductUnitsResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetProductUnitsResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling GetProductUnitsResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.ProductUnits, nil
@@ -35,10 +35,10 @@ func (cli *Client) GetProducts(ctx context.Context, filters map[string]string) (
 	}
 	var res GetProductsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetProductsResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProductsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Products, nil
 }
@@ -50,10 +50,10 @@ func (cli *Client) GetProductsCount(ctx context.Context, filters map[string]stri
 	}
 	var res GetProductsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return 0, erro.NewFromError("failed to unmarshal GetProductsResponse", err)
+		return 0, sharedCommon.NewFromError("failed to unmarshal GetProductsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return 0, erro.NewFromResponseStatus(&res.Status)
+		return 0, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Status.RecordsTotal, nil
 }
@@ -65,10 +65,10 @@ func (cli *Client) GetProductPriorityGroups(ctx context.Context, filters map[str
 		return res, err
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return res, erro.NewFromError("failed to unmarshal GetProductPriorityGroups", err)
+		return res, sharedCommon.NewFromError("failed to unmarshal GetProductPriorityGroups", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return res, erro.NewFromResponseStatus(&res.Status)
+		return res, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res, nil
 }
@@ -97,12 +97,12 @@ func (cli *Client) GetProductsBulk(ctx context.Context, bulkFilters []map[string
 		return productsResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&productsResp.Status) {
-		return productsResp, erro.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus)
+		return productsResp, sharedCommon.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus, productsResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range productsResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return productsResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return productsResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, prodBulkItem.Status.ErrorCode)
 		}
 	}
 
@@ -116,10 +116,10 @@ func (cli *Client) SaveProduct(ctx context.Context, filters map[string]string) (
 	}
 	var res SaveProductResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return SaveProductResult{}, erro.NewFromError("failed to unmarshal SaveProductResult", err)
+		return SaveProductResult{}, sharedCommon.NewFromError("failed to unmarshal SaveProductResult", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return SaveProductResult{}, erro.NewFromResponseStatus(&res.Status)
+		return SaveProductResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveProductResults) > 0 {
 		return res.SaveProductResults[0], nil
@@ -151,12 +151,12 @@ func (cli *Client) SaveProductBulk(ctx context.Context, bulkFilters []map[string
 		return productsResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&productsResp.Status) {
-		return productsResp, erro.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus)
+		return productsResp, sharedCommon.NewErplyError(productsResp.Status.ErrorCode.String(), productsResp.Status.Request+": "+productsResp.Status.ResponseStatus, productsResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range productsResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return productsResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return productsResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, productsResp.Status.ErrorCode)
 		}
 	}
 
@@ -170,10 +170,10 @@ func (cli *Client) DeleteProduct(ctx context.Context, filters map[string]string)
 	}
 	var res DeleteProductResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError("failed to unmarshal DeleteProductResponse", err)
+		return sharedCommon.NewFromError("failed to unmarshal DeleteProductResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return nil
 }
@@ -201,12 +201,12 @@ func (cli *Client) DeleteProductBulk(ctx context.Context, bulkFilters []map[stri
 		return deleteRespBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&deleteRespBulk.Status) {
-		return deleteRespBulk, erro.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus)
+		return deleteRespBulk, sharedCommon.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus, deleteRespBulk.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range deleteRespBulk.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return deleteRespBulk, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return deleteRespBulk, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, deleteRespBulk.Status.ErrorCode)
 		}
 	}
 
@@ -220,10 +220,10 @@ func (cli *Client) GetProductCategories(ctx context.Context, filters map[string]
 	}
 	var res getProductCategoriesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getProductCategoriesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal getProductCategoriesResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProductCategories, nil
 }
@@ -235,10 +235,10 @@ func (cli *Client) GetProductBrands(ctx context.Context, filters map[string]stri
 	}
 	var res getProductBrandsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getProductBrandsResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal getProductBrandsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProductBrands, nil
 }
@@ -250,10 +250,10 @@ func (cli *Client) GetBrands(ctx context.Context, filters map[string]string) ([]
 	}
 	var res getProductBrandsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getBrandsResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal getBrandsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProductBrands, nil
 }
@@ -265,10 +265,10 @@ func (cli *Client) GetProductGroups(ctx context.Context, filters map[string]stri
 	}
 	var res getProductGroupsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getProductGroupsResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal getProductGroupsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProductGroups, nil
 }
@@ -280,10 +280,10 @@ func (cli *Client) GetProductStock(ctx context.Context, filters map[string]strin
 	}
 	var res GetProductStockResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetProductStockResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProductStockResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.GetProductStock, nil
 }
@@ -296,10 +296,10 @@ func (cli *Client) GetProductStockFile(ctx context.Context, filters map[string]s
 	}
 	var res GetProductStockFileResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetProductStockFileResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProductStockFileResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.GetProductStockFile, nil
 }
@@ -328,12 +328,12 @@ func (cli *Client) GetProductStockBulk(ctx context.Context, bulkFilters []map[st
 		return productsStockResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductStockFileResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&productsStockResp.Status) {
-		return productsStockResp, erro.NewErplyError(productsStockResp.Status.ErrorCode.String(), productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus)
+		return productsStockResp, sharedCommon.NewErplyError(productsStockResp.Status.ErrorCode.String(), productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus, productsStockResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range productsStockResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return productsStockResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return productsStockResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, productsStockResp.Status.ErrorCode)
 		}
 	}
 
@@ -364,12 +364,20 @@ func (cli *Client) GetProductStockFileBulk(ctx context.Context, bulkFilters []ma
 		return productsStockResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductStockFileResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&productsStockResp.Status) {
-		return productsStockResp, erro.NewErplyError(productsStockResp.Status.ErrorCode.String(), productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus)
+		return productsStockResp, sharedCommon.NewErplyError(
+			productsStockResp.Status.ErrorCode.String(),
+			productsStockResp.Status.Request+": "+productsStockResp.Status.ResponseStatus,
+			productsStockResp.Status.ErrorCode,
+		)
 	}
 
 	for _, prodBulkItem := range productsStockResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return productsStockResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return productsStockResp, sharedCommon.NewErplyError(
+				prodBulkItem.Status.ErrorCode.String(),
+				prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus,
+				productsStockResp.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -383,10 +391,10 @@ func (cli *Client) SaveAssortment(ctx context.Context, filters map[string]string
 	}
 	var res SaveAssortmentResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return SaveAssortmentResult{}, erro.NewFromError("failed to unmarshal SaveAssortmentResult", err)
+		return SaveAssortmentResult{}, sharedCommon.NewFromError("failed to unmarshal SaveAssortmentResult", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return SaveAssortmentResult{}, erro.NewFromResponseStatus(&res.Status)
+		return SaveAssortmentResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveAssortmentResults) > 0 {
 		return res.SaveAssortmentResults[0], nil
@@ -418,12 +426,20 @@ func (cli *Client) SaveAssortmentBulk(ctx context.Context, bulkFilters []map[str
 		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal SaveAssortmentResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&assortmentResp.Status) {
-		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+		return assortmentResp, sharedCommon.NewErplyError(
+			assortmentResp.Status.ErrorCode.String(),
+			assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus,
+			assortmentResp.Status.ErrorCode,
+		)
 	}
 
 	for _, assortmentItem := range assortmentResp.BulkItems {
 		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
-			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+			return assortmentResp, sharedCommon.NewErplyError(
+				assortmentItem.Status.ErrorCode.String(),
+				assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus,
+				assortmentResp.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -437,10 +453,10 @@ func (cli *Client) AddAssortmentProducts(ctx context.Context, filters map[string
 	}
 	var res AddAssortmentProductsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return AddAssortmentProductsResult{}, erro.NewFromError("failed to unmarshal AddAssortmentProductsResult", err)
+		return AddAssortmentProductsResult{}, sharedCommon.NewFromError("failed to unmarshal AddAssortmentProductsResult", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return AddAssortmentProductsResult{}, erro.NewFromResponseStatus(&res.Status)
+		return AddAssortmentProductsResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.AddAssortmentProductsResults) > 0 {
 		return res.AddAssortmentProductsResults[0], nil
@@ -472,12 +488,20 @@ func (cli *Client) AddAssortmentProductsBulk(ctx context.Context, bulkFilters []
 		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal AddAssortmentProductsResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&assortmentResp.Status) {
-		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+		return assortmentResp, sharedCommon.NewErplyError(
+			assortmentResp.Status.ErrorCode.String(),
+			assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus,
+			assortmentResp.Status.ErrorCode,
+		)
 	}
 
 	for _, assortmentItem := range assortmentResp.BulkItems {
 		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
-			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+			return assortmentResp, sharedCommon.NewErplyError(
+				assortmentItem.Status.ErrorCode.String(),
+				assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus,
+				assortmentItem.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -491,10 +515,10 @@ func (cli *Client) EditAssortmentProducts(ctx context.Context, filters map[strin
 	}
 	var res EditAssortmentProductsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return EditAssortmentProductsResult{}, erro.NewFromError("failed to unmarshal EditAssortmentProductsResult", err)
+		return EditAssortmentProductsResult{}, sharedCommon.NewFromError("failed to unmarshal EditAssortmentProductsResult", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return EditAssortmentProductsResult{}, erro.NewFromResponseStatus(&res.Status)
+		return EditAssortmentProductsResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.EditAssortmentProductsResults) > 0 {
 		return res.EditAssortmentProductsResults[0], nil
@@ -526,12 +550,20 @@ func (cli *Client) EditAssortmentProductsBulk(ctx context.Context, bulkFilters [
 		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal EditAssortmentProductsResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&assortmentResp.Status) {
-		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+		return assortmentResp, sharedCommon.NewErplyError(
+			assortmentResp.Status.ErrorCode.String(),
+			assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus,
+			assortmentResp.Status.ErrorCode,
+		)
 	}
 
 	for _, assortmentItem := range assortmentResp.BulkItems {
 		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
-			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+			return assortmentResp, sharedCommon.NewErplyError(
+				assortmentItem.Status.ErrorCode.String(),
+				assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus,
+				assortmentItem.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -545,10 +577,10 @@ func (cli *Client) RemoveAssortmentProducts(ctx context.Context, filters map[str
 	}
 	var res RemoveAssortmentProductResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return RemoveAssortmentProductResult{}, erro.NewFromError("failed to unmarshal RemoveAssortmentProductResults", err)
+		return RemoveAssortmentProductResult{}, sharedCommon.NewFromError("failed to unmarshal RemoveAssortmentProductResults", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return RemoveAssortmentProductResult{}, erro.NewFromResponseStatus(&res.Status)
+		return RemoveAssortmentProductResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.RemoveAssortmentProductResults) > 0 {
 		return res.RemoveAssortmentProductResults[0], nil
@@ -580,12 +612,20 @@ func (cli *Client) RemoveAssortmentProductsBulk(ctx context.Context, bulkFilters
 		return assortmentResp, fmt.Errorf("ERPLY API: failed to unmarshal RemoveAssortmentProductResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&assortmentResp.Status) {
-		return assortmentResp, erro.NewErplyError(assortmentResp.Status.ErrorCode.String(), assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus)
+		return assortmentResp, sharedCommon.NewErplyError(
+			assortmentResp.Status.ErrorCode.String(),
+			assortmentResp.Status.Request+": "+assortmentResp.Status.ResponseStatus,
+			assortmentResp.Status.ErrorCode,
+		)
 	}
 
 	for _, assortmentItem := range assortmentResp.BulkItems {
 		if !common.IsJSONResponseOK(&assortmentItem.Status.Status) {
-			return assortmentResp, erro.NewErplyError(assortmentItem.Status.ErrorCode.String(), assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus)
+			return assortmentResp, sharedCommon.NewErplyError(
+				assortmentItem.Status.ErrorCode.String(),
+				assortmentItem.Status.Request+": "+assortmentItem.Status.ResponseStatus,
+				assortmentResp.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -599,10 +639,10 @@ func (cli *Client) SaveProductCategory(ctx context.Context, filters map[string]s
 	}
 	var res SaveProductCategoryResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return result, erro.NewFromError("failed to unmarshal SaveAssortmentResult", err)
+		return result, sharedCommon.NewFromError("failed to unmarshal SaveAssortmentResult", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return result, erro.NewFromResponseStatus(&res.Status)
+		return result, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveProductCategoryResults) > 0 {
 		return res.SaveProductCategoryResults[0], nil
@@ -637,12 +677,20 @@ func (cli *Client) SaveProductCategoryBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductCategoryResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(
+			respBulk.Status.ErrorCode.String(),
+			respBulk.Status.Request+": "+respBulk.Status.ResponseStatus,
+			respBulk.Status.ErrorCode,
+		)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(
+				bulkRespItem.Status.ErrorCode.String(),
+				bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus,
+				respBulk.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -656,10 +704,10 @@ func (cli *Client) SaveBrand(ctx context.Context, filters map[string]string) (re
 	}
 	var res SaveBrandResultResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return result, erro.NewFromError("failed to unmarshal SaveBrandResultResponse", err)
+		return result, sharedCommon.NewFromError("failed to unmarshal SaveBrandResultResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return result, erro.NewFromResponseStatus(&res.Status)
+		return result, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveBrandResults) > 0 {
 		return res.SaveBrandResults[0], nil
@@ -694,12 +742,12 @@ func (cli *Client) SaveBrandBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveBrandResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -713,10 +761,10 @@ func (cli *Client) SaveProductPriorityGroup(ctx context.Context, filters map[str
 	}
 	var res SaveProductPriorityGroupResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return result, erro.NewFromError("failed to unmarshal SaveProductPriorityGroupResponse", err)
+		return result, sharedCommon.NewFromError("failed to unmarshal SaveProductPriorityGroupResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return result, erro.NewFromResponseStatus(&res.Status)
+		return result, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveProductPriorityGroupResults) > 0 {
 		return res.SaveProductPriorityGroupResults[0], nil
@@ -751,12 +799,12 @@ func (cli *Client) SaveProductPriorityGroupBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductPriorityGroupResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -791,12 +839,12 @@ func (cli *Client) GetProductPriorityGroupBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPriorityGroupResponseBulk from '%s': %v", bodyStr, err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -831,12 +879,12 @@ func (cli *Client) GetProductCategoriesBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal GetProductCategoryResponseBulk from '%s': %v", bodyStr, err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -871,12 +919,12 @@ func (cli *Client) GetProductGroupsBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal GetProductGroupResponseBulk from '%s': %v", bodyStr, err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -890,10 +938,10 @@ func (cli *Client) SaveProductGroup(ctx context.Context, filters map[string]stri
 	}
 	var res SaveProductGroupResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return result, erro.NewFromError("failed to unmarshal SaveProductGroupResponse", err)
+		return result, sharedCommon.NewFromError("failed to unmarshal SaveProductGroupResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return result, erro.NewFromResponseStatus(&res.Status)
+		return result, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.SaveProductGroupResults) > 0 {
 		return res.SaveProductGroupResults[0], nil
@@ -928,12 +976,12 @@ func (cli *Client) SaveProductGroupBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveProductGroupResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -947,10 +995,10 @@ func (cli *Client) DeleteProductGroup(ctx context.Context, filters map[string]st
 	}
 	var res DeleteProductGroupResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError("failed to unmarshal DeleteProductGroupResponse", err)
+		return sharedCommon.NewFromError("failed to unmarshal DeleteProductGroupResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return nil
 }
@@ -978,12 +1026,12 @@ func (cli *Client) DeleteProductGroupBulk(ctx context.Context, bulkFilters []map
 		return deleteRespBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteProductGroupResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&deleteRespBulk.Status) {
-		return deleteRespBulk, erro.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus)
+		return deleteRespBulk, sharedCommon.NewErplyError(deleteRespBulk.Status.ErrorCode.String(), deleteRespBulk.Status.Request+": "+deleteRespBulk.Status.ResponseStatus, deleteRespBulk.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range deleteRespBulk.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return deleteRespBulk, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return deleteRespBulk, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, deleteRespBulk.Status.ErrorCode)
 		}
 	}
 
