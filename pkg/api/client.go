@@ -55,6 +55,10 @@ func (cl *Client) InvalidateSession() {
 	cl.commonClient.InvalidateSession()
 }
 
+func (cl *Client) GetSession() (sessionKey string, err error) {
+	return cl.commonClient.GetSession()
+}
+
 //NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
 //developer more flexibility
 func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {

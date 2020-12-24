@@ -91,6 +91,10 @@ func (cli *Client) InvalidateSession() {
 	cli.sessionProvider.Invalidate()
 }
 
+func (cli *Client) GetSession() (sessionKey string, err error) {
+	return cli.sessionProvider.GetSession()
+}
+
 type DestRespWithStatus interface {
 	GetStatus() *common.Status
 }
