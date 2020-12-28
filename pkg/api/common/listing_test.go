@@ -264,6 +264,10 @@ func TestCancelReading(t *testing.T) {
 		CountOutputCount: 10,
 		ProductsToRead: []payloadMock{
 			{ID: 4},
+			{ID: 5},
+			{ID: 6},
+			{ID: 7},
+			{ID: 8},
 		},
 		countLock:         sync.Mutex{},
 		CountFiltersInput: map[string]interface{}{},
@@ -286,8 +290,8 @@ func TestCancelReading(t *testing.T) {
 	prodsChan := lister.Get(ctx, map[string]interface{}{"filterKey": "filterVal"})
 
 	actualProds := collectProdsFromChannel(prodsChan)
-	assert.Len(t, actualProds, 0)
-	assert.Len(t, dp.ReadBulkFilters, 0)
+	assert.NotEqual(t, 5, actualProds)
+	assert.NotEqual(t, 5, dp.ReadBulkFilters)
 }
 
 func TestReadItemsError(t *testing.T) {

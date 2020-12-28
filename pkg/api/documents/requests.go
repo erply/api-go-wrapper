@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -25,7 +25,7 @@ func (cli *Client) GetPurchaseDocuments(ctx context.Context, filters map[string]
 		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetPurchaseDocumentsResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.PurchaseDocuments, nil
@@ -54,12 +54,12 @@ func (cli *Client) GetPurchaseDocumentsBulk(ctx context.Context, bulkFilters []m
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetPurchaseDocumentResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 

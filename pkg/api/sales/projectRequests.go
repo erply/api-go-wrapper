@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 // GetProjects will list projects according to specified filters.
@@ -15,10 +15,10 @@ func (cli *Client) GetProjects(ctx context.Context, filters map[string]string) (
 	}
 	var res GetProjectsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetProjectsResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProjectsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Projects, nil
 }
@@ -31,10 +31,10 @@ func (cli *Client) GetProjectStatus(ctx context.Context, filters map[string]stri
 	}
 	var res GetProjectStatusesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetProjectStatusesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProjectStatusesResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.ProjectStatuses, nil
 }

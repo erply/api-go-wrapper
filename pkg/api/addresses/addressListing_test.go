@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -56,7 +55,7 @@ func TestAddressListingCountSuccess(t *testing.T) {
 
 func TestAddressListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendAddressesRequest(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendAddressesRequest(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -75,7 +74,7 @@ func TestAddressListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -165,7 +164,7 @@ func TestAddressListingReadSuccess(t *testing.T) {
 
 func TestAddressListingReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendAddressesRequest(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendAddressesRequest(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -189,7 +188,7 @@ func TestAddressListingReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestAddressListingReadSuccessIntegration(t *testing.T) {
@@ -265,7 +264,7 @@ mainLoop:
 	return actualAddressIDs
 }
 
-func sendAddressesRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, addressIDsBulk [][]int) error {
+func sendAddressesRequest(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, addressIDsBulk [][]int) error {
 	bulkResp := GetAddressesResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}

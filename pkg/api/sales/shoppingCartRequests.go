@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 )
 
@@ -14,25 +13,25 @@ func (cli *Client) CalculateShoppingCart(ctx context.Context, filters map[string
 
 	resp, err := cli.SendRequest(ctx, "calculateShoppingCart", filters)
 	if err != nil {
-		return nil, erro.NewFromError("CalculateShoppingCart: error sending request", err)
+		return nil, sharedCommon.NewFromError("CalculateShoppingCart: error sending request", err, 0)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, erro.NewFromError(fmt.Sprintf("CalculateShoppingCart: bad response status code: %d", resp.StatusCode), nil)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("CalculateShoppingCart: bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
 	var respData struct {
-		Status  common2.Status
+		Status  sharedCommon.Status
 		Records []*ShoppingCartTotals
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return nil, erro.NewFromError("CalculateShoppingCart: unmarshaling response failed", err)
+		return nil, sharedCommon.NewFromError("CalculateShoppingCart: unmarshaling response failed", err, 0)
 	}
 	if !common.IsJSONResponseOK(&respData.Status) {
-		return nil, erro.NewErplyError(respData.Status.ErrorCode.String(), respData.Status.Request+": "+respData.Status.ResponseStatus)
+		return nil, sharedCommon.NewErplyError(respData.Status.ErrorCode.String(), respData.Status.Request+": "+respData.Status.ResponseStatus, respData.Status.ErrorCode)
 	}
 	if len(respData.Records) < 1 {
-		return nil, erro.NewFromError("CalculateShoppingCart: no records in response", nil)
+		return nil, sharedCommon.NewFromError("CalculateShoppingCart: no records in response", nil, respData.Status.ErrorCode)
 	}
 
 	return respData.Records[0], nil

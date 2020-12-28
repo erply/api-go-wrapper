@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/pkg/errors"
 )
 
@@ -21,7 +21,7 @@ func (cli *Client) GetServiceEndpoints(ctx context.Context) (*ServiceEndpoints, 
 		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode %s response", method))
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.Records) < 1 {
 		return nil, errors.New("no records in response")

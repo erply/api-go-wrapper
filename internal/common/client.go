@@ -9,47 +9,125 @@ type AuthFunc func(string) url.Values
 
 //NewClientWithURL allows creating a new Client with a hardcoded URL. Useful for testing purposes
 func NewClientWithURL(sk, cc, partnerKey, url string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
-	return newClientFull(sk, cc, partnerKey, url, httpCli, headersForEveryRequestFunc)
+	constr := &ClientConstructor{}
+	constr.WithSessionKey(sk)
+	constr.WithClientCode(cc)
+	constr.WithURL(url)
+	constr.WithHttpClient(httpCli)
+	constr.WithPartnerKey(partnerKey)
+	constr.WithHeaderFunc(headersForEveryRequestFunc)
+
+	return constr.Build()
 }
 
 func NewClient(sk, cc, partnerKey string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
-	return newClientFull(sk, cc, partnerKey, "", httpCli, headersForEveryRequestFunc)
+	constr := &ClientConstructor{}
+	constr.WithSessionKey(sk)
+	constr.WithClientCode(cc)
+	constr.WithHttpClient(httpCli)
+	constr.WithPartnerKey(partnerKey)
+	constr.WithHeaderFunc(headersForEveryRequestFunc)
+
+	return constr.Build()
 }
 
-func newClientFull(sk, cc, partnerKey, url string, httpCli *http.Client, headersForEveryRequestFunc AuthFunc) *Client {
-	if httpCli == nil {
-		httpCli = GetDefaultHTTPClient()
+type ClientConstructor struct {
+	sk                         string
+	url                        string
+	partnerKey                 string
+	clientCode                 string
+	httpCli                    *http.Client
+	headersForEveryRequestFunc AuthFunc
+	sessionProvider            SessionProvider
+}
+
+func (cc *ClientConstructor) Build() *Client {
+	var sessionProvider SessionProvider
+	if cc.sessionProvider != nil {
+		sessionProvider = cc.sessionProvider
+	} else {
+		sessionProvider = &DefaultSessionProvider{SessionKey: cc.sk}
 	}
+
+	if cc.httpCli == nil {
+		cc.httpCli = GetDefaultHTTPClient()
+	}
+
 	cli := &Client{
-		httpClient:  httpCli,
-		sessionKey:  sk,
-		clientCode:  cc,
-		partnerKey:  partnerKey,
-		headersFunc: headersForEveryRequestFunc,
+		httpClient:      cc.httpCli,
+		sessionProvider: sessionProvider,
+		clientCode:      cc.clientCode,
+		partnerKey:      cc.partnerKey,
+		headersFunc:     cc.headersForEveryRequestFunc,
 	}
 
 	if cli.headersFunc == nil {
 		cli.headersFunc = cli.getDefaultMandatoryHeaders
 	}
-	if url == "" {
-		if cc != "" {
-			cli.Url = GetBaseURL(cc)
+	if cc.url == "" {
+		if cc.clientCode != "" {
+			cli.Url = GetBaseURL(cc.clientCode)
 		} else {
 			cli.Url = GetBaseURLFromAuthFunc(cli.headersFunc)
 		}
 	} else {
-		cli.Url = url
+		cli.Url = cc.url
 	}
 	return cli
 }
 
+func (cc *ClientConstructor) WithSessionKey(sk string) {
+	cc.sk = sk
+}
+
+func (cc *ClientConstructor) WithURL(url string) {
+	cc.url = url
+}
+
+func (cc *ClientConstructor) WithPartnerKey(partnerKey string) {
+	cc.partnerKey = partnerKey
+}
+
+func (cc *ClientConstructor) WithClientCode(clientCode string) {
+	cc.clientCode = clientCode
+}
+
+func (cc *ClientConstructor) WithHttpClient(httpCli *http.Client) {
+	cc.httpCli = httpCli
+}
+
+func (cc *ClientConstructor) WithHeaderFunc(headersForEveryRequestFunc AuthFunc) {
+	cc.headersForEveryRequestFunc = headersForEveryRequestFunc
+}
+
+func (cc *ClientConstructor) WithSessionProvider(sessProv SessionProvider) {
+	cc.sessionProvider = sessProv
+}
+
+type SessionProvider interface {
+	GetSession() (sessionKey string, err error)
+	Invalidate()
+}
+
+type DefaultSessionProvider struct {
+	SessionKey string
+}
+
+func (dsp *DefaultSessionProvider) GetSession() (sessionKey string, err error) {
+	return dsp.SessionKey, nil
+}
+
+func (dsp *DefaultSessionProvider) Invalidate() {
+	dsp.SessionKey = ""
+}
+
 type Client struct {
-	Url         string
-	httpClient  *http.Client
-	sessionKey  string
-	clientCode  string
-	partnerKey  string
-	headersFunc func(string) url.Values
+	Url             string
+	httpClient      *http.Client
+	clientCode      string
+	partnerKey      string
+	headersFunc     AuthFunc
+	sessionProvider SessionProvider
 }
 
 func (cli *Client) Close() {

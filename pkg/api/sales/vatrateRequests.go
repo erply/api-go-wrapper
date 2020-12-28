@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
@@ -19,11 +18,11 @@ func (cli *Client) GetVatRates(ctx context.Context, filters map[string]string) (
 	}
 	res := &GetVatRatesResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetVatRatesResponse failed", err)
+		return nil, common2.NewFromError("unmarshaling GetVatRatesResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, common2.NewFromResponseStatus(&res.Status)
 	}
 	if res.VatRates == nil {
 		return nil, errors.New("no vat rates in response")
@@ -54,12 +53,12 @@ func (cli *Client) GetVatRatesBulk(ctx context.Context, bulkFilters []map[string
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetVatRatesResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, common2.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return bulkResp, common2.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -70,7 +69,7 @@ func (cli *Client) GetVatRatesBulk(ctx context.Context, bulkFilters []map[string
 func (cli *Client) SaveVatRate(ctx context.Context, filters map[string]string) (*SaveVatRateResult, error) {
 	resp, err := cli.SendRequest(ctx, "saveVatRate", filters)
 	if err != nil {
-		return nil, erro.NewFromError("saveVatRate request failed", err)
+		return nil, common2.NewFromError("saveVatRate request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -83,7 +82,7 @@ func (cli *Client) SaveVatRate(ctx context.Context, filters map[string]string) (
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, common2.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SaveVatRateResult) == 0 {
@@ -123,14 +122,15 @@ func (cli *Client) SaveVatRateBulk(ctx context.Context, bulkRequest []map[string
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, common2.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, common2.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -141,7 +141,7 @@ func (cli *Client) SaveVatRateBulk(ctx context.Context, bulkRequest []map[string
 func (cli *Client) SaveVatRateComponent(ctx context.Context, filters map[string]string) (*SaveVatRateComponentResult, error) {
 	resp, err := cli.SendRequest(ctx, "saveVatRateComponent", filters)
 	if err != nil {
-		return nil, erro.NewFromError("saveVatRateComponent request failed", err)
+		return nil, common2.NewFromError("saveVatRateComponent request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -154,7 +154,7 @@ func (cli *Client) SaveVatRateComponent(ctx context.Context, filters map[string]
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, common2.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SaveVatRateComponentResult) == 0 {
@@ -194,14 +194,15 @@ func (cli *Client) SaveVatRateComponentBulk(ctx context.Context, bulkRequest []m
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, common2.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, common2.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}

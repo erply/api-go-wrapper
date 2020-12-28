@@ -6,8 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 	"net/http"
 )
@@ -15,15 +14,15 @@ import (
 func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
 	resp, err := cli.SendRequest(ctx, "saveCustomer", filters)
 	if err != nil {
-		return nil, erro.NewFromError("PostCustomer request failed", err)
+		return nil, sharedCommon.NewFromError("PostCustomer request failed", err, 0)
 	}
 	res := &PostCustomerResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling CustomerImportReport failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling CustomerImportReport failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.CustomerImportReports) == 0 {
@@ -41,10 +40,10 @@ func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) 
 	}
 	var res GetCustomersResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetCustomersResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCustomersResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Customers, nil
 }
@@ -73,12 +72,12 @@ func (cli *Client) GetCustomersBulk(ctx context.Context, bulkFilters []map[strin
 		return customersResponse, fmt.Errorf("ERPLY API: failed to unmarshal GetCustomersResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&customersResponse.Status) {
-		return customersResponse, erro.NewErplyError(customersResponse.Status.ErrorCode.String(), customersResponse.Status.Request+": "+customersResponse.Status.ResponseStatus)
+		return customersResponse, sharedCommon.NewErplyError(customersResponse.Status.ErrorCode.String(), customersResponse.Status.Request+": "+customersResponse.Status.ResponseStatus, customersResponse.Status.ErrorCode)
 	}
 
 	for _, supplierBulkItem := range customersResponse.BulkItems {
 		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
-			return customersResponse, erro.NewErplyError(supplierBulkItem.Status.ErrorCode.String(), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus)
+			return customersResponse, sharedCommon.NewErplyError(supplierBulkItem.Status.ErrorCode.String(), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus, customersResponse.Status.ErrorCode)
 		}
 	}
 
@@ -93,22 +92,22 @@ func (cli *Client) VerifyCustomerUser(ctx context.Context, username, password st
 	}
 	resp, err := cli.SendRequest(ctx, "verifyCustomerUser", filters)
 	if err != nil {
-		return nil, erro.NewFromError("VerifyCustomerUser: request failed", err)
+		return nil, sharedCommon.NewFromError("VerifyCustomerUser: request failed", err, 0)
 	}
 
 	var res struct {
-		Status  common2.Status
+		Status  sharedCommon.Status
 		Records []WebshopClient
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("VerifyCustomerUser: unmarhsalling response failed", err)
+		return nil, sharedCommon.NewFromError("VerifyCustomerUser: unmarhsalling response failed", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.Records) != 1 {
-		return nil, erro.NewFromError("VerifyCustomerUser: no records in response", nil)
+		return nil, sharedCommon.NewFromError("VerifyCustomerUser: no records in response", nil, res.Status.ErrorCode)
 	}
 
 	return &res.Records[0], nil
@@ -118,24 +117,23 @@ func (cli *Client) ValidateCustomerUsername(ctx context.Context, username string
 	params := map[string]string{"username": username}
 	resp, err := cli.SendRequest(ctx, method, params)
 	if err != nil {
-		return false, erro.NewFromError("IsCustomerUsernameAvailable: error sending request", err)
+		return false, sharedCommon.NewFromError("IsCustomerUsernameAvailable: error sending request", err, 0)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return false, erro.NewFromError(fmt.Sprintf(method+": bad response status code: %d", resp.StatusCode), nil)
+		return false, sharedCommon.NewFromError(fmt.Sprintf(method+": bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
 	var respData struct {
-		Status common2.Status
+		Status sharedCommon.Status
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return false, erro.NewFromError(method+": unmarshaling response failed", err)
+		return false, sharedCommon.NewFromError(method+": unmarshaling response failed", err, 0)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return false, erro.NewFromError(fmt.Sprintf(method+": bad response error code: %s", respData.Status.ErrorCode), nil)
+		return false, sharedCommon.NewFromError(fmt.Sprintf(method+": bad response error code: %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
 	}
 	return true, nil
 }
-
 
 func (cli *Client) AddCustomerRewardPoints(ctx context.Context, filters map[string]string) (AddCustomerRewardPointsResult, error) {
 	resp, err := cli.SendRequest(ctx, "addCustomerRewardPoints", filters)
@@ -144,10 +142,10 @@ func (cli *Client) AddCustomerRewardPoints(ctx context.Context, filters map[stri
 	}
 	var res AddCustomerRewardPointsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return AddCustomerRewardPointsResult{}, erro.NewFromError("failed to unmarshal AddCustomerRewardPointsResponse", err)
+		return AddCustomerRewardPointsResult{}, sharedCommon.NewFromError("failed to unmarshal AddCustomerRewardPointsResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return AddCustomerRewardPointsResult{}, erro.NewFromResponseStatus(&res.Status)
+		return AddCustomerRewardPointsResult{}, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	if len(res.AddCustomerRewardPointsResults) > 0 {
 		return res.AddCustomerRewardPointsResults[0], nil
@@ -179,12 +177,12 @@ func (cli *Client) AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters 
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal AddCustomerRewardPointsResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -194,8 +192,8 @@ func (cli *Client) AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters 
 func (cli *Client) SaveCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (SaveCustomerResponseBulk, error) {
 	var saveCustomerResponseBulk SaveCustomerResponseBulk
 
-	if len(customerMap) > common2.MaxBulkRequestsCount {
-		return saveCustomerResponseBulk, fmt.Errorf("cannot save more than %d customers in one request", common2.MaxBulkRequestsCount)
+	if len(customerMap) > sharedCommon.MaxBulkRequestsCount {
+		return saveCustomerResponseBulk, fmt.Errorf("cannot save more than %d customers in one request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(customerMap))
@@ -221,14 +219,15 @@ func (cli *Client) SaveCustomerBulk(ctx context.Context, customerMap []map[strin
 	}
 
 	if !common.IsJSONResponseOK(&saveCustomerResponseBulk.Status) {
-		return saveCustomerResponseBulk, erro.NewErplyError(saveCustomerResponseBulk.Status.ErrorCode.String(), saveCustomerResponseBulk.Status.Request+": "+saveCustomerResponseBulk.Status.ResponseStatus)
+		return saveCustomerResponseBulk, sharedCommon.NewErplyError(saveCustomerResponseBulk.Status.ErrorCode.String(), saveCustomerResponseBulk.Status.Request+": "+saveCustomerResponseBulk.Status.ResponseStatus, saveCustomerResponseBulk.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range saveCustomerResponseBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return saveCustomerResponseBulk, erro.NewErplyError(
+			return saveCustomerResponseBulk, sharedCommon.NewErplyError(
 				bulkItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkItem.Status),
+				saveCustomerResponseBulk.Status.ErrorCode,
 			)
 		}
 	}
@@ -244,11 +243,11 @@ func (cli *Client) DeleteCustomer(ctx context.Context, filters map[string]string
 
 	var res DeleteCustomerResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError("failed to unmarshal DeleteCustomerResponse ", err)
+		return sharedCommon.NewFromError("failed to unmarshal DeleteCustomerResponse ", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return nil
@@ -257,8 +256,8 @@ func (cli *Client) DeleteCustomer(ctx context.Context, filters map[string]string
 func (cli *Client) DeleteCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (DeleteCustomersResponseBulk, error) {
 	var deleteCustomersResponse DeleteCustomersResponseBulk
 
-	if len(customerMap) > common2.MaxBulkRequestsCount {
-		return deleteCustomersResponse, fmt.Errorf("cannot delete more than %d customers in one request", common2.MaxBulkRequestsCount)
+	if len(customerMap) > sharedCommon.MaxBulkRequestsCount {
+		return deleteCustomersResponse, fmt.Errorf("cannot delete more than %d customers in one request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(customerMap))
@@ -284,14 +283,19 @@ func (cli *Client) DeleteCustomerBulk(ctx context.Context, customerMap []map[str
 	}
 
 	if !common.IsJSONResponseOK(&deleteCustomersResponse.Status) {
-		return deleteCustomersResponse, erro.NewErplyError(deleteCustomersResponse.Status.ErrorCode.String(), deleteCustomersResponse.Status.Request+": "+deleteCustomersResponse.Status.ResponseStatus)
+		return deleteCustomersResponse, sharedCommon.NewErplyError(
+			deleteCustomersResponse.Status.ErrorCode.String(),
+			deleteCustomersResponse.Status.Request+": "+deleteCustomersResponse.Status.ResponseStatus,
+			deleteCustomersResponse.Status.ErrorCode,
+		)
 	}
 
 	for _, bulkItem := range deleteCustomersResponse.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return deleteCustomersResponse, erro.NewErplyError(
+			return deleteCustomersResponse, sharedCommon.NewErplyError(
 				bulkItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkItem.Status),
+				deleteCustomersResponse.Status.ErrorCode,
 			)
 		}
 	}

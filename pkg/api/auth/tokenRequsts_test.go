@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"github.com/erply/api-go-wrapper/internal/common"
 	"testing"
 )
 
@@ -44,7 +45,7 @@ func TestTokenRequests(t *testing.T) {
 		}
 	})
 	t.Run("test GetJWTToken", func(t *testing.T) {
-		partnerCli := NewClient(sk, cc, partnerKey, nil)
+		partnerCli := NewClient(common.NewClient(sk, cc, partnerKey, nil, nil))
 
 		resp, err := partnerCli.GetJWTToken(ctx)
 		if err != nil {

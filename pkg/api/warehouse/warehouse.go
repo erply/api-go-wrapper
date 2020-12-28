@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -19,11 +18,11 @@ func (cli *Client) GetWarehouses(ctx context.Context, filters map[string]string)
 
 	res := &GetWarehousesResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetWarehousesResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling GetWarehousesResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Warehouses) == 0 {
@@ -63,12 +62,12 @@ func (cli *Client) GetWarehousesBulk(
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetWarehousesResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -78,7 +77,7 @@ func (cli *Client) GetWarehousesBulk(
 func (cli *Client) SaveWarehouse(ctx context.Context, filters map[string]string) (*SaveWarehouseResult, error) {
 	resp, err := cli.SendRequest(ctx, "saveWarehouse", filters)
 	if err != nil {
-		return nil, erro.NewFromError("saveWarehouse request failed", err)
+		return nil, sharedCommon.NewFromError("saveWarehouse request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -91,7 +90,7 @@ func (cli *Client) SaveWarehouse(ctx context.Context, filters map[string]string)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Results) == 0 {
@@ -104,8 +103,8 @@ func (cli *Client) SaveWarehouse(ctx context.Context, filters map[string]string)
 func (cli *Client) SaveWarehouseBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveWarehouseResponseBulk, error) {
 	var bulkResp SaveWarehouseResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot save more than %d warehouses in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot save more than %d warehouses in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -131,14 +130,15 @@ func (cli *Client) SaveWarehouseBulk(ctx context.Context, bulkRequest []map[stri
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}

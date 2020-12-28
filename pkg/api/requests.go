@@ -6,8 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -35,10 +34,10 @@ func (c *Client) GetCountries(ctx context.Context, filters map[string]string) ([
 	}
 	var res GetCountriesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetCountriesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCountriesResponse", err, 0)
 	}
-	if !common.IsJSONResponseOK((*common2.Status)(&res.Status)) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+	if !common.IsJSONResponseOK((*sharedCommon.Status)(&res.Status)) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Countries, nil
 }
@@ -48,15 +47,15 @@ func (c *Client) GetUserRights(ctx context.Context, filters map[string]string) (
 
 	resp, err := c.commonClient.SendRequest(ctx, GetUserRightsMethod, filters)
 	if err != nil {
-		return nil, erro.NewFromError(GetUserRightsMethod+" request failed", err)
+		return nil, sharedCommon.NewFromError(GetUserRightsMethod+" request failed", err, 0)
 	}
 	res := &GetUserRightsResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetUserRightsResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling GetUserRightsResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.Records) == 0 {
@@ -74,10 +73,10 @@ func (c *Client) GetEmployees(ctx context.Context, filters map[string]string) ([
 	}
 	var res GetEmployeesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetEmployeesResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Employees, nil
 }
@@ -105,12 +104,12 @@ func (cli *Client) GetEmployeesBulk(ctx context.Context, bulkFilters []map[strin
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetEmployeesResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -125,10 +124,10 @@ func (c *Client) GetBusinessAreas(ctx context.Context, filters map[string]string
 	}
 	var res GetBusinessAreasResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetBusinessAreasResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetBusinessAreasResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.BusinessAreas, nil
 }
@@ -141,10 +140,10 @@ func (c *Client) GetCurrencies(ctx context.Context, filters map[string]string) (
 	}
 	var res GetCurrenciesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetCurrenciesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCurrenciesResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Currencies, nil
 }
@@ -152,11 +151,11 @@ func (c *Client) GetCurrencies(ctx context.Context, filters map[string]string) (
 func (c *Client) LogProcessingOfCustomerData(ctx context.Context, filters map[string]string) error {
 	resp, err := c.commonClient.SendRequest(ctx, logProcessingOfCustomerDataMethod, filters)
 	if err != nil {
-		return erro.NewFromError("logProcessingOfCustomerData request failed", err)
+		return sharedCommon.NewFromError("logProcessingOfCustomerData request failed", err, 0)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return erro.NewFromError(fmt.Sprintf("Logging response HTTP status is %d", resp.StatusCode), nil)
+		return sharedCommon.NewFromError(fmt.Sprintf("Logging response HTTP status is %d", resp.StatusCode), nil, 0)
 	}
 
 	return nil
@@ -169,10 +168,10 @@ func (c *Client) GetUserOperationsLog(ctx context.Context, filters map[string]st
 	}
 	var res GetUserOperationsLogResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal getUserOperationsLog", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal getUserOperationsLog", err, 0)
 	}
 	if !strings.EqualFold(res.Status.ResponseStatus, "ok") {
-		return nil, erro.NewFromResponseStatus(&common2.Status{
+		return nil, sharedCommon.NewFromResponseStatus(&sharedCommon.Status{
 			Request:        res.Status.Request,
 			ResponseStatus: res.Status.ResponseStatus,
 			ErrorCode:      res.Status.ErrorCode,
@@ -189,10 +188,10 @@ func (c *Client) SaveEvent(ctx context.Context, filters map[string]string) (int,
 	}
 	var res SaveEventResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return 0, erro.NewFromError(fmt.Sprintf("failed to unmarshal %s response", SaveEventMethod), err)
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("failed to unmarshal %s response", SaveEventMethod), err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return 0, erro.NewFromResponseStatus(&res.Status)
+		return 0, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Records[0].EventID, nil
 }
@@ -204,10 +203,10 @@ func (c *Client) GetEvents(ctx context.Context, filters map[string]string) ([]Ev
 	}
 	var res GetEventsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetEmployeesResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetEmployeesResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Events, nil
 }

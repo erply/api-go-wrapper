@@ -5,22 +5,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
 func (cli *Client) SaveSalesDocument(ctx context.Context, filters map[string]string) (SaleDocImportReports, error) {
 	resp, err := cli.SendRequest(ctx, "saveSalesDocument", filters)
 	if err != nil {
-		return nil, erro.NewFromError("PostSalesDocument request failed", err)
+		return nil, sharedCommon.NewFromError("PostSalesDocument request failed", err, 0)
 	}
 	res := &PostSalesDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling PostSalesDocumentResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling PostSalesDocumentResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.ImportReports) == 0 {
@@ -56,12 +56,12 @@ func (cli *Client) SaveSalesDocumentBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SaveSalesDocumentResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus, respBulk.Status.ErrorCode)
 		}
 	}
 
@@ -108,12 +108,20 @@ func (cli *Client) SavePurchaseDocumentBulk(
 		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal SavePurchaseDocumentResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
-		return respBulk, erro.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus)
+		return respBulk, sharedCommon.NewErplyError(
+			respBulk.Status.ErrorCode.String(),
+			respBulk.Status.Request+": "+respBulk.Status.ResponseStatus,
+			respBulk.Status.ErrorCode,
+		)
 	}
 
 	for _, bulkRespItem := range respBulk.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return respBulk, erro.NewErplyError(bulkRespItem.Status.ErrorCode.String(), bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus)
+			return respBulk, sharedCommon.NewErplyError(
+				bulkRespItem.Status.ErrorCode.String(),
+				bulkRespItem.Status.Request+": "+bulkRespItem.Status.ResponseStatus,
+				respBulk.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -123,15 +131,15 @@ func (cli *Client) SavePurchaseDocumentBulk(
 func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error) {
 	resp, err := cli.SendRequest(ctx, "getSalesDocuments", filters)
 	if err != nil {
-		return nil, erro.NewFromError("GetSalesDocument request failed", err)
+		return nil, sharedCommon.NewFromError("GetSalesDocument request failed", err, 0)
 	}
 	res := &GetSalesDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetSalesDocumentResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling GetSalesDocumentResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SalesDocuments) == 0 {
@@ -145,15 +153,15 @@ func (cli *Client) GetSalesDocuments(ctx context.Context, filters map[string]str
 func (cli *Client) GetSalesDocumentsWithStatus(ctx context.Context, filters map[string]string) (*GetSalesDocumentResponse, error) {
 	resp, err := cli.SendRequest(ctx, "getSalesDocuments", filters)
 	if err != nil {
-		return nil, erro.NewFromError("GetSalesDocument request failed", err)
+		return nil, sharedCommon.NewFromError("GetSalesDocument request failed", err, 0)
 	}
 	res := &GetSalesDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling GetSalesDocumentResponse failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling GetSalesDocumentResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SalesDocuments) == 0 {
@@ -187,12 +195,20 @@ func (cli *Client) GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetSaleDocumentResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(
+			bulkResp.Status.ErrorCode.String(),
+			bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus,
+			bulkResp.Status.ErrorCode,
+		)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(bulkItem.Status.ErrorCode.String(), bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(
+				bulkItem.Status.ErrorCode.String(),
+				bulkItem.Status.Request+": "+bulkItem.Status.ResponseStatus,
+				bulkItem.Status.ErrorCode,
+			)
 		}
 	}
 
@@ -202,15 +218,15 @@ func (cli *Client) GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[
 func (cli *Client) DeleteDocument(ctx context.Context, filters map[string]string) error {
 	resp, err := cli.SendRequest(ctx, "deleteSalesDocument", filters)
 	if err != nil {
-		return erro.NewFromError("DeleteDocumentsByIds request failed", err)
+		return sharedCommon.NewFromError("DeleteDocumentsByIds request failed", err, 0)
 	}
 	res := &GetSalesDocumentResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError("unmarshaling DeleteDocumentsByIds failed", err)
+		return sharedCommon.NewFromError("unmarshaling DeleteDocumentsByIds failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return nil

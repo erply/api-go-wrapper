@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,18 +14,18 @@ import (
 	"time"
 )
 
-func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, productIDsBulk [][]int) error {
-	bulkResp := GetProductsResponseBulk{
+func sendRequestCategory(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, prodCategoryIDs [][]int) error {
+	bulkResp := GetProductCategoryResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
 
-	bulkItems := make([]GetProductsResponseBulkItem, 0, len(productIDsBulk))
-	for _, productIDs := range productIDsBulk {
-		products := make([]Product, 0, len(productIDs))
-		for _, id := range productIDs {
-			products = append(products, Product{
-				ProductID: id,
-				Code:      fmt.Sprintf("Some Product %d", id),
+	bulkItems := make([]GetProductCategoryBulkItem, 0, len(prodCategoryIDs))
+	for _, catIDs := range prodCategoryIDs {
+		prodCats := make([]ProductCategory, 0, len(catIDs))
+		for _, id := range catIDs {
+			prodCats = append(prodCats, ProductCategory{
+				ProductCategoryID:   id,
+				ProductCategoryName: fmt.Sprintf("Some Category %d", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}
@@ -37,11 +36,11 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 		}
 		statusBulk.RecordsTotal = totalCount
 		statusBulk.ErrorCode = errStatus
-		statusBulk.RecordsInResponse = len(productIDs)
+		statusBulk.RecordsInResponse = len(prodCategoryIDs)
 
-		bulkItems = append(bulkItems, GetProductsResponseBulkItem{
-			Status:   statusBulk,
-			Products: products,
+		bulkItems = append(bulkItems, GetProductCategoryBulkItem{
+			Status:  statusBulk,
+			Records: prodCats,
 		})
 	}
 	bulkResp.BulkItems = bulkItems
@@ -58,24 +57,23 @@ func sendRequest(w http.ResponseWriter, errStatus errors.ApiError, totalCount in
 	return nil
 }
 
-func TestListingCountSuccess(t *testing.T) {
+func TestProdCategoriesListingCountSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
-		assert.NoError(t, err)
-		if err != nil {
-			return
-		}
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
 
-		assert.Equal(t, "someclient", parsedRequest["clientCode"])
-		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
-		requests := parsedRequest["requests"].([]map[string]interface{})
-		assert.Equal(t, float64(1), requests[0]["pageNo"])
-		assert.Equal(t, float64(1), requests[0]["recordsOnPage"])
-		assert.Equal(t, "getProducts", requests[0]["requestName"])
-		assert.Equal(t, "smeval", requests[0]["somekey"])
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"recordsOnPage": float64(1),
+				"pageNo":        float64(1),
+				"requestName":   "getProductCategories",
+			},
+		})
 
-		err = sendRequest(w, 0, totalCount, [][]int{{1}})
+		err := sendRequestCategory(w, 0, totalCount, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -87,9 +85,9 @@ func TestListingCountSuccess(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	dataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval", "pageNo": 1, "recordsOnPage": 1})
+	actualCount, err := dataProvider.Count(context.Background(), map[string]interface{}{"pageNo": 1, "recordsOnPage": 1})
 	assert.NoError(t, err)
 	if err != nil {
 		return
@@ -97,9 +95,9 @@ func TestListingCountSuccess(t *testing.T) {
 	assert.Equal(t, totalCount, actualCount)
 }
 
-func TestListingCountError(t *testing.T) {
+func TestProdCategoryListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendRequestCategory(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -111,20 +109,20 @@ func TestListingCountError(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	listingDataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
+	actualCount, err := listingDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.Error(t, err)
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
-func TestListingCountWithNoBulkItems(t *testing.T) {
+func TestProdCategoryListingCountWithNoBulkItems(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, 0, 0, [][]int{})
+		err := sendRequestCategory(w, 0, 0, [][]int{})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -136,9 +134,9 @@ func TestListingCountWithNoBulkItems(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	dataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
-	actualCount, err := productsDataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
+	actualCount, err := dataProvider.Count(context.Background(), map[string]interface{}{"somekey": "smeval"})
 	assert.NoError(t, err)
 	if err != nil {
 		return
@@ -146,30 +144,28 @@ func TestListingCountWithNoBulkItems(t *testing.T) {
 	assert.Equal(t, 0, actualCount)
 }
 
-func TestReadSuccess(t *testing.T) {
-	const limit = 2
-	const offset = 1
+func TestProdCategoryReadSuccess(t *testing.T) {
 	const totalCount = 10
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
-		assert.NoError(t, err)
-		if err != nil {
-			return
-		}
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode": "someclient",
+			"sessionKey": "somesess",
+		})
 
-		assert.Equal(t, "someclient", parsedRequest["clientCode"])
-		assert.Equal(t, "somesess", parsedRequest["sessionKey"])
+		common.AssertRequestBulk(t, r, []map[string]interface{}{
+			{
+				"recordsOnPage": float64(10),
+				"pageNo":        float64(1),
+				"requestName":"getProductCategories",
+			},
+			{
+				"recordsOnPage": float64(10),
+				"pageNo":        float64(2),
+				"requestName":"getProductCategories",
+			},
+		})
 
-		requests := parsedRequest["requests"].([]map[string]interface{})
-		assert.Len(t, requests, 1)
-
-		assert.Equal(t, float64(offset), requests[0]["pageNo"])
-		assert.Equal(t, float64(limit), requests[0]["recordsOnPage"])
-
-		assert.Equal(t, "getProducts", requests[0]["requestName"])
-		assert.Equal(t, "smeval", requests[0]["somekey"])
-
-		err = sendRequest(w, 0, totalCount, [][]int{{1, 2}, {3, 4}, {5}})
+		err := sendRequestCategory(w, 0, totalCount, [][]int{{1, 2}, {3, 4}, {5}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -181,21 +177,24 @@ func TestReadSuccess(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	dataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
-	actualProdIDs := make([]int, 0, 5)
-	err := productsDataProvider.Read(
+	actualProdCategoryIDs := make([]int, 0, 5)
+	err := dataProvider.Read(
 		context.Background(),
 		[]map[string]interface{}{
 			{
-				"somekey":       "smeval",
 				"pageNo":        1,
-				"recordsOnPage": 2,
+				"recordsOnPage": 10,
+			},
+			{
+				"pageNo":        2,
+				"recordsOnPage": 10,
 			},
 		},
 		func(item interface{}) {
-			assert.IsType(t, item, Product{})
-			actualProdIDs = append(actualProdIDs, item.(Product).ProductID)
+			assert.IsType(t, item, ProductCategory{})
+			actualProdCategoryIDs = append(actualProdCategoryIDs, item.(ProductCategory).ProductCategoryID)
 		},
 	)
 	assert.NoError(t, err)
@@ -203,12 +202,12 @@ func TestReadSuccess(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, []int{1, 2, 3, 4, 5}, actualProdIDs)
+	assert.Equal(t, []int{1, 2, 3, 4, 5}, actualProdCategoryIDs)
 }
 
-func TestReadError(t *testing.T) {
+func TestProdCategoryReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendRequest(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendRequestCategory(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -220,9 +219,9 @@ func TestReadError(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	dataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
-	err := productsDataProvider.Read(
+	err := dataProvider.Read(
 		context.Background(),
 		[]map[string]interface{}{{"somekey": "smeval"}},
 		func(item interface{}) {},
@@ -232,10 +231,10 @@ func TestReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
-func TestReadSuccessIntegration(t *testing.T) {
+func TestProdCategoryReadSuccessIntegration(t *testing.T) {
 	const totalCount = 11
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		parsedRequest, err := common.ExtractBulkFiltersFromRequest(r)
@@ -248,9 +247,9 @@ func TestReadSuccessIntegration(t *testing.T) {
 		assert.Len(t, requests, 1)
 
 		if requests[0]["pageNo"] == float64(1) {
-			err = sendRequest(w, 0, totalCount, [][]int{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}})
+			err = sendRequestCategory(w, 0, totalCount, [][]int{{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}})
 		} else {
-			err = sendRequest(w, 0, totalCount, [][]int{{11}})
+			err = sendRequestCategory(w, 0, totalCount, [][]int{{11}})
 		}
 
 		assert.NoError(t, err)
@@ -264,7 +263,7 @@ func TestReadSuccessIntegration(t *testing.T) {
 	baseClient := common.NewClient("somesess", "someclient", "", nil, nil)
 	baseClient.Url = srv.URL
 	productsClient := NewClient(baseClient)
-	productsDataProvider := NewListingDataProvider(productsClient)
+	dataProvider := NewProductCategoriesListingDataProvider(productsClient)
 
 	lister := sharedCommon.NewLister(
 		sharedCommon.ListingSettings{
@@ -273,25 +272,25 @@ func TestReadSuccessIntegration(t *testing.T) {
 			MaxItemsPerRequest:        10,
 			MaxFetchersCount:          10,
 		},
-		productsDataProvider,
+		dataProvider,
 		func(sleepTime time.Duration) {},
 	)
 
 	prodsChan := lister.Get(context.Background(), map[string]interface{}{})
 
-	actualProdIDs := collectProdIDsFromChannel(prodsChan)
-	sort.Ints(actualProdIDs)
+	actualProdGroupIDs := collectProdCategoryIDsFromChannel(prodsChan)
+	sort.Ints(actualProdGroupIDs)
 
-	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, actualProdIDs)
+	assert.Equal(t, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, actualProdGroupIDs)
 }
 
-func collectProdIDsFromChannel(prodsChan sharedCommon.ItemsStream) []int {
-	actualProdIDs := make([]int, 0)
+func collectProdCategoryIDsFromChannel(itemsChan sharedCommon.ItemsStream) []int {
+	actualProdCategoryIDs := make([]int, 0)
 	doneChan := make(chan struct{}, 1)
 	go func() {
 		defer close(doneChan)
-		for prod := range prodsChan {
-			actualProdIDs = append(actualProdIDs, prod.Payload.(Product).ProductID)
+		for item := range itemsChan {
+			actualProdCategoryIDs = append(actualProdCategoryIDs, item.Payload.(ProductCategory).ProductCategoryID)
 		}
 	}()
 
@@ -305,5 +304,5 @@ mainLoop:
 		}
 	}
 
-	return actualProdIDs
+	return actualProdCategoryIDs
 }

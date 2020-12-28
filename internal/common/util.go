@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/api/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -25,7 +25,7 @@ func IsJSONResponseOK(responseStatus *common.Status) bool {
 func getHTTPRequest(cli *Client, body io.Reader) (*http.Request, error) {
 	req, err := http.NewRequest("POST", cli.Url, body)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, common.NewFromError("failed to build HTTP request", err, 0)
 
 	}
 	return req, err
@@ -40,7 +40,6 @@ func (cli *Client) getDefaultMandatoryHeaders(request string) url.Values {
 	params := url.Values{}
 	params.Add("request", request)
 	params.Add("setContentType", "1")
-	params.Add(sessionKey, cli.sessionKey)
 	params.Add(clientCode, cli.clientCode)
 	if cli.partnerKey != "" {
 		params.Add("partnerKey", cli.partnerKey)
@@ -56,19 +55,44 @@ func setParams(params url.Values, filters map[string]string) {
 }
 
 func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters map[string]string) (*http.Response, error) {
+	log.Log.Log(log.Debug, "will call %s with filters %+v", apiMethod, filters)
 	req, err := getHTTPRequest(cli, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build http request", err)
+		return nil, common.NewFromError("failed to build http request", err, 0)
 	}
 	req = req.WithContext(ctx)
 	params := cli.headersFunc(apiMethod)
+	log.Log.Log(log.Debug, "extracted headers %+v", params)
+
+	params, err = cli.addSessionParams(params)
+	if err != nil {
+		return nil, err
+	}
+
 	setParams(params, filters)
+
 	req.URL.RawQuery = params.Encode()
 	resp, err := doRequest(req, cli)
 	if err != nil {
-		return nil, erro.NewFromError(fmt.Sprintf("%v request failed", apiMethod), err)
+		return nil, common.NewFromError(fmt.Sprintf("%v request failed", apiMethod), err, 0)
 	}
+	log.Log.Log(log.Debug, "got response with code: %d", resp.StatusCode)
 	return resp, nil
+}
+
+func (cli *Client) addSessionParams(params url.Values) (url.Values, error) {
+	sk, err := cli.sessionProvider.GetSession()
+	params.Add(sessionKey, sk)
+
+	return params, err
+}
+
+func (cli *Client) InvalidateSession() {
+	cli.sessionProvider.Invalidate()
+}
+
+func (cli *Client) GetSession() (sessionKey string, err error) {
+	return cli.sessionProvider.GetSession()
 }
 
 type DestRespWithStatus interface {
@@ -78,23 +102,24 @@ type DestRespWithStatus interface {
 func (cli *Client) Scan(ctx context.Context, apiMethod string, filters map[string]string, dest DestRespWithStatus) error {
 	resp, err := cli.SendRequest(ctx, apiMethod, filters)
 	if err != nil {
-		return erro.NewFromError(apiMethod +" request failed", err)
+		return common.NewFromError(apiMethod +" request failed", err, 0)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return erro.NewFromError("unmarshalling of response has failed", err)
+		return common.NewFromError("unmarshalling of response has failed", err, 0)
 	}
 
 	if err := json.Unmarshal(body, dest); err != nil {
-		return erro.NewFromError("unmarshalling of response failed", err)
+		return common.NewFromError("unmarshalling of response failed", err, 0)
 	}
 
 	status := dest.GetStatus()
 	if !IsJSONResponseOK(dest.GetStatus()) {
-		return erro.NewErplyErrorf(
+		return common.NewErplyErrorf(
 			status.ErrorCode.String(),
 			"request name: %s, error field: %s, response status: %s, body: %s",
+			status.ErrorCode,
 			status.Request,
 			status.ErrorField,
 			status.ResponseStatus,
@@ -106,6 +131,7 @@ func (cli *Client) Scan(ctx context.Context, apiMethod string, filters map[strin
 }
 
 func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filters map[string]string) (*http.Response, error) {
+	log.Log.Log(log.Debug, "will call Bulk request with inputs %+v and filters %+v", inputs, filters)
 	bulkRequest := make([]map[string]interface{}, 0, len(inputs))
 	for _, input := range inputs {
 		bulkItemFilters := input.Filters
@@ -116,7 +142,7 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 
 	jsonRequests, err := json.Marshal(bulkRequest)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build requests payload", err)
+		return nil, common.NewFromError("failed to build requests payload", err, 0)
 	}
 
 	filters["requests"] = string(jsonRequests)
@@ -125,6 +151,11 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 	if cli.headersFunc != nil {
 		params = cli.headersFunc("")
 		params.Del("request")
+		params, err = cli.addSessionParams(params)
+		if err != nil {
+			return nil, err
+		}
+
 	} else {
 		params = make(url.Values)
 	}
@@ -133,7 +164,7 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 
 	req, err := getHTTPRequest(cli, strings.NewReader(params.Encode()))
 	if err != nil {
-		return nil, erro.NewFromError("failed to build http request", err)
+		return nil, common.NewFromError("failed to build http request", err, 0)
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -141,8 +172,9 @@ func (cli *Client) SendRequestBulk(ctx context.Context, inputs []BulkInput, filt
 
 	resp, err := doRequest(req, cli)
 	if err != nil {
-		return nil, erro.NewFromError("Bulk request failed", err)
+		return nil, common.NewFromError("Bulk request failed", err, 0)
 	}
+	log.Log.Log(log.Debug, "got response from Bulk API with status %d", resp.StatusCode)
 	return resp, nil
 }
 

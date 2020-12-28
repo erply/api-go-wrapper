@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"net/http"
 	"net/url"
 )
@@ -39,33 +38,33 @@ func CreateInstallation(baseUrl, partnerKey string, filters map[string]string, h
 
 	req, err := http.NewRequest("POST", baseUrl, nil)
 	if err != nil {
-		return nil, erro.NewFromError("failed to build HTTP request", err)
+		return nil, sharedCommon.NewFromError("failed to build HTTP request", err, 0)
 
 	}
 	req.URL.RawQuery = params.Encode()
 	resp, err := httpCli.Do(req)
 	if err != nil {
-		return nil, erro.NewFromError("CreateInstallation: error sending POST request", err)
+		return nil, sharedCommon.NewFromError("CreateInstallation: error sending POST request", err, 0)
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: bad response status code: %d", resp.StatusCode), nil)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("CreateInstallation: bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
 	var respData struct {
-		Status  common2.Status
+		Status  sharedCommon.Status
 		Records []InstallationResponse
 	}
 
 	err = json.NewDecoder(resp.Body).Decode(&respData)
 	if err != nil {
-		return nil, erro.NewFromError("CreateInstallation: error decoding JSON response body", err)
+		return nil, sharedCommon.NewFromError("CreateInstallation: error decoding JSON response body", err, 0)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return nil, erro.NewFromError(fmt.Sprintf("CreateInstallation: API error %s", respData.Status.ErrorCode), nil)
+		return nil, sharedCommon.NewFromError(fmt.Sprintf("CreateInstallation: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
 	}
 	if len(respData.Records) < 1 {
-		return nil, erro.NewFromError("CreateInstallation: no records in response", nil)
+		return nil, sharedCommon.NewFromError("CreateInstallation: no records in response", nil, respData.Status.ErrorCode)
 	}
 
 	return &respData.Records[0], nil

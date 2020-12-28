@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -18,10 +17,10 @@ func (cli *Client) GetSuppliers(ctx context.Context, filters map[string]string) 
 	}
 	var res GetSuppliersResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetSuppliersResponse ", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetSuppliersResponse ", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Suppliers, nil
 }
@@ -50,12 +49,12 @@ func (cli *Client) GetSuppliersBulk(ctx context.Context, bulkFilters []map[strin
 		return suppliersResp, fmt.Errorf("ERPLY API: failed to unmarshal GetSuppliersResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&suppliersResp.Status) {
-		return suppliersResp, erro.NewErplyError(suppliersResp.Status.ErrorCode.String(), suppliersResp.Status.Request+": "+suppliersResp.Status.ResponseStatus)
+		return suppliersResp, sharedCommon.NewErplyError(suppliersResp.Status.ErrorCode.String(), suppliersResp.Status.Request+": "+suppliersResp.Status.ResponseStatus, suppliersResp.Status.ErrorCode)
 	}
 
 	for _, supplierBulkItem := range suppliersResp.BulkItems {
 		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
-			return suppliersResp, erro.NewErplyError(supplierBulkItem.Status.ErrorCode.String(), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus)
+			return suppliersResp, sharedCommon.NewErplyError(supplierBulkItem.Status.ErrorCode.String(), supplierBulkItem.Status.Request+": "+supplierBulkItem.Status.ResponseStatus, suppliersResp.Status.ErrorCode)
 		}
 	}
 
@@ -65,15 +64,15 @@ func (cli *Client) GetSuppliersBulk(ctx context.Context, bulkFilters []map[strin
 func (cli *Client) SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
 	resp, err := cli.SendRequest(ctx, "saveSupplier", filters)
 	if err != nil {
-		return nil, erro.NewFromError("PostSupplier request failed", err)
+		return nil, sharedCommon.NewFromError("PostSupplier request failed", err, 0)
 	}
 	res := &PostCustomerResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("unmarshaling CustomerImportReport failed", err)
+		return nil, sharedCommon.NewFromError("unmarshaling CustomerImportReport failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.CustomerImportReports) == 0 {
@@ -86,8 +85,8 @@ func (cli *Client) SaveSupplier(ctx context.Context, filters map[string]string) 
 func (cli *Client) SaveSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (SaveSuppliersResponseBulk, error) {
 	var saveSuppliersResponseBulk SaveSuppliersResponseBulk
 
-	if len(supplierMap) > common2.MaxBulkRequestsCount {
-		return saveSuppliersResponseBulk, fmt.Errorf("cannot save more than %d suppliers in one request", common2.MaxBulkRequestsCount)
+	if len(supplierMap) > sharedCommon.MaxBulkRequestsCount {
+		return saveSuppliersResponseBulk, fmt.Errorf("cannot save more than %d suppliers in one request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(supplierMap))
@@ -113,14 +112,19 @@ func (cli *Client) SaveSupplierBulk(ctx context.Context, supplierMap []map[strin
 	}
 
 	if !common.IsJSONResponseOK(&saveSuppliersResponseBulk.Status) {
-		return saveSuppliersResponseBulk, erro.NewErplyError(saveSuppliersResponseBulk.Status.ErrorCode.String(), saveSuppliersResponseBulk.Status.Request+": "+saveSuppliersResponseBulk.Status.ResponseStatus)
+		return saveSuppliersResponseBulk, sharedCommon.NewErplyError(
+			saveSuppliersResponseBulk.Status.ErrorCode.String(),
+			saveSuppliersResponseBulk.Status.Request+": "+saveSuppliersResponseBulk.Status.ResponseStatus,
+			saveSuppliersResponseBulk.Status.ErrorCode,
+		)
 	}
 
 	for _, supplierBulkItem := range saveSuppliersResponseBulk.BulkItems {
 		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
-			return saveSuppliersResponseBulk, erro.NewErplyError(
+			return saveSuppliersResponseBulk, sharedCommon.NewErplyError(
 				supplierBulkItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", supplierBulkItem.Status),
+				supplierBulkItem.Status.ErrorCode,
 			)
 		}
 	}
@@ -136,10 +140,10 @@ func (cli *Client) DeleteSupplier(ctx context.Context, filters map[string]string
 	}
 	var res DeleteSupplierResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return erro.NewFromError("failed to unmarshal DeleteSupplierResponse ", err)
+		return sharedCommon.NewFromError("failed to unmarshal DeleteSupplierResponse ", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return erro.NewFromResponseStatus(&res.Status)
+		return sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return nil
 }
@@ -147,8 +151,8 @@ func (cli *Client) DeleteSupplier(ctx context.Context, filters map[string]string
 func (cli *Client) DeleteSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (DeleteSuppliersResponseBulk, error) {
 	var deleteSupplierResponse DeleteSuppliersResponseBulk
 
-	if len(supplierMap) > common2.MaxBulkRequestsCount {
-		return deleteSupplierResponse, fmt.Errorf("cannot delete more than %d suppliers in one request", common2.MaxBulkRequestsCount)
+	if len(supplierMap) > sharedCommon.MaxBulkRequestsCount {
+		return deleteSupplierResponse, fmt.Errorf("cannot delete more than %d suppliers in one request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(supplierMap))
@@ -174,14 +178,19 @@ func (cli *Client) DeleteSupplierBulk(ctx context.Context, supplierMap []map[str
 	}
 
 	if !common.IsJSONResponseOK(&deleteSupplierResponse.Status) {
-		return deleteSupplierResponse, erro.NewErplyError(deleteSupplierResponse.Status.ErrorCode.String(), deleteSupplierResponse.Status.Request+": "+deleteSupplierResponse.Status.ResponseStatus)
+		return deleteSupplierResponse, sharedCommon.NewErplyError(
+			deleteSupplierResponse.Status.ErrorCode.String(),
+			deleteSupplierResponse.Status.Request+": "+deleteSupplierResponse.Status.ResponseStatus,
+			deleteSupplierResponse.Status.ErrorCode,
+		)
 	}
 
 	for _, supplierBulkItem := range deleteSupplierResponse.BulkItems {
 		if !common.IsJSONResponseOK(&supplierBulkItem.Status.Status) {
-			return deleteSupplierResponse, erro.NewErplyError(
+			return deleteSupplierResponse, sharedCommon.NewErplyError(
 				supplierBulkItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", supplierBulkItem.Status),
+				deleteSupplierResponse.Status.ErrorCode,
 			)
 		}
 	}

@@ -1,7 +1,8 @@
-package errors
+package common
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 )
 
 type ApiError int
@@ -337,3 +338,41 @@ func (s ApiError) String() string {
 
 	return fmt.Sprintf("[%d] %s", int(s), strVal)
 }
+
+type ErplyError struct {
+	error
+	Status  string
+	Message string
+	Code    ApiError
+}
+
+func (e *ErplyError) Error() string {
+	return fmt.Sprintf("ERPLY API: %s, status: %s, code: %d", e.Message, e.Status, e.Code)
+}
+
+func NewErplyError(status, msg string, code ApiError) *ErplyError {
+	return &ErplyError{Status: status, Message: msg, Code: code}
+}
+
+func NewErplyErrorf(status, msg string, code ApiError, args ...interface{}) *ErplyError {
+	return &ErplyError{Status: status, Message: fmt.Sprintf(msg, args...), Code: code}
+}
+
+func NewFromResponseStatus(status *Status) *ErplyError {
+	var s string
+	if status.ErrorField != "" {
+		s = fmt.Sprintf("%s, error field: %s", status.ErrorCode.String(), status.ErrorField)
+	} else {
+		s = status.ErrorCode.String()
+	}
+	m := status.Request + ": " + status.ResponseStatus
+	return &ErplyError{Status: s, Message: m, Code: status.ErrorCode}
+}
+
+func NewFromError(msg string, err error, code ApiError) *ErplyError {
+	if err != nil {
+		return NewErplyError("Error", errors.Wrap(err, msg).Error(), code)
+	}
+	return NewErplyError("Error", msg, code)
+}
+

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 	"net/http"
@@ -14,24 +13,24 @@ import (
 func (cli *Client) SaveInventoryRegistration(ctx context.Context, filters map[string]string) (inventoryRegistrationID int, err error) {
 	resp, err := cli.SendRequest(ctx, "saveInventoryRegistration", filters)
 	if err != nil {
-		return 0, erro.NewFromError("saveInventoryRegistration: error sending POST request", err)
+		return 0, sharedCommon.NewFromError("saveInventoryRegistration: error sending POST request", err, 0)
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return 0, erro.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil)
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
 	respData := SaveInventoryRegistrationResponse{}
 
 	err = json.NewDecoder(resp.Body).Decode(&respData)
 	if err != nil {
-		return 0, erro.NewFromError("saveInventoryRegistration: error decoding JSON response body", err)
+		return 0, sharedCommon.NewFromError("saveInventoryRegistration: error decoding JSON response body", err, 0)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return 0, erro.NewFromError(fmt.Sprintf("saveInventoryRegistration: API error %s", respData.Status.ErrorCode), nil)
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
 	}
 	if len(respData.Results) < 1 {
-		return 0, erro.NewFromError("saveInventoryRegistration: no records in response", nil)
+		return 0, sharedCommon.NewFromError("saveInventoryRegistration: no records in response", nil, respData.Status.ErrorCode)
 	}
 
 	return respData.Results[0].InventoryRegistrationID, nil
@@ -73,14 +72,15 @@ func (cli *Client) SaveInventoryRegistrationBulk(
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}

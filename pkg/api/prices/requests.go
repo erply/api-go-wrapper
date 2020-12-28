@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
-	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 )
 
@@ -26,7 +25,7 @@ func (cli *Client) GetSupplierPriceLists(ctx context.Context, filters map[string
 		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetPriceListsResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.PriceLists, nil
@@ -43,7 +42,7 @@ func (cli *Client) EditProductToSupplierPriceList(ctx context.Context, filters m
 func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method string, filters map[string]string) (*ChangeProductToSupplierPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return nil, erro.NewFromError(method+" request failed", err)
+		return nil, sharedCommon.NewFromError(method+" request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -56,7 +55,7 @@ func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.ChangeProductToSupplierPriceListResult) == 0 {
@@ -70,8 +69,8 @@ func (cli *Client) persistProductToSupplierPriceList(ctx context.Context, method
 func (cli *Client) ChangeProductToSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (ChangeProductToSupplierPriceListResponseBulk, error) {
 	var bulkResp ChangeProductToSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -102,14 +101,15 @@ func (cli *Client) ChangeProductToSupplierPriceListBulk(ctx context.Context, bul
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -140,12 +140,12 @@ func (cli *Client) GetSupplierPriceListsBulk(ctx context.Context, bulkFilters []
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetPriceListsResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -168,7 +168,7 @@ func (cli *Client) GetProductsInSupplierPriceList(ctx context.Context, filters m
 		return nil, fmt.Errorf("ERPLY API: failed to unmarshal ProductsInSupplierPriceListResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.ProductsInSupplierPriceList, nil
@@ -197,12 +197,12 @@ func (cli *Client) GetProductsInSupplierPriceListBulk(ctx context.Context, bulkF
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal ProductsInSupplierPriceListResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -225,7 +225,7 @@ func (cli *Client) GetProductsInPriceList(ctx context.Context, filters map[strin
 		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsInPriceListResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res.PriceLists, nil
@@ -247,7 +247,7 @@ func (cli *Client) GetProductsInPriceListWithStatus(ctx context.Context, filters
 		return res, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsInPriceListResponse from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return res, erro.NewFromResponseStatus(&res.Status)
+		return res, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	return res, nil
@@ -277,12 +277,12 @@ func (cli *Client) GetProductsInPriceListBulk(ctx context.Context, bulkFilters [
 		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsInPriceListResponseBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, prodBulkItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus)
+			return bulkResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 		}
 	}
 
@@ -292,7 +292,7 @@ func (cli *Client) GetProductsInPriceListBulk(ctx context.Context, bulkFilters [
 func (cli *Client) DeleteProductsFromSupplierPriceList(ctx context.Context, filters map[string]string) (*DeleteProductsFromSupplierPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "deleteProductsFromSupplierPriceList", filters)
 	if err != nil {
-		return nil, erro.NewFromError("deleteProductsFromSupplierPriceList request failed", err)
+		return nil, sharedCommon.NewFromError("deleteProductsFromSupplierPriceList request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -305,7 +305,7 @@ func (cli *Client) DeleteProductsFromSupplierPriceList(ctx context.Context, filt
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.DeleteProductsFromSupplierPriceListResult) == 0 {
@@ -318,8 +318,8 @@ func (cli *Client) DeleteProductsFromSupplierPriceList(ctx context.Context, filt
 func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (DeleteProductsFromSupplierPriceListResponseBulk, error) {
 	var bulkResp DeleteProductsFromSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -345,14 +345,15 @@ func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, 
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -363,7 +364,7 @@ func (cli *Client) DeleteProductsFromSupplierPriceListBulk(ctx context.Context, 
 func (cli *Client) SaveSupplierPriceList(ctx context.Context, filters map[string]string) (*SaveSupplierPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "saveSupplierPriceList", filters)
 	if err != nil {
-		return nil, erro.NewFromError("saveSupplierPriceList request failed", err)
+		return nil, sharedCommon.NewFromError("saveSupplierPriceList request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -376,7 +377,7 @@ func (cli *Client) SaveSupplierPriceList(ctx context.Context, filters map[string
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SaveSupplierPriceListResult) == 0 {
@@ -389,8 +390,8 @@ func (cli *Client) SaveSupplierPriceList(ctx context.Context, filters map[string
 func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveSupplierPriceListResponseBulk, error) {
 	var bulkResp SaveSupplierPriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -416,14 +417,15 @@ func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -434,7 +436,7 @@ func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []
 func (cli *Client) SavePriceList(ctx context.Context, filters map[string]string) (*SavePriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "savePriceList", filters)
 	if err != nil {
-		return nil, erro.NewFromError("savePriceList request failed", err)
+		return nil, sharedCommon.NewFromError("savePriceList request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -447,7 +449,7 @@ func (cli *Client) SavePriceList(ctx context.Context, filters map[string]string)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.SavePriceListResults) == 0 {
@@ -460,8 +462,8 @@ func (cli *Client) SavePriceList(ctx context.Context, filters map[string]string)
 func (cli *Client) SavePriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SavePriceListResponseBulk, error) {
 	var bulkResp SavePriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot save more than %d price lists in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -487,14 +489,15 @@ func (cli *Client) SavePriceListBulk(ctx context.Context, bulkRequest []map[stri
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -513,7 +516,7 @@ func (cli *Client) EditProductToPriceList(ctx context.Context, filters map[strin
 func (cli *Client) persistProductToPriceList(ctx context.Context, method string, filters map[string]string) (*ChangeProductToPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, method, filters)
 	if err != nil {
-		return nil, erro.NewFromError(method+" request failed", err)
+		return nil, sharedCommon.NewFromError(method+" request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -526,7 +529,7 @@ func (cli *Client) persistProductToPriceList(ctx context.Context, method string,
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.ChangeProductToPriceListResults) == 0 {
@@ -539,8 +542,8 @@ func (cli *Client) persistProductToPriceList(ctx context.Context, method string,
 func (cli *Client) ChangeProductToPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (ChangeProductToPriceListResponseBulk, error) {
 	var bulkResp ChangeProductToPriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot add more than %d products to price list in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -571,14 +574,15 @@ func (cli *Client) ChangeProductToPriceListBulk(ctx context.Context, bulkRequest
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}
@@ -589,7 +593,7 @@ func (cli *Client) ChangeProductToPriceListBulk(ctx context.Context, bulkRequest
 func (cli *Client) DeleteProductsFromPriceList(ctx context.Context, filters map[string]string) (*DeleteProductsFromPriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "deleteProductInPriceList", filters)
 	if err != nil {
-		return nil, erro.NewFromError("deleteProductInPriceList request failed", err)
+		return nil, sharedCommon.NewFromError("deleteProductInPriceList request failed", err, 0)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -602,7 +606,7 @@ func (cli *Client) DeleteProductsFromPriceList(ctx context.Context, filters map[
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 
 	if len(res.DeleteProductsFromPriceListResults) == 0 {
@@ -619,8 +623,8 @@ func (cli *Client) DeleteProductsFromPriceListBulk(
 ) (DeleteProductsFromPriceListResponseBulk, error) {
 	var bulkResp DeleteProductsFromPriceListResponseBulk
 
-	if len(bulkRequest) > common2.MaxBulkRequestsCount {
-		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", common2.MaxBulkRequestsCount)
+	if len(bulkRequest) > sharedCommon.MaxBulkRequestsCount {
+		return bulkResp, fmt.Errorf("cannot delete more than %d products from price list in one bulk request", sharedCommon.MaxBulkRequestsCount)
 	}
 
 	bulkInputs := make([]common.BulkInput, 0, len(bulkRequest))
@@ -646,14 +650,15 @@ func (cli *Client) DeleteProductsFromPriceListBulk(
 	}
 
 	if !common.IsJSONResponseOK(&bulkResp.Status) {
-		return bulkResp, erro.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus)
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
 	}
 
 	for _, bulkRespItem := range bulkResp.BulkItems {
 		if !common.IsJSONResponseOK(&bulkRespItem.Status.Status) {
-			return bulkResp, erro.NewErplyError(
+			return bulkResp, sharedCommon.NewErplyError(
 				bulkRespItem.Status.ErrorCode.String(),
 				fmt.Sprintf("%+v", bulkRespItem.Status),
+				bulkResp.Status.ErrorCode,
 			)
 		}
 	}

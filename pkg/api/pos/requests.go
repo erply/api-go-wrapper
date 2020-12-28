@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/erply/api-go-wrapper/internal/common"
-	erro "github.com/erply/api-go-wrapper/internal/errors"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 // GetPointsOfSale will list points of sale according to specified filters.
@@ -15,10 +15,10 @@ func (cli *Client) GetPointsOfSale(ctx context.Context, filters map[string]strin
 	}
 	var res GetPointsOfSaleResponse
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, erro.NewFromError("failed to unmarshal GetPointsOfSaleResponse", err)
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetPointsOfSaleResponse", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, erro.NewFromResponseStatus(&res.Status)
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.PointsOfSale, nil
 }

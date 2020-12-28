@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,7 +14,7 @@ import (
 	"time"
 )
 
-func sendSaleDocumentsResponse(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, documentsIDBulk [][]int) error {
+func sendSaleDocumentsResponse(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, documentsIDBulk [][]int) error {
 	bulkResp := GetSaleDocumentResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
@@ -99,7 +98,7 @@ func TestSaleDocumentsListingCountSuccess(t *testing.T) {
 
 func TestSaleDocumentsListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendSaleDocumentsResponse(w, errors.MalformedRequest, 0, [][]int{{1}})
+		err := sendSaleDocumentsResponse(w, sharedCommon.MalformedRequest, 0, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -118,7 +117,7 @@ func TestSaleDocumentsListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -208,7 +207,7 @@ func TestSaleDocumentsReadSuccess(t *testing.T) {
 
 func TestSaleDocumentsReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendSaleDocumentsResponse(w, errors.MalformedRequest, 10, [][]int{{1}})
+		err := sendSaleDocumentsResponse(w, sharedCommon.MalformedRequest, 10, [][]int{{1}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -232,7 +231,7 @@ func TestSaleDocumentsReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestSaleDocumentsReadSuccessIntegration(t *testing.T) {
@@ -308,7 +307,7 @@ mainLoop:
 	return actualDocIDs
 }
 
-func sendVatRatesResponse(w http.ResponseWriter, errStatus errors.ApiError, totalCount int, rateIDs [][]string) error {
+func sendVatRatesResponse(w http.ResponseWriter, errStatus sharedCommon.ApiError, totalCount int, rateIDs [][]string) error {
 	bulkResp := GetVatRatesResponseBulk{
 		Status: sharedCommon.Status{ResponseStatus: "ok"},
 	}
@@ -392,7 +391,7 @@ func TestVatRatesListingCountSuccess(t *testing.T) {
 
 func TestVatRatesListingCountError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendVatRatesResponse(w, errors.MalformedRequest, 0, [][]string{{"1"}})
+		err := sendVatRatesResponse(w, sharedCommon.MalformedRequest, 0, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -411,7 +410,7 @@ func TestVatRatesListingCountError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 	assert.Equal(t, 0, actualCount)
 }
 
@@ -475,7 +474,7 @@ func TestVatRatesReadSuccess(t *testing.T) {
 
 func TestVatRatesReadError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := sendVatRatesResponse(w, errors.MalformedRequest, 10, [][]string{{"1"}})
+		err := sendVatRatesResponse(w, sharedCommon.MalformedRequest, 10, [][]string{{"1"}})
 		assert.NoError(t, err)
 		if err != nil {
 			return
@@ -499,7 +498,7 @@ func TestVatRatesReadError(t *testing.T) {
 		return
 	}
 
-	assert.Contains(t, err.Error(), errors.MalformedRequest.String())
+	assert.Contains(t, err.Error(), sharedCommon.MalformedRequest.String())
 }
 
 func TestVatRatesReadSuccessIntegration(t *testing.T) {

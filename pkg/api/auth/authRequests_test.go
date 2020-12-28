@@ -49,7 +49,7 @@ func TestGetSessionKeyUserSuccess(t *testing.T) {
 		return
 	}
 
-	assert.Equal(t, sessKeyUserToGive, sessKeyUserActual)
+	assert.Equal(t, sessKeyUserToGive, *sessKeyUserActual)
 	assert.Len(t, cl.Requests, 1)
 	if len(cl.Requests) != 1 {
 		return
@@ -109,7 +109,7 @@ func TestGetSessionKeyUserZeroRecords(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.Contains(t, err.Error(), "ERPLY API: getSessionKeyUser: no records in response status")
+	assert.Contains(t, err.Error(), "ERPLY API: getSessionKeyUser: no records in response, status: Error, code: 0")
 }
 
 func TestGetSessionKeyUserError(t *testing.T) {
@@ -134,7 +134,7 @@ func TestGetSessionKeyUserError(t *testing.T) {
 	if err == nil {
 		return
 	}
-	assert.EqualError(t, err, "ERPLY API: failed to call getSessionKeyUser request: some bad error status: Error")
+	assert.EqualError(t, err, "ERPLY API: failed to call getSessionKeyUser request: some bad error, status: Error, code: 0")
 }
 
 func TestGetSessionKeyUserWrongRespCode(t *testing.T) {

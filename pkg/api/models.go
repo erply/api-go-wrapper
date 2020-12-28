@@ -2,7 +2,6 @@ package api
 
 import (
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/errors"
 )
 
 type UserRights struct {
@@ -28,12 +27,12 @@ type GetCurrenciesResponse struct {
 
 type GetUserOperationsLogResponse struct {
 	Status struct {
-		Request         string          `json:"request"`
-		RequestUnixTime int             `json:"requestUnixTime"`
-		ResponseStatus  string          `json:"responseStatus"`
-		ErrorCode       errors.ApiError `json:"errorCode"`
-		ErrorField      string          `json:"errorField"`
-		GenerationTime  float64         `json:"generationTime"`
+		Request         string                `json:"request"`
+		RequestUnixTime int                   `json:"requestUnixTime"`
+		ResponseStatus  string                `json:"responseStatus"`
+		ErrorCode       sharedCommon.ApiError `json:"errorCode"`
+		ErrorField      string                `json:"errorField"`
+		GenerationTime  float64               `json:"generationTime"`
 		//the records total field is string type for this request
 		RecordsTotal      string `json:"recordsTotal"`
 		RecordsInResponse int    `json:"recordsInResponse"`
