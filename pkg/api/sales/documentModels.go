@@ -183,7 +183,7 @@ type (
 	}
 
 	SaleDocImportReport struct {
-		InvoiceID    int              `json:"invoiceID"`
+		InvoiceID    json.Number      `json:"invoiceID"`
 		InvoiceNo    string           `json:"invoiceNo"`
 		CustomNumber string           `json:"customNumber"`
 		InvoiceLink  string           `json:"invoiceLink"`
