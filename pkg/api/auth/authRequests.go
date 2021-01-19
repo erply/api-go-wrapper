@@ -253,7 +253,7 @@ func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) 
 	if err != nil {
 		return nil, sharedCommon.NewFromError("failed to call getSessionKeyInfo request", err, 0)
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
 		var body []byte
