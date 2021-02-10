@@ -22,3 +22,19 @@ func (cli *Client) GetPointsOfSale(ctx context.Context, filters map[string]strin
 	}
 	return res.PointsOfSale, nil
 }
+
+// GetClockIns will list clocking of employees according to the specified filters.
+func (cli *Client) GetClockIns(ctx context.Context, filters map[string]string) ([]Clocking, error) {
+	resp, err := cli.SendRequest(ctx, "getClockIns", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetClockInsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetClockInsResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.ClockIns, nil
+}
