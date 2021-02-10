@@ -18,4 +18,17 @@ type (
 		Status       common2.Status `json:"status"`
 		PointsOfSale []PointOfSale  `json:"records"`
 	}
+
+	Clocking struct {
+		InUnixTime        int64 `json:"InUnixTime"`
+		OutUnixTime       int64 `json:"OutUnixTime"`
+		EmployeeID        int64 `json:"employeeID"`
+		TimeClockRecordID int64 `json:"timeclockRecordID"`
+		WarehouseID       int64 `json:"warehouseID"`
+	}
+
+	GetClockInsResponse struct {
+		Status   common2.Status `json:"status"`
+		ClockIns []Clocking     `json:"records"`
+	}
 )
