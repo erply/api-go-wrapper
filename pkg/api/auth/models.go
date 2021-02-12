@@ -43,21 +43,27 @@ type (
 	}
 
 	SessionKeyUser struct {
-		UserID             string `json:"userID"`
-		UserName           string `json:"userName"`
-		EmployeeName       string `json:"employeeName"`
-		EmployeeID         string `json:"employeeID"`
-		GroupID            string `json:"groupID"`
-		GroupName          string `json:"groupName"`
-		IPAddress          string `json:"ipAddress"`
-		SessionKey         string `json:"sessionKey"`
-		SessionLength      int    `json:"sessionLength"`
-		LoginUrl           string `json:"loginUrl"`
-		BerlinPOSVersion   string `json:"berlinPOSVersion"`
-		BerlinPOSAssetsURL string `json:"berlinPOSAssetsURL"`
-		EpsiURL            string `json:"epsiURL"`
-		IdentityToken      string `json:"identityToken"`
-		Token              string `json:"token"`
+		UserID               string `json:"userID"`
+		UserName             string `json:"userName"`
+		EmployeeName         string `json:"employeeName"`
+		EmployeeID           string `json:"employeeID"`
+		GroupID              string `json:"groupID"`
+		GroupName            string `json:"groupName"`
+		IPAddress            string `json:"ipAddress"`
+		SessionKey           string `json:"sessionKey"`
+		SessionLength        int    `json:"sessionLength"`
+		LoginUrl             string `json:"loginUrl"`
+		BerlinPOSVersion     string `json:"berlinPOSVersion"`
+		BerlinPOSAssetsURL   string `json:"berlinPOSAssetsURL"`
+		EpsiURL              string `json:"epsiURL"`
+		IdentityToken        string `json:"identityToken"`
+		Token                string `json:"token"`
+		CustomerRegistryURLs []struct {
+			Priority int64  `json:"priority"`
+			Token    string `json:"token"`
+			URL      string `json:"url"`
+			Weight   int64  `json:"weight"`
+		} `json:"customerRegistryURLs"`
 	}
 
 	SessionKeyInfoResponse struct {
