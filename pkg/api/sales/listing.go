@@ -38,8 +38,8 @@ func (sdldp *SaleDocumentsListingDataProvider) Read(ctx context.Context, bulkFil
 	}
 
 	for _, bulkItem := range resp.BulkItems {
-		for _, doc := range bulkItem.SaleDocuments {
-			callback(doc)
+		for i := range bulkItem.SaleDocuments {
+			callback(bulkItem.SaleDocuments[i])
 		}
 	}
 

@@ -109,15 +109,15 @@ func GetProductsBulk(cl *api.Client) {
 
 	bulkFilters := []map[string]interface{}{
 		{
-			"recordsOnPage": "10",
-			"pageNo": "1",
-			"getAllLanguages": "1",
-			"getFIFOCost": "1",
-			"getMatrixVariations": "1",
-			"getPackageInfo": "1",
+			"recordsOnPage":            "10",
+			"pageNo":                   "1",
+			"getAllLanguages":          "1",
+			"getFIFOCost":              "1",
+			"getMatrixVariations":      "1",
+			"getPackageInfo":           "1",
 			"getPriceCalculationSteps": 1,
-			"getPackagingMaterials": "1",
-			"getParameters": "1",
+			"getPackagingMaterials":    "1",
+			"getParameters":            "1",
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -213,9 +213,7 @@ func GetProductStockFileBulk(cl *api.Client) (stockFiles []products.GetProductSt
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, stockFile := range bulkItem.GetProductStockFiles {
-			stockFiles = append(stockFiles, stockFile)
-		}
+		stockFiles = append(stockFiles, bulkItem.GetProductStockFiles...)
 	}
 
 	return stockFiles, err
@@ -243,9 +241,7 @@ func SaveProductsBulk(cl *api.Client) (saveProdResult []products.SaveProductResu
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, prod := range bulkItem.Products {
-			saveProdResult = append(saveProdResult, prod)
-		}
+		saveProdResult = append(saveProdResult, bulkItem.Products...)
 	}
 
 	return
@@ -590,11 +586,11 @@ func GetProductPriorityGroupBulk(cl *api.Client) {
 	filter := []map[string]interface{}{
 		{
 			"recordsOnPage": 5,
-			"pageNo": 1,
+			"pageNo":        1,
 		},
 		{
 			"recordsOnPage": 5,
-			"pageNo": 2,
+			"pageNo":        2,
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -701,7 +697,7 @@ func GetProductPriorityGroupsInParallel(cl *api.Client) {
 
 	prioGroupChan := lister.Get(ctx, map[string]interface{}{
 		"recordsOnPage": 10,
-		"pageNo": 1,
+		"pageNo":        1,
 	})
 
 	prioGroups := make([]products.ProductPriorityGroup, 0)
@@ -721,15 +717,15 @@ func GetProductGroupBulk(cl *api.Client) {
 	filter := []map[string]interface{}{
 		{
 			"recordsOnPage": 5,
-			"pageNo": 3,
+			"pageNo":        3,
 		},
 		{
 			"recordsOnPage": 5,
-			"pageNo": 4,
+			"pageNo":        4,
 		},
 		{
 			"recordsOnPage": 5,
-			"pageNo": 5,
+			"pageNo":        5,
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -762,7 +758,7 @@ func GetProductGroupsInParallel(cl *api.Client) {
 
 	prioGroupChan := lister.Get(ctx, map[string]interface{}{
 		"recordsOnPage": 10,
-		"pageNo": 1,
+		"pageNo":        1,
 	})
 
 	groups := make([]products.ProductGroup, 0)
@@ -782,15 +778,15 @@ func GetProductCategoriesBulk(cl *api.Client) {
 	filter := []map[string]interface{}{
 		{
 			"recordsOnPage": 5,
-			"pageNo": 1,
+			"pageNo":        1,
 		},
 		{
 			"recordsOnPage": 5,
-			"pageNo": 2,
+			"pageNo":        2,
 		},
 		{
 			"recordsOnPage": 5,
-			"pageNo": 3,
+			"pageNo":        3,
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -823,7 +819,7 @@ func GetProductCategoriesInParallel(cl *api.Client) {
 
 	prioGroupChan := lister.Get(ctx, map[string]interface{}{
 		"recordsOnPage": 10,
-		"pageNo": 1,
+		"pageNo":        1,
 	})
 
 	categories := make([]products.ProductCategory, 0)

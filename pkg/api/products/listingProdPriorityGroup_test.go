@@ -158,12 +158,12 @@ func TestProdPrioGroupReadSuccess(t *testing.T) {
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(1),
-				"requestName":"getProductPriorityGroups",
+				"requestName":   "getProductPriorityGroups",
 			},
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(2),
-				"requestName":"getProductPriorityGroups",
+				"requestName":   "getProductPriorityGroups",
 			},
 		})
 

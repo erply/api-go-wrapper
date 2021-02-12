@@ -36,11 +36,11 @@ type (
 	}
 
 	DeleteAddressResponse struct {
-		Status               sharedCommon.Status   `json:"status"`
+		Status sharedCommon.Status `json:"status"`
 	}
 
 	DeleteAddressBulkItem struct {
-		Status  sharedCommon.StatusBulk `json:"status"`
+		Status sharedCommon.StatusBulk `json:"status"`
 	}
 
 	DeleteAddressResponseBulk struct {

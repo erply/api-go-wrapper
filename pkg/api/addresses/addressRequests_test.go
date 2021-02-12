@@ -292,7 +292,7 @@ func TestDeleteAddresses(t *testing.T) {
 	defer srv.Close()
 
 	inpt := map[string]string{
-		"addressID":         "2223",
+		"addressID": "2223",
 	}
 
 	cli := common.NewClient("somesess", "someclient", "", nil, nil)
@@ -329,12 +329,12 @@ func TestDeleteAddressesBulk(t *testing.T) {
 		}
 		expectedBulkRequests := []map[string]interface{}{
 			{
-				"requestName":         "deleteAddress",
-				"addressID": "3456",
+				"requestName": "deleteAddress",
+				"addressID":   "3456",
 			},
 			{
-				"requestName":         "deleteAddress",
-				"addressID": "3457",
+				"requestName": "deleteAddress",
+				"addressID":   "3457",
 			},
 		}
 		assert.Equal(t, expectedBulkRequests, bulkRequests)
@@ -343,10 +343,10 @@ func TestDeleteAddressesBulk(t *testing.T) {
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []DeleteAddressBulkItem{
 				{
-					Status:  statusBulk,
+					Status: statusBulk,
 				},
 				{
-					Status:  statusBulk,
+					Status: statusBulk,
 				},
 			},
 		}

@@ -253,7 +253,6 @@ func (cli *Client) GetProductsInPriceListWithStatus(ctx context.Context, filters
 	return res, nil
 }
 
-
 func (cli *Client) GetProductsInPriceListBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductsInPriceListResponseBulk, error) {
 	var bulkResp GetProductsInPriceListResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
@@ -615,7 +614,6 @@ func (cli *Client) DeleteProductsFromPriceList(ctx context.Context, filters map[
 
 	return &res.DeleteProductsFromPriceListResults[0], nil
 }
-
 
 func (cli *Client) DeleteProductsFromPriceListBulk(
 	ctx context.Context,

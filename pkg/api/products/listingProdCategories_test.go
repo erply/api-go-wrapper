@@ -156,12 +156,12 @@ func TestProdCategoryReadSuccess(t *testing.T) {
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(1),
-				"requestName":"getProductCategories",
+				"requestName":   "getProductCategories",
 			},
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(2),
-				"requestName":"getProductCategories",
+				"requestName":   "getProductCategories",
 			},
 		})
 

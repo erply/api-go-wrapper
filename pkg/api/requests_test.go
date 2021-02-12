@@ -182,8 +182,8 @@ func TestGetEmployeesBulk(t *testing.T) {
 
 	assert.Equal(t, []Employee{
 		{
-			EmployeeID:   "1",
-			FullName: "Name 1",
+			EmployeeID: "1",
+			FullName:   "Name 1",
 		},
 	}, bulkResp.BulkItems[0].Employees)
 
@@ -191,8 +191,8 @@ func TestGetEmployeesBulk(t *testing.T) {
 
 	assert.Equal(t, []Employee{
 		{
-			EmployeeID:   "2",
-			FullName: "Name 2",
+			EmployeeID: "2",
+			FullName:   "Name 2",
 		},
 	}, bulkResp.BulkItems[1].Employees)
 
@@ -200,8 +200,8 @@ func TestGetEmployeesBulk(t *testing.T) {
 
 	assert.Equal(t, []Employee{
 		{
-			EmployeeID:   "3",
-			FullName: "Name 3",
+			EmployeeID: "3",
+			FullName:   "Name 3",
 		},
 	}, bulkResp.BulkItems[2].Employees)
 

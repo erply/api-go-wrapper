@@ -91,7 +91,7 @@ type (
 
 	SaveCustomerResponseBulkItem struct {
 		Status  sharedCommon.StatusBulk `json:"status"`
-		Records []SaveCustomerResp  `json:"records"`
+		Records []SaveCustomerResp      `json:"records"`
 	}
 
 	SaveCustomerResponseBulk struct {

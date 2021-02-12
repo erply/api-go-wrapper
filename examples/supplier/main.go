@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	sharedCommon "github.com/erply/api-go-wrapper/internal/common"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/erply/api-go-wrapper/pkg/api"
+	"github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/erply/api-go-wrapper/pkg/api/customers"
 	"time"
 )
@@ -50,9 +50,7 @@ func GetSupplierBulk(cl *api.Client) (suppliers []customers.Supplier, err error)
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, supplier := range bulkItem.Suppliers {
-			suppliers = append(suppliers, supplier)
-		}
+		suppliers = append(suppliers, bulkItem.Suppliers...)
 	}
 
 	return
@@ -80,7 +78,6 @@ func SaveSupplierBulk(cl *api.Client) (err error) {
 
 	return
 }
-
 
 func DeleteSupplierBulk(cl *api.Client) (err error) {
 	supplierCli := cl.CustomerManager

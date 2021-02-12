@@ -29,8 +29,8 @@ func TestSingleConnectSuccess(t *testing.T) {
 			connectAmount++
 			return
 		},
-		AttemptsCount:         connectsCount,
-		Waiter:                w,
+		AttemptsCount: connectsCount,
+		Waiter:        w,
 	}
 
 	err := c.Run()
@@ -109,10 +109,10 @@ func TestMultipleConnectFailure(t *testing.T) {
 	assert.Equal(t, 5, connectAmount)
 	assert.Len(t, w.WaitingDurations, 5)
 	assert.Equal(t, time.Second, w.WaitingDurations[0])
-	assert.Equal(t, time.Second * 3, w.WaitingDurations[1])
-	assert.Equal(t, time.Second * 5, w.WaitingDurations[2])
-	assert.Equal(t, time.Second * 7, w.WaitingDurations[3])
-	assert.Equal(t, time.Second * 9, w.WaitingDurations[4])
+	assert.Equal(t, time.Second*3, w.WaitingDurations[1])
+	assert.Equal(t, time.Second*5, w.WaitingDurations[2])
+	assert.Equal(t, time.Second*7, w.WaitingDurations[3])
+	assert.Equal(t, time.Second*9, w.WaitingDurations[4])
 }
 
 func TestSessionCleanFailure(t *testing.T) {
@@ -135,8 +135,8 @@ func TestSessionCleanFailure(t *testing.T) {
 			connectAmount++
 			return
 		},
-		AttemptsCount:         connectsCount,
-		Waiter:                w,
+		AttemptsCount: connectsCount,
+		Waiter:        w,
 	}
 
 	err := c.Run()

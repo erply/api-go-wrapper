@@ -270,11 +270,11 @@ func TestAddCustomerRewardPointsBulk(t *testing.T) {
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []AddCustomerRewardPointsResponseBulkItem{
 				{
-					Status:  statusBulk,
+					Status:                         statusBulk,
 					AddCustomerRewardPointsResults: []AddCustomerRewardPointsResult{{TransactionID: 3456}},
 				},
 				{
-					Status:  statusBulk,
+					Status:                         statusBulk,
 					AddCustomerRewardPointsResults: []AddCustomerRewardPointsResult{{TransactionID: 3457}},
 				},
 			},
@@ -290,14 +290,14 @@ func TestAddCustomerRewardPointsBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"customerID":  "123",
-			"invoiceID":   "34456",
-			"points":      "22",
+			"customerID": "123",
+			"invoiceID":  "34456",
+			"points":     "22",
 		},
 		{
-			"customerID":  "124",
-			"invoiceID":   "34457",
-			"points":      "12",
+			"customerID": "124",
+			"invoiceID":  "34457",
+			"points":     "12",
 		},
 	}
 
@@ -344,12 +344,12 @@ func TestSaveCustomersBulk(t *testing.T) {
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"requestName": "saveCustomer",
-				"companyName":  "Some comp",
+				"companyName": "Some comp",
 				"firstName":   "Max",
 			},
 			{
 				"requestName": "saveCustomer",
-				"companyName":  "Some comp 2",
+				"companyName": "Some comp 2",
 				"firstName":   "Hans",
 			},
 		})
@@ -378,11 +378,11 @@ func TestSaveCustomersBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"companyName":  "Some comp",
+			"companyName": "Some comp",
 			"firstName":   "Max",
 		},
 		{
-			"companyName":  "Some comp 2",
+			"companyName": "Some comp 2",
 			"firstName":   "Hans",
 		},
 	}
@@ -434,7 +434,7 @@ func TestDeleteCustomersBulk(t *testing.T) {
 			},
 			{
 				"requestName": "deleteCustomer",
-				"customerID":   float64(124),
+				"customerID":  float64(124),
 			},
 		})
 
@@ -442,10 +442,10 @@ func TestDeleteCustomersBulk(t *testing.T) {
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
 			BulkItems: []DeleteCustomerResponseBulkItem{
 				{
-					Status:  statusBulk,
+					Status: statusBulk,
 				},
 				{
-					Status:  statusBulk,
+					Status: statusBulk,
 				},
 			},
 		}
@@ -460,10 +460,10 @@ func TestDeleteCustomersBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"customerID":  123,
+			"customerID": 123,
 		},
 		{
-			"customerID":  124,
+			"customerID": 124,
 		},
 	}
 

@@ -9,7 +9,7 @@ type Waiter interface {
 	Wait(dur time.Duration)
 }
 
-type SleepWaiter struct {}
+type SleepWaiter struct{}
 
 func (sw SleepWaiter) Wait(dur time.Duration) {
 	time.Sleep(dur)
