@@ -107,18 +107,16 @@ func DeleteAddressBulk(cl *api.Client) {
 
 	addressesToDelete := []map[string]interface{}{
 		{
-			"addressID":     7238,
+			"addressID": 7238,
 		},
 		{
-			"addressID":     7239,
+			"addressID": 7239,
 		},
 	}
 	bulkResponse, err := addressProvider.DeleteAddressBulk(ctx, addressesToDelete, map[string]string{})
 	common.Die(err)
 
 	fmt.Printf("%s", common.ConvertSourceToJsonStrIfPossible(bulkResponse))
-
-	return
 }
 
 func CheckAddressListing(cl *api.Client) {

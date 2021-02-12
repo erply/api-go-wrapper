@@ -274,8 +274,8 @@ func sendAddressesRequest(w http.ResponseWriter, errStatus sharedCommon.ApiError
 		addresses := make(sharedCommon.Addresses, 0, len(addressIDs))
 		for _, id := range addressIDs {
 			addresses = append(addresses, sharedCommon.Address{
-				AddressID:          id,
-				Address: fmt.Sprintf("Some Address %d", id),
+				AddressID: id,
+				Address:   fmt.Sprintf("Some Address %d", id),
 			})
 		}
 		statusBulk := sharedCommon.StatusBulk{}

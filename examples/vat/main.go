@@ -24,10 +24,10 @@ func SaveVatRate(cl *api.Client) {
 
 	filter := map[string]string{
 		"vatRateID": "141",
-		"name": "19%",
-		"rate":    "0.19",
-		"code": "19Percent",
-		"active": "1",
+		"name":      "19%",
+		"rate":      "0.19",
+		"code":      "19Percent",
+		"active":    "1",
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
@@ -59,15 +59,15 @@ func SaveVatRateBulk(cl *api.Client) {
 	bulkItems := []map[string]interface{}{
 		{
 			"vatRateID": "141",
-			"name": "19%",
-			"rate":    "0.19",
-			"code": "19Percent",
-			"active": "1",
+			"name":      "19%",
+			"rate":      "0.19",
+			"code":      "19Percent",
+			"active":    "1",
 		},
 		{
-			"name": "20%",
-			"rate":    "0.20",
-			"code": "20Percent",
+			"name":   "20%",
+			"rate":   "0.20",
+			"code":   "20Percent",
 			"active": "1",
 		},
 	}
@@ -85,10 +85,10 @@ func SaveVatRateComponent(cl *api.Client) {
 	mngr := cl.SalesManager
 
 	filter := map[string]string{
-		"name": "Comp19%",
-		"rate":    "0.19",
-		"type": "STATE",
-		"vatRateID": "141",
+		"name":               "Comp19%",
+		"rate":               "0.19",
+		"type":               "STATE",
+		"vatRateID":          "141",
 		"vatRateComponentID": "247",
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -105,16 +105,16 @@ func SaveVatRateComponentBulk(cl *api.Client) {
 
 	bulkItems := []map[string]interface{}{
 		{
-			"name": "Comp19%",
-			"rate":    "0.19",
-			"type": "STATE",
-			"vatRateID": "142",
+			"name":               "Comp19%",
+			"rate":               "0.19",
+			"type":               "STATE",
+			"vatRateID":          "142",
 			"vatRateComponentID": "247",
 		},
 		{
-			"name": "Comp20%",
-			"rate":    "0.20",
-			"type": "COUNTY",
+			"name":      "Comp20%",
+			"rate":      "0.20",
+			"type":      "COUNTY",
 			"vatRateID": "142",
 		},
 	}

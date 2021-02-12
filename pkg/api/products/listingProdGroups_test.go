@@ -24,7 +24,7 @@ func sendRequestGroup(w http.ResponseWriter, errStatus sharedCommon.ApiError, to
 		prodGroups := make([]ProductGroup, 0, len(groupIDs))
 		for _, id := range groupIDs {
 			prodGroups = append(prodGroups, ProductGroup{
-				ID:   id,
+				ID: id,
 				NameLanguages: NameLanguages{
 					Name: fmt.Sprintf("Some Group %d", id),
 				},
@@ -158,12 +158,12 @@ func TestProdGroupReadSuccess(t *testing.T) {
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(1),
-				"requestName":"getProductGroups",
+				"requestName":   "getProductGroups",
 			},
 			{
 				"recordsOnPage": float64(10),
 				"pageNo":        float64(2),
-				"requestName":"getProductGroups",
+				"requestName":   "getProductGroups",
 			},
 		})
 

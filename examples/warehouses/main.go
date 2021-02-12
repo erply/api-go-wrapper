@@ -72,9 +72,7 @@ func GetWarehousesBulk(cl *api.Client) (warehouses warehouse.Warehouses, err err
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, warehouseItem := range bulkItem.Warehouses {
-			warehouses = append(warehouses, warehouseItem)
-		}
+		warehouses = append(warehouses, bulkItem.Warehouses...)
 	}
 
 	return
@@ -157,7 +155,7 @@ func SaveInventoryRegistration(cl *api.Client) {
 
 	req := map[string]string{
 		"warehouseID": "21",
-		"productID1": "39929",
+		"productID1":  "39929",
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -174,11 +172,11 @@ func SaveInventoryRegistrationBulk(cl *api.Client) {
 	bulkItems := []map[string]interface{}{
 		{
 			"warehouseID": "21",
-			"productID1": "33526",
+			"productID1":  "33526",
 		},
 		{
 			"warehouseID": "21",
-			"productID1": "44582",
+			"productID1":  "44582",
 		},
 	}
 

@@ -54,9 +54,7 @@ func GetSalesDocumentsBulk(cl *api.Client) (docs []sales.SaleDocument, err error
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, doc := range bulkItem.SaleDocuments {
-			docs = append(docs, doc)
-		}
+		docs = append(docs, bulkItem.SaleDocuments...)
 	}
 
 	return
@@ -158,11 +156,11 @@ func SaveSalesDocumentBulk(cl *api.Client) {
 			"currencyCode": "EUR",
 			"date":         time.Now().Format("2006-01-02"),
 			"time":         "14:59:00",
-			"productID1": "1",
-			"itemName": "black box",
-			"vatrateID": "1",
-			"amount": "1",
-			"price": "22.22",
+			"productID1":   "1",
+			"itemName":     "black box",
+			"vatrateID":    "1",
+			"amount":       "1",
+			"price":        "22.22",
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
@@ -181,11 +179,11 @@ func SavePaymentsBulk(cl *api.Client) {
 	bulkFilters := []map[string]interface{}{
 		{
 			"documentID": 1300,
-			"type": "CASH",
-			"added": 1606839183,
+			"type":       "CASH",
+			"added":      1606839183,
 		},
 		{
-			"type": "CASH",
+			"type":  "CASH",
 			"added": 1606839184,
 		},
 	}

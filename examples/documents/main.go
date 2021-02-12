@@ -55,9 +55,7 @@ func GetPurchaseDocumentsBulk(cl *api.Client) (docs []documents.PurchaseDocument
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, doc := range bulkItem.PurchaseDocuments {
-			docs = append(docs, doc)
-		}
+		docs = append(docs, bulkItem.PurchaseDocuments...)
 	}
 
 	return

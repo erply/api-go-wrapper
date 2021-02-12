@@ -52,9 +52,7 @@ func GetCustomersBulk(cl *api.Client) (custmrs customers.Customers, err error) {
 	}
 
 	for _, bulkItem := range bulkResp.BulkItems {
-		for _, customr := range bulkItem.Customers {
-			custmrs = append(custmrs, customr)
-		}
+		custmrs = append(custmrs, bulkItem.Customers...)
 	}
 
 	return
@@ -165,8 +163,6 @@ func DeleteCustomer(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Printf("Deleted customer %s", common.ConvertSourceToJsonStrIfPossible(ids))
-
-	return
 }
 
 func DeleteCustomerBulk(cl *api.Client) {
@@ -190,6 +186,4 @@ func DeleteCustomerBulk(cl *api.Client) {
 	common.Die(err)
 
 	fmt.Println(common.ConvertSourceToJsonStrIfPossible(bulkResponse))
-
-	return
 }

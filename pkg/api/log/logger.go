@@ -9,6 +9,7 @@ func init() {
 }
 
 type Type int
+
 const (
 	Debug Type = iota + 1
 	Info
@@ -22,10 +23,10 @@ type Logger interface {
 
 type NullLogger struct{}
 
-func (nl NullLogger) Log(t Type, message string, arguments ...interface{}){}
+func (nl NullLogger) Log(t Type, message string, arguments ...interface{}) {}
 
 type StdLogger struct{}
 
-func (sl StdLogger) Log(t Type, message string, arguments ...interface{}){
+func (sl StdLogger) Log(t Type, message string, arguments ...interface{}) {
 	log.Printf(message, arguments...)
 }

@@ -25,7 +25,7 @@ func main() {
 		panic(err)
 	}
 
-	_, err = auth.GetSessionKeyUser(sessionKey, *clientCode, httpCli)
+	_, _ = auth.GetSessionKeyUser(sessionKey, *clientCode, httpCli)
 
 	//this function will receive the request name at every request execution inside the erply api client
 	customHeadersSetter := func(requestName string) url.Values {

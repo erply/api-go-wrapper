@@ -17,7 +17,7 @@ func BuildClient() (*Client, error) {
 	connectionTimeout := 60 * time.Second
 	transport := &http.Transport{
 		DisableKeepAlives:     true,
-		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig:       &tls.Config{},
 		ResponseHeaderTimeout: connectionTimeout,
 	}
 	httpCl := &http.Client{Transport: transport}

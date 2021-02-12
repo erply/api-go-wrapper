@@ -375,4 +375,3 @@ func NewFromError(msg string, err error, code ApiError) *ErplyError {
 	}
 	return NewErplyError("Error", msg, code)
 }
-

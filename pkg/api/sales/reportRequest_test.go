@@ -18,9 +18,9 @@ func TestGetSalesReport(t *testing.T) {
 	t.Run("test sales report", func(t *testing.T) {
 
 		salesReport, err := cli.GetSalesReport(ctx, map[string]string{
-			"type": "SALES_BY_PRODUCT",
+			"type":      "SALES_BY_PRODUCT",
 			"dateStart": "2010-01-01",
-			"dateEnd": "2020-12-30",
+			"dateEnd":   "2020-12-30",
 		})
 		if err != nil {
 			t.Error(err)

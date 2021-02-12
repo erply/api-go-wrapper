@@ -132,14 +132,14 @@ func TestReadingSuccess(t *testing.T) {
 						"recordsOnPage": 100,
 					})
 				}
-				res = append(res, bulkItems)
-				res = append(res, []map[string]interface{}{
-					{
-						"filterKey":     "filterVal",
-						"pageNo":        101,
-						"recordsOnPage": 100,
-					},
-				})
+				res = append(res, bulkItems,
+					[]map[string]interface{}{
+						{
+							"filterKey":     "filterVal",
+							"pageNo":        101,
+							"recordsOnPage": 100,
+						},
+					})
 				return
 			},
 		},

@@ -187,15 +187,15 @@ func TestSavePaymentsBulk(t *testing.T) {
 		common.AssertRequestBulk(t, r, []map[string]interface{}{
 			{
 				"requestName": "savePayment",
-				"customerID":   "1",
+				"customerID":  "1",
 			},
 			{
 				"requestName": "savePayment",
-				"customerID":   "2",
+				"customerID":  "2",
 			},
 			{
 				"requestName": "savePayment",
-				"customerID":   "3",
+				"customerID":  "3",
 			},
 		})
 

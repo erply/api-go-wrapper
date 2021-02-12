@@ -214,12 +214,12 @@ func TestSaveWarehouseBulk(t *testing.T) {
 
 	inpt := []map[string]interface{}{
 		{
-			"name":        "www1",
-			"code":        "1",
+			"name": "www1",
+			"code": "1",
 		},
 		{
-			"name":        "www2",
-			"code":        "2",
+			"name": "www2",
+			"code": "2",
 		},
 	}
 

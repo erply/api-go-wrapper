@@ -38,8 +38,8 @@ func (l *ListingDataProvider) Read(ctx context.Context, bulkFilters []map[string
 	}
 
 	for _, bulkItem := range resp.BulkItems {
-		for _, doc := range bulkItem.PurchaseDocuments {
-			callback(doc)
+		for i := range bulkItem.PurchaseDocuments {
+			callback(bulkItem.PurchaseDocuments[i])
 		}
 	}
 

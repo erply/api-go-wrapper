@@ -371,7 +371,7 @@ func DeleteProductsFromPriceListBulk(cl *api.Client) {
 
 	bulkFilters := []map[string]interface{}{
 		{
-			"priceListID":        "100000002",
+			"priceListID":         "100000002",
 			"priceListProductIDs": "100001030",
 		},
 	}
@@ -387,7 +387,7 @@ func DeleteProductsFromPriceList(cl *api.Client) {
 	cli := cl.PricesManager
 
 	filters := map[string]string{
-		"priceListID":        "100000002",
+		"priceListID":         "100000002",
 		"priceListProductIDs": "100001029",
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)

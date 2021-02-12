@@ -1855,12 +1855,12 @@ func TestGetProductPriorityGroupBulk(t *testing.T) {
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "1",
-				"requestName":"getProductPriorityGroups",
+				"requestName":   "getProductPriorityGroups",
 			},
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "2",
-				"requestName":"getProductPriorityGroups",
+				"requestName":   "getProductPriorityGroups",
 			},
 		})
 
@@ -1957,12 +1957,12 @@ func TestGetProductGroupsBulk(t *testing.T) {
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "1",
-				"requestName":"getProductGroups",
+				"requestName":   "getProductGroups",
 			},
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "2",
-				"requestName":"getProductGroups",
+				"requestName":   "getProductGroups",
 			},
 		})
 
@@ -1973,7 +1973,7 @@ func TestGetProductGroupsBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: []ProductGroup{
 						{
-							ID:   1,
+							ID: 1,
 							NameLanguages: NameLanguages{
 								Name: "Prod Group 1",
 							},
@@ -1984,7 +1984,7 @@ func TestGetProductGroupsBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: []ProductGroup{
 						{
-							ID:   2,
+							ID: 2,
 							NameLanguages: NameLanguages{
 								Name: "Prod Group 2",
 							},
@@ -2055,12 +2055,12 @@ func TestGetProductCategoriesBulk(t *testing.T) {
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "1",
-				"requestName":"getProductCategories",
+				"requestName":   "getProductCategories",
 			},
 			{
 				"recordsOnPage": "10",
 				"pageNo":        "2",
-				"requestName":"getProductCategories",
+				"requestName":   "getProductCategories",
 			},
 		})
 

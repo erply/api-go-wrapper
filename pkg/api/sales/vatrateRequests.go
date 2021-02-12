@@ -65,7 +65,6 @@ func (cli *Client) GetVatRatesBulk(ctx context.Context, bulkFilters []map[string
 	return bulkResp, nil
 }
 
-
 func (cli *Client) SaveVatRate(ctx context.Context, filters map[string]string) (*SaveVatRateResult, error) {
 	resp, err := cli.SendRequest(ctx, "saveVatRate", filters)
 	if err != nil {

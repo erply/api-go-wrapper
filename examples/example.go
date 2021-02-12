@@ -28,7 +28,7 @@ func main() {
 	}
 	fmt.Println(sessInfo)
 
-	info, err := auth.GetSessionKeyUser(sessionKey, clientCode, httpCli)
+	info, _ := auth.GetSessionKeyUser(sessionKey, clientCode, httpCli)
 	cli, err := api.NewClient(sessionKey, clientCode, nil)
 	if err != nil {
 		panic(err)

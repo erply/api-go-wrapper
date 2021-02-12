@@ -419,7 +419,7 @@ func TestGetVatRatesBulk(t *testing.T) {
 
 	assert.Equal(t, []VatRate{
 		{
-			ID: "1",
+			ID:   "1",
 			Name: "Name 1",
 		},
 	}, bulkResp.BulkItems[0].VatRates)
@@ -428,7 +428,7 @@ func TestGetVatRatesBulk(t *testing.T) {
 
 	assert.Equal(t, []VatRate{
 		{
-			ID: "2",
+			ID:   "2",
 			Name: "Name 2",
 		},
 	}, bulkResp.BulkItems[1].VatRates)
@@ -437,7 +437,7 @@ func TestGetVatRatesBulk(t *testing.T) {
 
 	assert.Equal(t, []VatRate{
 		{
-			ID: "3",
+			ID:   "3",
 			Name: "Name 3",
 		},
 	}, bulkResp.BulkItems[2].VatRates)

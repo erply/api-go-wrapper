@@ -102,7 +102,7 @@ type DestRespWithStatus interface {
 func (cli *Client) Scan(ctx context.Context, apiMethod string, filters map[string]string, dest DestRespWithStatus) error {
 	resp, err := cli.SendRequest(ctx, apiMethod, filters)
 	if err != nil {
-		return common.NewFromError(apiMethod +" request failed", err, 0)
+		return common.NewFromError(apiMethod+" request failed", err, 0)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

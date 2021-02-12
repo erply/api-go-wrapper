@@ -110,10 +110,8 @@ func VerifyUserV3(ctx context.Context, filters map[string]string, clientCode str
 func VerifyUserFull(ctx context.Context, username, password, clientCode string, inputParams map[string]string, cli *http.Client) (*SessionKeyUser, error) {
 	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
 	params := url.Values{}
-	if inputParams != nil {
-		for k, v := range inputParams {
-			params.Add(k, v)
-		}
+	for k, v := range inputParams {
+		params.Add(k, v)
 	}
 	params.Add("username", username)
 	params.Add("clientCode", clientCode)
@@ -150,10 +148,8 @@ func VerifyUserFull(ctx context.Context, username, password, clientCode string, 
 func SwitchUser(ctx context.Context, sessionKey, pin, clientCode string, inputParams map[string]string, cli *http.Client) (*SessionKeyUser, error) {
 	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
 	params := url.Values{}
-	if inputParams != nil {
-		for k, v := range inputParams {
-			params.Add(k, v)
-		}
+	for k, v := range inputParams {
+		params.Add(k, v)
 	}
 	params.Add("sessionKey", sessionKey)
 	params.Add("cardCode", pin)

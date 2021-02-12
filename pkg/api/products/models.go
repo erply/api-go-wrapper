@@ -299,8 +299,8 @@ type (
 	}
 
 	ProductCategory struct {
-		ProductCategoryID   int   `json:"productCategoryID"`
-		ParentCategoryID    int   `json:"parentCategoryID"`
+		ProductCategoryID   int    `json:"productCategoryID"`
+		ParentCategoryID    int    `json:"parentCategoryID"`
 		ProductCategoryName string `json:"productCategoryName"`
 		Added               uint64 `json:"added"`
 		LastModified        uint64 `json:"lastModified"`
@@ -322,10 +322,10 @@ type (
 	ProductGroup struct {
 		ID int `json:"productGroupID"`
 		NameLanguages
-		ShowInWebshop   string            `json:"showInWebshop"`
+		ShowInWebshop   string         `json:"showInWebshop"`
 		NonDiscountable int            `json:"nonDiscountable"`
 		PositionNo      int            `json:"positionNo"`
-		ParentGroupID   string            `json:"parentGroupID"`
+		ParentGroupID   string         `json:"parentGroupID"`
 		Added           uint64         `json:"added"`
 		LastModified    uint64         `json:"lastModified"`
 		SubGroups       []ProductGroup `json:"subGroups"`
