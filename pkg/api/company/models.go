@@ -40,8 +40,8 @@ type (
 
 type (
 	ConfParameter struct {
-		Announcement         string `json:"invoice_announcement_eng"`
-		CSVSeparator         string `json:"csv_field_separator"`
+		Announcement      string `json:"invoice_announcement_eng"`
+		CSVSeparator      string `json:"csv_field_separator"`
 		DcMemberProductID string `json:"DC_MEMBER_PRODUCT_ID"`
 		AccountBank       string `json:"account_bank"`
 		AccountLinks      struct {

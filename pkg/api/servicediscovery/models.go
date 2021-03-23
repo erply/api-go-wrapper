@@ -17,6 +17,7 @@ type ServiceEndpoints struct {
 	Reports     Endpoint `json:"reports"`
 	Json        Endpoint `json:"json"`
 	Assignments Endpoint `json:"assignments"`
+	ClockIn     Endpoint `json:"clockin"`
 }
 type Endpoint struct {
 	Url           string `json:"url"`
