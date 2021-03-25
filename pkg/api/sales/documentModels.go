@@ -175,11 +175,11 @@ type (
 	SaleDocImportReports []SaleDocImportReport
 
 	SaveInvoiceRow struct {
-		RowID       int    `json:"rowID"`
-		StableRowID int    `json:"stableRowID"`
-		ProductID   int    `json:"productID"`
-		ServiceID   int    `json:"serviceID"`
-		Amount      string `json:"amount"`
+		RowID       int         `json:"rowID"`
+		StableRowID int         `json:"stableRowID"`
+		ProductID   int         `json:"productID"`
+		ServiceID   int         `json:"serviceID"`
+		Amount      json.Number `json:"amount"`
 	}
 
 	SaleDocImportReport struct {
