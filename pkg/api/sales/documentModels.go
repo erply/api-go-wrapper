@@ -87,7 +87,7 @@ type (
 		PayerName                       string              `json:"payerName"`
 		PayerAddress                    string              `json:"payerAddress"`
 		PayerFactoringContractNumber    string              `json:"payerFactoringContractNumber"`
-		PayerPaysViaFactoring           string              `json:"payerPaysViaFactoring"`
+		PayerPaysViaFactoring           json.Number         `json:"payerPaysViaFactoring"`
 		ShipToAddress                   string              `json:"shipToAddress"`
 		ShipToContactID                 int                 `json:"shipToContactID"`
 		ShipToContactName               string              `json:"shipToContactName"`
@@ -125,7 +125,7 @@ type (
 		AmountPaidWithStoreCredit       json.Number         `json:"amountPaidWithStoreCredit"`
 		ApplianceID                     int                 `json:"applianceID"`
 		ApplianceReference              string              `json:"applianceReference"`
-		AssignmentID                    int                 `json:"assignmentID"`
+		AssignmentID                    json.Number         `json:"assignmentID"`
 		VehicleMileage                  int                 `json:"vehicleMileage"`
 	}
 
