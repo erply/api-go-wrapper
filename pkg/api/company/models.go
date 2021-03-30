@@ -595,4 +595,17 @@ type (
 		Status         common2.Status  `json:"status"`
 		ConfParameters []ConfParameter `json:"records"`
 	}
+	Language struct {
+		Name             string   `json:"name"`
+		NativeName       string   `json:"nativeName"`
+		ShortDisplayName string   `json:"shortDisplayName"`
+		LegacyIdentifier string   `json:"legacyIdentifier"`
+		IsoCode          string   `json:"isoCode"`
+		Countries        []string `json:"countries"`
+		IsOverride       bool     `json:"isOverride"`
+	}
+	GetDefaultLanguageResponse struct {
+		Status    common2.Status `json:"status"`
+		Languages []Language     `json:"records"`
+	}
 )
