@@ -18,7 +18,7 @@ func (cli *Client) GetWarehouses(ctx context.Context, filters map[string]string)
 
 	res := &GetWarehousesResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, sharedCommon.NewFromError("unmarshaling GetWarehousesResponse failed", err, 0)
+		return nil, sharedCommon.NewFromError("unmarshalling GetWarehousesResponse failed", err, 0)
 	}
 
 	if !common.IsJSONResponseOK(&res.Status) {
@@ -31,6 +31,30 @@ func (cli *Client) GetWarehouses(ctx context.Context, filters map[string]string)
 
 	return res.Warehouses, nil
 }
+
+//GetWarehousesWithStatus ...
+func (cli *Client) GetWarehousesWithStatus(ctx context.Context, filters map[string]string) (*GetWarehousesResponse, error) {
+	resp, err := cli.SendRequest(ctx, "getWarehouses", filters)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &GetWarehousesResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("unmarshalling GetWarehousesResponse failed", err, 0)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	if len(res.Warehouses) == 0 {
+		return nil, nil
+	}
+
+	return res, nil
+}
+
 
 func (cli *Client) GetWarehousesBulk(
 	ctx context.Context,
