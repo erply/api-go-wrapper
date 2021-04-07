@@ -240,6 +240,11 @@ type (
 		Status    sharedCommon.Status            `json:"status"`
 		BulkItems []SavePurchaseDocumentBulkItem `json:"requests"`
 	}
+
+	DeleteSalesDocumentsResponseBulk struct {
+		Status    sharedCommon.Status       `json:"status"`
+	}
+
 )
 
 func (spdr SavePurchaseDocumentResponse) GetStatus() *sharedCommon.Status {
