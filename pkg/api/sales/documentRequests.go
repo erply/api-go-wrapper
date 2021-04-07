@@ -236,7 +236,7 @@ func (cli *Client) DeleteDocumentsBulk(
 	ctx context.Context,
 	bulkFilters []map[string]interface{},
 	baseFilters map[string]string,
-) (respBulk DeleteSalesDocumentsResponseBulk, err error) {
+) (respBulk DeleteResponseBulk, err error) {
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
 	for _, bulkFilterMap := range bulkFilters {
 		bulkInputs = append(bulkInputs, common.BulkInput{
@@ -255,7 +255,7 @@ func (cli *Client) DeleteDocumentsBulk(
 	}
 
 	if err := json.Unmarshal(body, &respBulk); err != nil {
-		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteSalesDocumentsResponseBulk from '%s': %v", string(body), err)
+		return respBulk, fmt.Errorf("ERPLY API: failed to unmarshal DeleteDocumentsBulk from '%s': %v", string(body), err)
 	}
 	if !common.IsJSONResponseOK(&respBulk.Status) {
 		return respBulk, sharedCommon.NewErplyError(respBulk.Status.ErrorCode.String(), respBulk.Status.Request+": "+respBulk.Status.ResponseStatus, respBulk.Status.ErrorCode)

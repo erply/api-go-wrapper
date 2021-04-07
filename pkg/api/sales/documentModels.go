@@ -241,7 +241,7 @@ type (
 		BulkItems []SavePurchaseDocumentBulkItem `json:"requests"`
 	}
 
-	DeleteSalesDocumentsResponseBulk struct {
+	DeleteResponseBulk struct {
 		Status    sharedCommon.Status       `json:"status"`
 	}
 
