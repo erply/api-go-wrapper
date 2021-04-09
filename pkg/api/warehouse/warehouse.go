@@ -55,7 +55,6 @@ func (cli *Client) GetWarehousesWithStatus(ctx context.Context, filters map[stri
 	return res, nil
 }
 
-
 func (cli *Client) GetWarehousesBulk(
 	ctx context.Context,
 	bulkFilters []map[string]interface{},
