@@ -24,6 +24,11 @@ type (
 			bulkFilters []map[string]interface{},
 			baseFilters map[string]string,
 		) (respBulk SavePurchaseDocumentResponseBulk, err error)
+		DeleteDocumentsBulk(
+			ctx context.Context,
+			bulkFilters []map[string]interface{},
+			baseFilters map[string]string,
+		) (respBulk DeleteResponseBulk, err error)
 	}
 
 	VatRateManager interface {
@@ -54,6 +59,8 @@ type (
 		SavePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SavePaymentsResponseBulk, error)
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 		GetPaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetPaymentsResponseBulk, error)
+		DeletePayment(ctx context.Context, filters map[string]string) error
+		DeletePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string ) (DeleteResponseBulk, error)
 
 		//shopping cart
 		CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error)
