@@ -16,6 +16,7 @@ type ServiceEndpoints struct {
 	Promotion   Endpoint `json:"promotion"`
 	Reports     Endpoint `json:"reports"`
 	Json        Endpoint `json:"json"`
+	Sales       Endpoint `json:"sales"`
 	Assignments Endpoint `json:"assignments"`
 	ClockIn     Endpoint `json:"clockin"`
 }
