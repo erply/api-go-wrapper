@@ -242,9 +242,8 @@ type (
 	}
 
 	DeleteResponseBulk struct {
-		Status    sharedCommon.Status       `json:"status"`
+		Status sharedCommon.Status `json:"status"`
 	}
-
 )
 
 func (spdr SavePurchaseDocumentResponse) GetStatus() *sharedCommon.Status {

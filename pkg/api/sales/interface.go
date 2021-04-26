@@ -60,7 +60,7 @@ type (
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
 		GetPaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetPaymentsResponseBulk, error)
 		DeletePayment(ctx context.Context, filters map[string]string) error
-		DeletePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string ) (DeleteResponseBulk, error)
+		DeletePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteResponseBulk, error)
 
 		//shopping cart
 		CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error)
