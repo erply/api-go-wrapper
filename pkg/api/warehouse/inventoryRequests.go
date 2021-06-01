@@ -115,9 +115,9 @@ func (cli *Client) SaveInventoryWriteOff(ctx context.Context, filters map[string
 }
 
 func (cli *Client) SaveInventoryTransfer(ctx context.Context, filters map[string]string) (inventoryTransferID int, err error) {
-	resp, err := cli.SendRequest(ctx, "SaveInventoryTransfer", filters)
+	resp, err := cli.SendRequest(ctx, "saveInventoryTransfer", filters)
 	if err != nil {
-		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: error sending POST request", err, 0)
+		return 0, sharedCommon.NewFromError("saveInventoryTransfer: error sending POST request", err, 0)
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
@@ -128,13 +128,13 @@ func (cli *Client) SaveInventoryTransfer(ctx context.Context, filters map[string
 
 	err = json.NewDecoder(resp.Body).Decode(&respData)
 	if err != nil {
-		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: error decoding JSON response body", err, 0)
+		return 0, sharedCommon.NewFromError("saveInventoryTransfer: error decoding JSON response body", err, 0)
 	}
 	if respData.Status.ErrorCode != 0 {
-		return 0, sharedCommon.NewFromError(fmt.Sprintf("SaveInventoryTransfer: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryTransfer: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
 	}
 	if len(respData.Results) < 1 {
-		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: no records in response", nil, respData.Status.ErrorCode)
+		return 0, sharedCommon.NewFromError("saveInventoryTransfer: no records in response", nil, respData.Status.ErrorCode)
 	}
 
 	return respData.Results[0].InventoryTransferID, nil

@@ -134,3 +134,87 @@ func TestSaveInventoryRegistrationBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
+
+func TestSaveInventoryWriteOff(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":              "someclient",
+			"sessionKey":              "somesess",
+			"request":                 "saveInventoryWriteOff",
+			"inventoryRegistrationID": "12345",
+			"creatorID":               "2234",
+		})
+
+		resp := SaveInventoryWriteOffResponse{
+			Status:  sharedCommon.Status{ResponseStatus: "ok"},
+			Results: []SaveInventoryWriteOffResult{{InventoryWriteOffID: 999}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"inventoryRegistrationID": "12345",
+		"creatorID":               "2234",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	writeOffID, err := cl.SaveInventoryWriteOff(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 999, writeOffID)
+}
+
+func TestSaveInventoryTransfer(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"clientCode":              "someclient",
+			"sessionKey":              "somesess",
+			"request":                 "saveInventoryTransfer",
+			"inventoryRegistrationID": "12345",
+			"creatorID":               "2234",
+		})
+
+		resp := SaveInventoryTransferResponse{
+			Status:  sharedCommon.Status{ResponseStatus: "ok"},
+			Results: []SaveInventoryTransferResult{{InventoryTransferID: 999}},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"inventoryRegistrationID": "12345",
+		"creatorID":               "2234",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	TransferID, err := cl.SaveInventoryTransfer(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 999, TransferID)
+}

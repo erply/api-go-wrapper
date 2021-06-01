@@ -7,5 +7,5 @@ type InventoryManager interface {
 	SaveInventoryRegistrationBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveInventoryRegistrationResponseBulk, error)
 	SaveInventoryWriteOff(ctx context.Context, filters map[string]string) (inventoryWriteOffID int, err error)
 	SaveInventoryTransfer(ctx context.Context, filters map[string]string) (inventoryTransferID int, err error)
-	GetReasonCodes(ctx context.Context, filters map[string]string)
+	GetReasonCodes(ctx context.Context, filters map[string]string) ([]ReasonCode, error)
 }
