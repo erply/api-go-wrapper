@@ -87,6 +87,22 @@ type (
 		Results []SaveInventoryRegistrationResult `json:"records"`
 	}
 
+	SaveInventoryWriteOffResult struct {
+		InventoryWriteOffID int `json:"inventoryWriteOffID"`
+	}
+	SaveInventoryWriteOffResponse struct {
+		Status  sharedCommon.Status           `json:"status"`
+		Results []SaveInventoryWriteOffResult `json:"records"`
+	}
+
+	SaveInventoryTransferResult struct {
+		InventoryTransferID int `json:"inventoryTransferID"`
+	}
+	SaveInventoryTransferResponse struct {
+		Status  sharedCommon.Status           `json:"status"`
+		Results []SaveInventoryTransferResult `json:"records"`
+	}
+
 	SaveInventoryRegistrationBulkItem struct {
 		Status  sharedCommon.StatusBulk           `json:"status"`
 		Results []SaveInventoryRegistrationResult `json:"records"`
@@ -95,5 +111,19 @@ type (
 	SaveInventoryRegistrationResponseBulk struct {
 		Status    sharedCommon.Status                 `json:"status"`
 		BulkItems []SaveInventoryRegistrationBulkItem `json:"requests"`
+	}
+
+	ReasonCode struct {
+		ReasonID                             int    `json:"reasonID"`
+		Name                                 string `json:"name"`
+		Added                                int    `json:"added"`
+		LastModified                         int    `json:"lastModified"`
+		Purpose                              string `json:"purpose"`
+		Code                                 string `json:"code"`
+		ManualDiscountDisablesPromotionTiers []int  `json:"manualDiscountDisablesPromotionTiers"`
+	}
+	GetReasonCodesResponse struct {
+		Status      sharedCommon.Status `json:"status"`
+		ReasonCodes []ReasonCode        `json:"records"`
 	}
 )

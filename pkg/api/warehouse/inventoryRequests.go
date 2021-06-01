@@ -87,3 +87,70 @@ func (cli *Client) SaveInventoryRegistrationBulk(
 
 	return bulkResp, nil
 }
+
+func (cli *Client) SaveInventoryWriteOff(ctx context.Context, filters map[string]string) (inventoryWriteOffID int, err error) {
+	resp, err := cli.SendRequest(ctx, "saveInventoryWriteOff", filters)
+	if err != nil {
+		return 0, sharedCommon.NewFromError("saveInventoryWriteOff: error sending POST request", err, 0)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil, 0)
+	}
+
+	respData := SaveInventoryWriteOffResponse{}
+
+	err = json.NewDecoder(resp.Body).Decode(&respData)
+	if err != nil {
+		return 0, sharedCommon.NewFromError("saveInventoryWriteOff: error decoding JSON response body", err, 0)
+	}
+	if respData.Status.ErrorCode != 0 {
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryWriteOff: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
+	}
+	if len(respData.Results) < 1 {
+		return 0, sharedCommon.NewFromError("saveInventoryWriteOff: no records in response", nil, respData.Status.ErrorCode)
+	}
+
+	return respData.Results[0].InventoryWriteOffID, nil
+}
+
+func (cli *Client) SaveInventoryTransfer(ctx context.Context, filters map[string]string) (inventoryTransferID int, err error) {
+	resp, err := cli.SendRequest(ctx, "SaveInventoryTransfer", filters)
+	if err != nil {
+		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: error sending POST request", err, 0)
+	}
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil, 0)
+	}
+
+	respData := SaveInventoryTransferResponse{}
+
+	err = json.NewDecoder(resp.Body).Decode(&respData)
+	if err != nil {
+		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: error decoding JSON response body", err, 0)
+	}
+	if respData.Status.ErrorCode != 0 {
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("SaveInventoryTransfer: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
+	}
+	if len(respData.Results) < 1 {
+		return 0, sharedCommon.NewFromError("SaveInventoryTransfer: no records in response", nil, respData.Status.ErrorCode)
+	}
+
+	return respData.Results[0].InventoryTransferID, nil
+}
+
+func (cli *Client) GetReasonCodes(ctx context.Context, filters map[string]string) ([]ReasonCode, error) {
+	resp, err := cli.SendRequest(ctx, "getReasonCodes", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetReasonCodesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetReasonCodesResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.ReasonCodes, nil
+}
