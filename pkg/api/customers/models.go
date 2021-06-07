@@ -84,6 +84,18 @@ type (
 		LastLogin string `json:"webshopLastLogin"`
 	}
 
+	CompanyType struct {
+		ID           int    `json:"id"`
+		Name         string `json:"name"`
+		Order        int    `json:"order"`
+		Added        int    `json:"added"`
+		LastModified int    `json:"lastModified"`
+	}
+	GetCompanyTypesResponse struct {
+		Status       sharedCommon.Status `json:"status"`
+		CompanyTypes []CompanyType       `json:"records"`
+	}
+
 	SaveCustomerResp struct {
 		CustomerID    int  `json:"customerID"`
 		AlreadyExists bool `json:"alreadyExists"`

@@ -302,3 +302,18 @@ func (cli *Client) DeleteCustomerBulk(ctx context.Context, customerMap []map[str
 
 	return deleteCustomersResponse, nil
 }
+
+func (cli *Client) GetCompanyTypes(ctx context.Context, filters map[string]string) ([]CompanyType, error) {
+	resp, err := cli.SendRequest(ctx, "getCompanyTypes", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCompanyTypesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCompanyTypesResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.CompanyTypes, nil
+}
