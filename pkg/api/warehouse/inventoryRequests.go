@@ -20,20 +20,20 @@ func (cli *Client) SaveInventoryRegistration(ctx context.Context, filters map[st
 		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
-	respData := SaveInventoryRegistrationResponse{}
+	res := SaveInventoryRegistrationResponse{}
 
-	err = json.NewDecoder(resp.Body).Decode(&respData)
+	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return 0, sharedCommon.NewFromError("saveInventoryRegistration: error decoding JSON response body", err, 0)
 	}
-	if respData.Status.ErrorCode != 0 {
-		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
+	if !common.IsJSONResponseOK(&res.Status) {
+		return 0, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
-	if len(respData.Results) < 1 {
-		return 0, sharedCommon.NewFromError("saveInventoryRegistration: no records in response", nil, respData.Status.ErrorCode)
+	if len(res.Results) < 1 {
+		return 0, sharedCommon.NewFromError("saveInventoryRegistration: no records in response", nil, res.Status.ErrorCode)
 	}
 
-	return respData.Results[0].InventoryRegistrationID, nil
+	return res.Results[0].InventoryRegistrationID, nil
 }
 
 func (cli *Client) SaveInventoryRegistrationBulk(
@@ -121,23 +121,23 @@ func (cli *Client) SaveInventoryTransfer(ctx context.Context, filters map[string
 	}
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryRegistration: bad response status code: %d", resp.StatusCode), nil, 0)
+		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryTransfer: bad response status code: %d", resp.StatusCode), nil, 0)
 	}
 
-	respData := SaveInventoryTransferResponse{}
+	res := SaveInventoryTransferResponse{}
 
-	err = json.NewDecoder(resp.Body).Decode(&respData)
+	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
 		return 0, sharedCommon.NewFromError("saveInventoryTransfer: error decoding JSON response body", err, 0)
 	}
-	if respData.Status.ErrorCode != 0 {
-		return 0, sharedCommon.NewFromError(fmt.Sprintf("saveInventoryTransfer: API error %s", respData.Status.ErrorCode), nil, respData.Status.ErrorCode)
+	if !common.IsJSONResponseOK(&res.Status) {
+		return 0, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
-	if len(respData.Results) < 1 {
-		return 0, sharedCommon.NewFromError("saveInventoryTransfer: no records in response", nil, respData.Status.ErrorCode)
+	if len(res.Results) < 1 {
+		return 0, sharedCommon.NewFromError("saveInventoryTransfer: no records in response", nil, res.Status.ErrorCode)
 	}
 
-	return respData.Results[0].InventoryTransferID, nil
+	return res.Results[0].InventoryTransferID, nil
 }
 
 func (cli *Client) GetReasonCodes(ctx context.Context, filters map[string]string) ([]ReasonCode, error) {
