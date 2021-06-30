@@ -2,8 +2,7 @@ package common
 
 import (
 	"encoding/json"
-	"fmt"
-	"strconv"
+	"github.com/pkg/errors"
 )
 
 type (
@@ -58,19 +57,19 @@ type (
 func (u *Address) UnmarshalJSON(data []byte) error {
 
 	raw := struct {
-		AddressID        int    `json:"addressID"`
-		OwnerID          int    `json:"ownerID"`
-		TypeID           interface{}    `json:"typeID"`
-		TypeActivelyUsed int    `json:"typeActivelyUsed"`
-		Added            int64  `json:"added"`
-		Address2         string `json:"address2"`
-		TypeName         string `json:"typeName"`
-		Address          string `json:"address"`
-		Street           string `json:"street"`
-		PostalCode       string `json:"postalCode"`
-		City             string `json:"city"`
-		State            string `json:"state"`
-		Country          string `json:"country"`
+		AddressID        int         `json:"addressID"`
+		OwnerID          int         `json:"ownerID"`
+		TypeID           json.Number `json:"typeID"`
+		TypeActivelyUsed int         `json:"typeActivelyUsed"`
+		Added            int64       `json:"added"`
+		Address2         string      `json:"address2"`
+		TypeName         string      `json:"typeName"`
+		Address          string      `json:"address"`
+		Street           string      `json:"street"`
+		PostalCode       string      `json:"postalCode"`
+		City             string      `json:"city"`
+		State            string      `json:"state"`
+		Country          string      `json:"country"`
 		LastModified
 		Attributes
 	}{}
@@ -81,19 +80,11 @@ func (u *Address) UnmarshalJSON(data []byte) error {
 
 	u.AddressID = raw.AddressID
 	u.OwnerID = raw.OwnerID
-
-	switch v := raw.TypeID.(type) {
-	case int:
-		u.TypeID = v
-	case float64:
-		u.TypeID = int(v)
-	case string:
-		i, err := strconv.Atoi(v)
-		if err != nil {
-			return fmt.Errorf("unable to unmarshal address. typeId did not contain an int: %s", v)
-		}
-		u.TypeID = i
+	typeID, err := raw.TypeID.Int64()
+	if err != nil {
+		return errors.Wrapf(err, "unable to unmarshal address. typeId did not contain an int: %s", raw.TypeID.String())
 	}
+	u.TypeID = int(typeID)
 
 	u.TypeActivelyUsed = raw.TypeActivelyUsed
 	u.Added = raw.Added
