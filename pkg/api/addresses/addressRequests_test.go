@@ -134,6 +134,118 @@ func TestGetAddressesBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
 }
 
+func TestGetAddressesBulkCustomUnmarshal(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte(`{
+	"status": {
+		"requestUnixTime": 0,
+		"responseStatus": "ok",
+		"errorCode": 0,
+		"generationTime": 0
+	},
+	"requests": [{
+			"status": {
+				"requestName": "",
+				"requestID": null,
+				"requestUnixTime": 0,
+				"responseStatus": "ok",
+				"errorCode": 0,
+				"generationTime": 0,
+				"recordsTotal": 0,
+				"recordsInResponse": 0
+			},
+			"records": [
+				{
+					"addressID": 123,
+					"address": "Some Address 123",
+					"typeID": 3
+				},
+				{
+					"addressID": 124,
+					"address": "Some Address 124",
+					"typeID": "4"
+				}
+			]
+		},{
+			"status": {
+				"requestName": "",
+				"requestID": null,
+				"requestUnixTime": 0,
+				"responseStatus": "ok",
+				"errorCode": 0,
+				"generationTime": 0,
+				"recordsTotal": 0,
+				"recordsInResponse": 0
+			},
+			"records": [
+				{
+					"addressID": 125,
+					"address": "Some Address 125",
+					"typeID": 5
+				}
+			]
+		}
+	]
+}`))
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	addressClient := NewClient(cli)
+
+	suppliersBulk, err := addressClient.GetAddressesBulk(
+		context.Background(),
+		[]map[string]interface{}{
+			{
+				"recordsOnPage": 2,
+				"pageNo":        1,
+			},
+			{
+				"recordsOnPage": 2,
+				"pageNo":        2,
+			},
+		},
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, sharedCommon.Status{ResponseStatus: "ok"}, suppliersBulk.Status)
+
+	expectedStatus := sharedCommon.StatusBulk{}
+	expectedStatus.ResponseStatus = "ok"
+
+	assert.Equal(t, sharedCommon.Addresses{
+		{
+			AddressID: 123,
+			Address:   "Some Address 123",
+			TypeID: 3,
+		},
+		{
+			AddressID: 124,
+			Address:   "Some Address 124",
+			TypeID: 4,
+		},
+	}, suppliersBulk.BulkItems[0].Addresses)
+
+	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[0].Status)
+
+	assert.Equal(t, sharedCommon.Addresses{
+		{
+			AddressID: 125,
+			Address:   "Some Address 125",
+			TypeID: 5,
+		},
+	}, suppliersBulk.BulkItems[1].Addresses)
+	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)
+}
+
 func TestGetAddressesBulkResponseFailure(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte(`some junk`))
