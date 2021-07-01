@@ -11,23 +11,6 @@ import (
 	"testing"
 )
 
-//works
-func TestErplyClient_GetWarehouses(t *testing.T) {
-	const (
-		//fill your data here
-		sk = ""
-		cc = ""
-	)
-
-	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
-	resp, err := cli.GetWarehouses(context.Background(), map[string]string{})
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	t.Log(resp)
-}
-
 func TestGetWarehousesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}

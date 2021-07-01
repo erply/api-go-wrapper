@@ -11,32 +11,6 @@ import (
 	"testing"
 )
 
-//works
-func TestVatRateManager(t *testing.T) {
-	const (
-		//fill your data here
-		sk        = ""
-		cc        = ""
-		vatRateID = ""
-	)
-	var (
-		ctx = context.Background()
-	)
-	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
-
-	resp, err := cli.GetVatRates(ctx, map[string]string{
-		"searchAttributeName":  "id",
-		"searchAttributeValue": vatRateID,
-		"active":               "1",
-	})
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	t.Log(resp)
-}
-
 func TestSaveVatRate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))

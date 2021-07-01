@@ -11,68 +11,6 @@ import (
 	"testing"
 )
 
-//works
-func TestSalesDocuments(t *testing.T) {
-	const (
-		//fill your data here
-		sk              = ""
-		cc              = ""
-		invoiceNoToSave = ""
-		supplierID      = ""
-		vatrateID       = ""
-		amount          = ""
-		price           = ""
-	)
-
-	ctx := context.Background()
-	cli := NewClient(common.NewClient(sk, cc, "", nil, nil))
-	t.Run("test get sales doc", func(t *testing.T) {
-		saleDocs, err := cli.GetSalesDocuments(ctx, map[string]string{
-			"id": "",
-		})
-		if err != nil {
-			t.Error(err)
-			return
-		}
-
-		for _, r := range saleDocs[0].InvoiceRows {
-			t.Logf("row's code2: %s", r.Code2)
-			t.Logf(r.StableRowID)
-		}
-	})
-
-	t.Run("test save purchase", func(t *testing.T) {
-		resp, err := cli.SavePurchaseDocument(ctx, map[string]string{
-			"currencyCode": "EUR",
-			"no":           invoiceNoToSave,
-			"supplierID":   supplierID,
-			"vatrateID":    vatrateID,
-			"amount":       amount,
-			"price":        price,
-		})
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		t.Log(resp)
-	})
-	t.Run("test save sales doc", func(t *testing.T) {
-		reports, err := cli.SaveSalesDocument(ctx, map[string]string{
-			"id":         "57",
-			"productID1": "4",
-			"amount1":    "2",
-			"price1":     "20",
-		})
-		if err != nil {
-			t.Error(err)
-			return
-		}
-		for _, r := range reports {
-			t.Log(r.InvoiceID)
-		}
-	})
-}
-
 func TestGetPurchaseDocumentsBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}
@@ -325,7 +263,7 @@ func TestSaveSalesDocumentBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: SaleDocImportReports{
 						{
-							InvoiceID: 123,
+							InvoiceID: json.Number("123"),
 						},
 					},
 				},
@@ -333,7 +271,7 @@ func TestSaveSalesDocumentBulk(t *testing.T) {
 					Status: statusBulk,
 					Records: SaleDocImportReports{
 						{
-							InvoiceID: 124,
+							InvoiceID: json.Number("124"),
 						},
 					},
 				},
@@ -381,9 +319,9 @@ func TestSaveSalesDocumentBulk(t *testing.T) {
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Len(t, bulkResp.BulkItems[0].Records, 1)
-	assert.Equal(t, 123, bulkResp.BulkItems[0].Records[0].InvoiceID)
+	assert.Equal(t, json.Number("123"), bulkResp.BulkItems[0].Records[0].InvoiceID)
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 	assert.Len(t, bulkResp.BulkItems[1].Records, 1)
-	assert.Equal(t, 124, bulkResp.BulkItems[1].Records[0].InvoiceID)
+	assert.Equal(t, json.Number("124"), bulkResp.BulkItems[1].Records[0].InvoiceID)
 }
