@@ -4,7 +4,6 @@ import "context"
 
 type Manager interface {
 	SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
-	GetCompanyTypes(ctx context.Context, filters map[string]string) ([]CompanyType, error)
 	SaveCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (SaveCustomerResponseBulk, error)
 	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
 	GetCustomersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetCustomersResponseBulk, error)
@@ -20,4 +19,7 @@ type Manager interface {
 	DeleteSupplierBulk(ctx context.Context, supplierMap []map[string]interface{}, attrs map[string]string) (DeleteSuppliersResponseBulk, error)
 	AddCustomerRewardPoints(ctx context.Context, filters map[string]string) (AddCustomerRewardPointsResult, error)
 	AddCustomerRewardPointsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (AddCustomerRewardPointsResponseBulk, error)
+	GetCompanyTypes(ctx context.Context, filters map[string]string) ([]CompanyType, error)
+	SaveCompanyType(ctx context.Context, filters map[string]string) (*SaveCompanyTypeResponse, error)
+	SaveSupplierGroup(ctx context.Context, filters map[string]string) (*SaveSupplierGroupResponse, error)
 }

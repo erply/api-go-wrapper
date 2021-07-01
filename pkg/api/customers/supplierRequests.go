@@ -197,3 +197,48 @@ func (cli *Client) DeleteSupplierBulk(ctx context.Context, supplierMap []map[str
 
 	return deleteSupplierResponse, nil
 }
+
+func (cli *Client) GetCompanyTypes(ctx context.Context, filters map[string]string) ([]CompanyType, error) {
+	res := &GetCompanyTypesResponse{}
+
+	err := cli.Scan(ctx, "getCompanyTypes", filters, res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res.CompanyTypes, nil
+}
+
+func (cli *Client) SaveCompanyType(ctx context.Context, filters map[string]string) (*SaveCompanyTypeResponse, error) {
+	resp, err := cli.SendRequest(ctx, "saveCompanyType", filters)
+	if err != nil {
+		return nil, sharedCommon.NewFromError("saveCompanyType request failed", err, 0)
+	}
+	res := &SaveCompanyTypeResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("unmarshalling SaveCompanyType failed", err, 0)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}
+
+func (cli *Client) SaveSupplierGroup(ctx context.Context, filters map[string]string) (*SaveSupplierGroupResponse, error) {
+	resp, err := cli.SendRequest(ctx, "saveSupplierGroup", filters)
+	if err != nil {
+		return nil, sharedCommon.NewFromError("saveSupplierGroup request failed", err, 0)
+	}
+	res := &SaveSupplierGroupResponse{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("unmarshalling SaveSupplierGroup failed", err, 0)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}

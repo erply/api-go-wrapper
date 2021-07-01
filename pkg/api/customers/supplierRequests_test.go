@@ -403,3 +403,150 @@ func TestDeleteSupplierBulkFailure(t *testing.T) {
 		return
 	}
 }
+
+func TestGetCompanyTypes(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := GetCompanyTypesResponse{
+			Status: common2.Status{
+				ResponseStatus: "ok",
+			},
+			CompanyTypes: []CompanyType{
+				{
+					ID:    1,
+					Name:  "name",
+					Order: 1,
+				},
+				{
+					ID:    2,
+					Name:  "name2",
+					Order: 2,
+				},
+			}}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	companyTypes, err := cl.GetCompanyTypes(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []CompanyType{
+		{
+			ID:    1,
+			Name:  "name",
+			Order: 1,
+		},
+		{
+			ID:    2,
+			Name:  "name2",
+			Order: 2,
+		}}, companyTypes)
+}
+func TestSaveSupplierGroup(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveSupplierGroupResponse{
+			Status: common2.Status{ResponseStatus: "ok"},
+			Records: []SaveSupplierGroupRecord{
+				{
+					SupplierGroupID: 1,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
+			"setContentType": "1",
+			"request":        "saveSupplierGroup",
+			"sessionKey":     "somesess",
+			"name":           "100000046",
+			"clientCode":     "someclient",
+		}, reqItems)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	res, err := suppliersClient.SaveSupplierGroup(
+		context.Background(),
+		map[string]string{
+			"name": "100000046",
+		},
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, res.Records[0].SupplierGroupID)
+}
+
+func TestSaveCompanyType(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := SaveCompanyTypeResponse{
+			Status: common2.Status{ResponseStatus: "ok"},
+			Records: []SaveCompanyTypeRecord{
+				{
+					CompanyTypeID: 1,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
+			"setContentType": "1",
+			"request":        "saveCompanyType",
+			"sessionKey":     "somesess",
+			"name":           "100000046",
+			"clientCode":     "someclient",
+		}, reqItems)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	suppliersClient := NewClient(cli)
+
+	res, err := suppliersClient.SaveCompanyType(
+		context.Background(),
+		map[string]string{
+			"name": "100000046",
+		},
+	)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, res.Records[0].CompanyTypeID)
+}

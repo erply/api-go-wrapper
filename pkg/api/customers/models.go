@@ -193,6 +193,24 @@ type (
 		Status                sharedCommon.Status   `json:"status"`
 		CustomerImportReports CustomerImportReports `json:"records"`
 	}
+
+	SaveCompanyTypeResponse struct {
+		Status  sharedCommon.Status     `json:"status"`
+		Records []SaveCompanyTypeRecord `json:"records"`
+	}
+	SaveCompanyTypeRecord struct {
+		CompanyTypeID int `json:"companyTypeID"`
+	}
+
+	SaveSupplierGroupResponse struct {
+		Status  sharedCommon.Status       `json:"status"`
+		Records []SaveSupplierGroupRecord `json:"records"`
+	}
+
+	SaveSupplierGroupRecord struct {
+		SupplierGroupID int `json:"supplierGroupID"`
+	}
+
 	CustomerImportReports []CustomerImportReport
 	CustomerImportReport  struct {
 		ClientID   int `json:"clientID"`
@@ -209,6 +227,10 @@ type (
 		BulkItems []GetCustomersResponseBulkItem `json:"requests"`
 	}
 )
+
+func (r GetCompanyTypesResponse) GetStatus() *sharedCommon.Status {
+	return &r.Status
+}
 
 type (
 	Supplier struct {
