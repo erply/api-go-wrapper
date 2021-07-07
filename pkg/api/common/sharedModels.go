@@ -13,7 +13,7 @@ type (
 	Address struct {
 		AddressID        int
 		OwnerID          int
-		TypeID           json.Number
+		TypeID           int
 		TypeActivelyUsed int
 		Added            int64
 		Address2         string
@@ -80,11 +80,13 @@ func (u *Address) UnmarshalJSON(data []byte) error {
 
 	u.AddressID = raw.AddressID
 	u.OwnerID = raw.OwnerID
-	typeID, err := raw.TypeID.Int64()
-	if err != nil {
-		return errors.Wrapf(err, "unable to unmarshal address. typeId did not contain an int: %s", raw.TypeID.String())
+	if raw.TypeID.String() != "" {
+		typeID, err := raw.TypeID.Int64()
+		if err != nil {
+			return errors.Wrapf(err, "unable to unmarshal address. typeId did not contain an int: %s", raw.TypeID.String())
+		}
+		u.TypeID = int(typeID)
 	}
-	u.TypeID = int(typeID)
 
 	u.TypeActivelyUsed = raw.TypeActivelyUsed
 	u.Added = raw.Added
