@@ -13,7 +13,7 @@ type (
 	Address struct {
 		AddressID        int
 		OwnerID          int
-		TypeID           int
+		TypeID           json.Number
 		TypeActivelyUsed int
 		Added            int64
 		Address2         string
