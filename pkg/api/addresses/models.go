@@ -19,8 +19,8 @@ type (
 	Type struct {
 		ID           string `json:"id"`
 		Name         string `json:"name"`
-		Added        int64  `json:"added"`
-		LastModified int64  `json:"lastModified"`
+		Added        string `json:"added"`
+		LastModified string `json:"lastModified"`
 	}
 
 	GetAddressesResponseBulkItem struct {
