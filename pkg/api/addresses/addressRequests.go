@@ -20,6 +20,17 @@ func (cli *Client) GetAddresses(ctx context.Context, filters map[string]string) 
 	return res.Addresses, nil
 }
 
+func (cli *Client) GetAddressTypes(ctx context.Context, filters map[string]string) (addrTypes []Type, err error) {
+	res := &TypeResponse{}
+
+	err = cli.Scan(ctx, "getAddressTypes", filters, res)
+	if err != nil {
+		return
+	}
+
+	return res.AddressTypes, nil
+}
+
 // GetAddressesBulk will list addresses according to specified filters sending a bulk request to fetch more addresses than the default limit
 func (cli *Client) GetAddressesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetAddressesResponseBulk, error) {
 	var addrResp GetAddressesResponseBulk

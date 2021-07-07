@@ -11,6 +11,92 @@ import (
 	"testing"
 )
 
+func TestGetAddresses(t *testing.T) {
+	addrs := []sharedCommon.Address{
+		{
+			AddressID: 1,
+			OwnerID:   1,
+		},
+		{
+			AddressID: 2,
+			OwnerID:   2,
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := Response{
+			Status: sharedCommon.Status{
+				ResponseStatus: "ok",
+			},
+			Addresses: addrs}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	addrsResp, err := cl.GetAddresses(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, addrs, addrsResp)
+}
+
+func TestGetAddressTypes(t *testing.T) {
+	addrTypes := []Type{
+		{
+			ID:   "1",
+			Name: "name",
+		},
+		{
+			ID:   "2",
+			Name: "name2",
+		},
+	}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := TypeResponse{
+			Status: sharedCommon.Status{
+				ResponseStatus: "ok",
+			},
+			AddressTypes: addrTypes}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	addrTypesResp, err := cl.GetAddressTypes(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, addrTypes, addrTypesResp)
+}
+
 func TestGetAddressesBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}

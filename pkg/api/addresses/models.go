@@ -11,6 +11,18 @@ type (
 		Addresses sharedCommon.Addresses `json:"records"`
 	}
 
+	TypeResponse struct {
+		Status       sharedCommon.Status `json:"status"`
+		AddressTypes []Type              `json:"records"`
+	}
+
+	Type struct {
+		ID           string `json:"id"`
+		Name         string `json:"name"`
+		Added        int64  `json:"added"`
+		LastModified int64  `json:"lastModified"`
+	}
+
 	GetAddressesResponseBulkItem struct {
 		Status    sharedCommon.StatusBulk `json:"status"`
 		Addresses sharedCommon.Addresses  `json:"records"`
@@ -50,5 +62,9 @@ type (
 )
 
 func (r Response) GetStatus() *sharedCommon.Status {
+	return &r.Status
+}
+
+func (r TypeResponse) GetStatus() *sharedCommon.Status {
 	return &r.Status
 }
