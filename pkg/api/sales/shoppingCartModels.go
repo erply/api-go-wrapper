@@ -12,7 +12,7 @@ type ShoppingCartProduct struct {
 	ProductID            string  `json:"productID"`
 	Amount               string  `json:"amount"`
 	VatRateID            int     `json:"vatrateID"`
-	VatRate              float64 `json:"vatRate"`
+	VatRate              string  `json:"vatRate"`
 	OriginalPrice        float64 `json:"originalPrice"`
 	OriginalPriceWithVAT float64 `json:"originalPriceWithVAT"`
 	PromotionDiscount    float64 `json:"promotionDiscount"`
