@@ -1037,3 +1037,54 @@ func (cli *Client) DeleteProductGroupBulk(ctx context.Context, bulkFilters []map
 
 	return deleteRespBulk, nil
 }
+
+func (cli *Client) GetProductPictures(ctx context.Context, filters map[string]string) ([]Image, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPictures", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPicturesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProductPicturesResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.Records, nil
+}
+
+func (cli *Client) GetProductPicturesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductPicturesResponseBulk, error) {
+	var productPicturesResp GetProductPicturesResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getProductPictures",
+			Filters:    bulkFilterMap,
+		})
+	}
+
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return productPicturesResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return productPicturesResp, err
+	}
+
+	if err := json.Unmarshal(body, &productPicturesResp); err != nil {
+		return productPicturesResp, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPicturesBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&productPicturesResp.Status) {
+		return productPicturesResp, sharedCommon.NewErplyError(productPicturesResp.Status.ErrorCode.String(), productPicturesResp.Status.Request+": "+productPicturesResp.Status.ResponseStatus, productPicturesResp.Status.ErrorCode)
+	}
+
+	for _, prodPicturesBulkItem := range productPicturesResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodPicturesBulkItem.Status) {
+			return productPicturesResp, sharedCommon.NewErplyError(prodPicturesBulkItem.Status.ErrorCode.String(), prodPicturesBulkItem.Status.Request+": "+prodPicturesBulkItem.Status.ResponseStatus, prodPicturesBulkItem.Status.ErrorCode)
+		}
+	}
+
+	return productPicturesResp, nil
+}
