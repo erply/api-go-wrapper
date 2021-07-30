@@ -70,4 +70,5 @@ type Manager interface {
 	DeleteProductGroup(ctx context.Context, filters map[string]string) error
 	DeleteProductGroupBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductGroupResponseBulk, error)
 	GetProductPictures(ctx context.Context, filters map[string]string) ([]Image, error)
+	GetProductPicturesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetProductPicturesResponseBulk, error)
 }

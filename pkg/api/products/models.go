@@ -440,6 +440,11 @@ type (
 		BulkItems []GetProductStockResponseBulkItem `json:"requests"`
 	}
 
+	GetProductPicturesResponseBulk struct {
+		Status    sharedCommon.Status          `json:"status"`
+		BulkItems []GetProductPicturesResponse `json:"requests"`
+	}
+
 	SaveProductResult struct {
 		ProductID int `json:"productID"`
 	}
