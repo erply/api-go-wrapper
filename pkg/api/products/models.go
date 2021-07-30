@@ -258,6 +258,22 @@ type (
 		sharedCommon.LongAttributes
 	}
 
+	Image struct {
+		Added            int64       `json:"added"`
+		External         int64       `json:"external"`
+		FullURL          string      `json:"fullURL"`
+		Hash             *string     `json:"hash"`
+		HostingProvider  string      `json:"hostingProvider"`
+		LargeURL         string      `json:"largeURL"`
+		LastModified     interface{} `json:"lastModified"`
+		Name             string      `json:"name"`
+		ProductID        int64       `json:"productID"`
+		ProductPictureID int64       `json:"productPictureID"`
+		SmallURL         string      `json:"smallURL"`
+		Tenant           *string     `json:"tenant"`
+		ThumbURL         string      `json:"thumbURL"`
+	}
+
 	Option struct {
 		ID              int     `json:"optionID"`
 		Name            string  `json:"optionName"`
@@ -651,5 +667,10 @@ type (
 	GetProductGroupResponseBulk struct {
 		Status    sharedCommon.Status       `json:"status"`
 		BulkItems []GetProductGroupBulkItem `json:"requests"`
+	}
+
+	GetProductPicturesResponse struct {
+		Records []Image             `json:"records"`
+		Status  sharedCommon.Status `json:"status"`
 	}
 )

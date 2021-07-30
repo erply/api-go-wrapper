@@ -1037,3 +1037,18 @@ func (cli *Client) DeleteProductGroupBulk(ctx context.Context, bulkFilters []map
 
 	return deleteRespBulk, nil
 }
+
+func (cli *Client) GetProductPictures(ctx context.Context, filters map[string]string) ([]Image, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPictures", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPicturesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetProductPicturesResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.Records, nil
+}
