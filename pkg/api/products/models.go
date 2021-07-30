@@ -260,15 +260,15 @@ type (
 
 	Image struct {
 		Added            int64       `json:"added"`
-		External         int64       `json:"external"`
+		External         int         `json:"external"`
 		FullURL          string      `json:"fullURL"`
 		Hash             *string     `json:"hash"`
 		HostingProvider  string      `json:"hostingProvider"`
 		LargeURL         string      `json:"largeURL"`
 		LastModified     interface{} `json:"lastModified"`
 		Name             string      `json:"name"`
-		ProductID        int64       `json:"productID"`
-		ProductPictureID int64       `json:"productPictureID"`
+		ProductID        int         `json:"productID"`
+		ProductPictureID int         `json:"productPictureID"`
 		SmallURL         string      `json:"smallURL"`
 		Tenant           *string     `json:"tenant"`
 		ThumbURL         string      `json:"thumbURL"`
