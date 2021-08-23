@@ -69,7 +69,7 @@ func (cli *Client) SaveSalesDocumentBulk(
 }
 
 func (cli *Client) GetPurchaseDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error) {
-	resp, err := cli.SendRequest(ctx, "getSalesDocuments", filters)
+	resp, err := cli.SendRequest(ctx, "getPurchaseDocuments", filters)
 	if err != nil {
 		return nil, sharedCommon.NewFromError("GetPurchaseDocuments request failed", err, 0)
 	}
