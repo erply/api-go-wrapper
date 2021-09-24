@@ -432,6 +432,28 @@ func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []
 	return bulkResp, nil
 }
 
+func (cli *Client) GetPriceLists(ctx context.Context, filters map[string]string) (*GetRegularPriceListResult, error) {
+	resp, err := cli.SendRequest(ctx, "getPriceLists", filters)
+	if err != nil {
+		return nil, sharedCommon.NewFromError("getPriceLists request failed", err, 0)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &GetRegularPriceListResult{}
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetRegularPriceListsResponse from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}
+
 func (cli *Client) SavePriceList(ctx context.Context, filters map[string]string) (*SavePriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "savePriceList", filters)
 	if err != nil {

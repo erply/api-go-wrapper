@@ -89,6 +89,25 @@ type ProductsInSupplierPriceListResponseBulk struct {
 	BulkItems []ProductsInSupplierPriceListResponseBulkItem `json:"requests"`
 }
 
+type RegularPriceList struct {
+	PricelistID            int                         `json:"pricelistID"`
+	Name                   string                      `json:"name"`
+	ValidFrom              string                      `json:"startDate"`
+	ValidTo                string                      `json:"endDate"`
+	Active                 string                      `json:"active"`
+	AddedTimestamp         int                         `json:"added"`
+	LastModifiedTimestamp  int                         `json:"lastModified"`
+	AddedByUserName        string                      `json:"addedByUserName"`
+	LastModifiedByUserName string                      `json:"lastModifiedByUserName"`
+	Rules                  []PriceListRule             `json:"pricelistRules"`
+	Attributes             []sharedCommon.ObjAttribute `json:"attributes"`
+}
+
+type GetRegularPriceListResult struct {
+	Status     sharedCommon.Status `json:"status"`
+	PriceLists []RegularPriceList  `json:"records"`
+}
+
 type ProductsInSupplierPriceListResponse struct {
 	Status                      sharedCommon.Status           `json:"status"`
 	ProductsInSupplierPriceList []ProductsInSupplierPriceList `json:"records"`
