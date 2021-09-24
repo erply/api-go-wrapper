@@ -68,28 +68,6 @@ func (cli *Client) SaveSalesDocumentBulk(
 	return respBulk, nil
 }
 
-func (cli *Client) GetPurchaseDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error) {
-	resp, err := cli.SendRequest(ctx, "getPurchaseDocuments", filters)
-	if err != nil {
-		return nil, sharedCommon.NewFromError("GetPurchaseDocuments request failed", err, 0)
-	}
-	res := &GetSalesDocumentResponse{}
-	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, sharedCommon.NewFromError("unmarshaling GetPurchaseDocumentsResponse failed", err, 0)
-	}
-
-	if !common.IsJSONResponseOK(&res.Status) {
-		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
-	}
-
-	if len(res.SalesDocuments) == 0 {
-		//intentionally, otherwise when the documents are cached the error will be triggered.
-		return nil, nil
-	}
-
-	return res.SalesDocuments, nil
-}
-
 func (cli *Client) SavePurchaseDocument(ctx context.Context, filters map[string]string) (resp PurchaseDocImportReports, err error) {
 	res := &SavePurchaseDocumentResponse{}
 	err = cli.Scan(ctx, "savePurchaseDocument", filters, res)

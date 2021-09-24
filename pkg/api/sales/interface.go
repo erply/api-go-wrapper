@@ -18,7 +18,6 @@ type (
 		GetSalesDocumentsWithStatus(ctx context.Context, filters map[string]string) (*GetSalesDocumentResponse, error)
 		GetSalesDocumentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSaleDocumentResponseBulk, error)
 		DeleteDocument(ctx context.Context, filters map[string]string) error
-		GetPurchaseDocuments(ctx context.Context, filters map[string]string) ([]SaleDocument, error)
 		SavePurchaseDocument(ctx context.Context, filters map[string]string) (PurchaseDocImportReports, error)
 		SavePurchaseDocumentBulk(
 			ctx context.Context,
