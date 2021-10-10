@@ -12,6 +12,13 @@ type PriceListRule struct {
 	Amount          int     `json:"amount"`
 }
 
+type RegularPriceListRule struct {
+	ID              int     `json:"id"`
+	Price           float32 `json:"price,string"`
+	Type            string  `json:"type"`
+	DiscountPercent int     `json:"discountPercent,string"`
+}
+
 type PriceList struct {
 	ID                     int                         `json:"supplierPriceListID"`
 	SupplierID             int                         `json:"supplierID"`
@@ -111,7 +118,7 @@ type RegularPriceList struct {
 	LastModifiedTimestamp  int                         `json:"lastModified"`
 	AddedByUserName        string                      `json:"addedByUserName"`
 	LastModifiedByUserName string                      `json:"lastModifiedByUserName"`
-	Rules                  []PriceListRule             `json:"pricelistRules"`
+	Rules                  []RegularPriceListRule      `json:"pricelistRules"`
 	Attributes             []sharedCommon.ObjAttribute `json:"attributes"`
 }
 
