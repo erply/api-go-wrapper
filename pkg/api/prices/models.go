@@ -43,7 +43,17 @@ type GetPriceListsResponseBulkItem struct {
 	PriceLists []PriceList             `json:"records"`
 }
 
+type GetRegularPriceListResponseBulkItem struct {
+	Status     sharedCommon.StatusBulk `json:"status"`
+	PriceLists []RegularPriceList      `json:"records"`
+}
+
 type GetPriceListsResponseBulk struct {
+	Status    sharedCommon.Status             `json:"status"`
+	BulkItems []GetPriceListsResponseBulkItem `json:"requests"`
+}
+
+type GetRegularPriceListResponseBulk struct {
 	Status    sharedCommon.Status             `json:"status"`
 	BulkItems []GetPriceListsResponseBulkItem `json:"requests"`
 }
