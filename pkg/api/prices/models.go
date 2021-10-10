@@ -5,9 +5,11 @@ import (
 )
 
 type PriceListRule struct {
-	ProductID int     `json:"productID"`
-	Price     float32 `json:"price,string"`
-	Amount    int     `json:"amount"`
+	ProductID       int     `json:"productID"`
+	Price           float32 `json:"price,string"`
+	Type            string  `json:"type"`
+	DiscountPercent int     `json:"discountPercent,string"`
+	Amount          int     `json:"amount"`
 }
 
 type PriceList struct {
@@ -54,7 +56,7 @@ type GetPriceListsResponseBulk struct {
 }
 
 type GetRegularPriceListResponseBulk struct {
-	Status    sharedCommon.Status             `json:"status"`
+	Status    sharedCommon.Status                   `json:"status"`
 	BulkItems []GetRegularPriceListResponseBulkItem `json:"requests"`
 }
 
