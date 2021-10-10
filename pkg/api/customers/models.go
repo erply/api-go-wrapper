@@ -189,6 +189,25 @@ type (
 		Customers Customers           `json:"records"`
 	}
 
+	GetCustomerGroupsResponse struct {
+		Status    sharedCommon.Status `json:"status"`
+		Customers []CustomerGroup     `json:"records"`
+	}
+
+	CustomerGroup struct {
+		Added           int    `json:"added"`
+		ClientGroupID   int    `json:"clientGroupID"`
+		CustomerGroupID int    `json:"customerGroupID"`
+		LastModified    int    `json:"lastModified"`
+		Name            string `json:"name"`
+		ParentID        int    `json:"parentID"`
+		PricelistID     int    `json:"pricelistID"`
+		PricelistID2    int    `json:"pricelistID2"`
+		PricelistID3    int    `json:"pricelistID3"`
+		PricelistID4    int    `json:"pricelistID4"`
+		PricelistID5    int    `json:"pricelistID5"`
+	}
+
 	PostCustomerResponse struct {
 		Status                sharedCommon.Status   `json:"status"`
 		CustomerImportReports CustomerImportReports `json:"records"`
