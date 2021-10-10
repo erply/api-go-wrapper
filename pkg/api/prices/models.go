@@ -55,7 +55,7 @@ type GetPriceListsResponseBulk struct {
 
 type GetRegularPriceListResponseBulk struct {
 	Status    sharedCommon.Status             `json:"status"`
-	BulkItems []GetPriceListsResponseBulkItem `json:"requests"`
+	BulkItems []GetRegularPriceListResponseBulkItem `json:"requests"`
 }
 
 type ProductsInPriceList struct {
