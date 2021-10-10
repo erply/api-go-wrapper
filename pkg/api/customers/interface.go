@@ -11,6 +11,7 @@ type Manager interface {
 	DeleteCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (DeleteCustomersResponseBulk, error)
 	VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error)
 	ValidateCustomerUsername(ctx context.Context, username string) (bool, error)
+	GetCustomerGroups(ctx context.Context, filters map[string]string) ([]CustomerGroup, error)
 	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
 	GetSuppliersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSuppliersResponseBulk, error)
 	SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
