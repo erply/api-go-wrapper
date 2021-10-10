@@ -18,6 +18,7 @@ type Manager interface {
 	SaveSupplierPriceList(ctx context.Context, filters map[string]string) (*SaveSupplierPriceListResult, error)
 	SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveSupplierPriceListResponseBulk, error)
 	GetPriceLists(ctx context.Context, filters map[string]string) (*GetRegularPriceListResult, error)
+	GetPriceListsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetRegularPriceListResponseBulk, error)
 	SavePriceList(ctx context.Context, filters map[string]string) (*SavePriceListResult, error)
 	SavePriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SavePriceListResponseBulk, error)
 	AddProductToPriceList(ctx context.Context, filters map[string]string) (*ChangeProductToPriceListResult, error)
