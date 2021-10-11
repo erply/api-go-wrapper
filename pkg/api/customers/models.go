@@ -82,6 +82,11 @@ type (
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
 		LastLogin string `json:"webshopLastLogin"`
+
+		// Detailed info
+		PriceListID int `json:"priceListID"`
+		PriceListID2 int `json:"priceListID2"`
+		PriceListID3 int `json:"priceListID3"`
 	}
 
 	CompanyType struct {
