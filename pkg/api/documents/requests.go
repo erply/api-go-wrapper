@@ -31,6 +31,29 @@ func (cli *Client) GetPurchaseDocuments(ctx context.Context, filters map[string]
 	return res.PurchaseDocuments, nil
 }
 
+func (cli *Client) GetPurchaseDocumentsWithStatus(ctx context.Context, filters map[string]string) (GetPurchaseDocumentsResponse, error) {
+	var res GetPurchaseDocumentsResponse
+
+	resp, err := cli.SendRequest(ctx, "getPurchaseDocuments", filters)
+	if err != nil {
+		return res, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return res, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return res, fmt.Errorf("ERPLY API: failed to unmarshal GetPurchaseDocumentsResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return res, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}
+
 func (cli *Client) GetPurchaseDocumentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetPurchaseDocumentResponseBulk, error) {
 	var bulkResp GetPurchaseDocumentResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))

@@ -5,9 +5,18 @@ import (
 )
 
 type PriceListRule struct {
-	ProductID int     `json:"productID"`
-	Price     float32 `json:"price,string"`
-	Amount    int     `json:"amount"`
+	ProductID       int     `json:"productID"`
+	Price           float32 `json:"price,string"`
+	Type            string  `json:"type"`
+	DiscountPercent int     `json:"discountPercent,string"`
+	Amount          int     `json:"amount"`
+}
+
+type RegularPriceListRule struct {
+	ID              int     `json:"id"`
+	Price           float32 `json:"price,string"`
+	Type            string  `json:"type"`
+	DiscountPercent int     `json:"discountPercent,string"`
 }
 
 type PriceList struct {
@@ -43,9 +52,19 @@ type GetPriceListsResponseBulkItem struct {
 	PriceLists []PriceList             `json:"records"`
 }
 
+type GetRegularPriceListResponseBulkItem struct {
+	Status     sharedCommon.StatusBulk `json:"status"`
+	PriceLists []RegularPriceList      `json:"records"`
+}
+
 type GetPriceListsResponseBulk struct {
 	Status    sharedCommon.Status             `json:"status"`
 	BulkItems []GetPriceListsResponseBulkItem `json:"requests"`
+}
+
+type GetRegularPriceListResponseBulk struct {
+	Status    sharedCommon.Status                   `json:"status"`
+	BulkItems []GetRegularPriceListResponseBulkItem `json:"requests"`
 }
 
 type ProductsInPriceList struct {
@@ -99,7 +118,7 @@ type RegularPriceList struct {
 	LastModifiedTimestamp  int                         `json:"lastModified"`
 	AddedByUserName        string                      `json:"addedByUserName"`
 	LastModifiedByUserName string                      `json:"lastModifiedByUserName"`
-	Rules                  []PriceListRule             `json:"pricelistRules"`
+	Rules                  []RegularPriceListRule      `json:"pricelistRules"`
 	Attributes             []sharedCommon.ObjAttribute `json:"attributes"`
 }
 

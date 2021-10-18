@@ -48,6 +48,22 @@ func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) 
 	return res.Customers, nil
 }
 
+// GetCustomerGroups will list customers groups according to specified filters.
+func (cli *Client) GetCustomerGroups(ctx context.Context, filters map[string]string) ([]CustomerGroup, error) {
+	resp, err := cli.SendRequest(ctx, "getCustomerGroups", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCustomerGroupsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCustomerGroupsResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.Customers, nil
+}
+
 // GetCustomersBulk will list customers according to specified filters sending a bulk request to fetch more customers than the default limit
 func (cli *Client) GetCustomersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetCustomersResponseBulk, error) {
 	var customersResponse GetCustomersResponseBulk
