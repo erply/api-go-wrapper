@@ -52,19 +52,19 @@ type Client struct {
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
 }
 
-func (cl *Client) InvalidateSession() {
-	cl.commonClient.InvalidateSession()
+func (c *Client) InvalidateSession() {
+	c.commonClient.InvalidateSession()
 }
 
-func (cl *Client) GetSession() (sessionKey string, err error) {
-	return cl.commonClient.GetSession()
+func (c *Client) GetSession() (sessionKey string, err error) {
+	return c.commonClient.GetSession()
 }
 
 //SendParametersInRequestBody indicates to the client that the request should add the data payload in the
 //request body instead of using the query parameters. Using the request body eliminates the query size
 //limitations imposed by the maximum URL length
-func (cl *Client) SendParametersInRequestBody() {
-	cl.commonClient.SendParametersInRequestBody()
+func (c *Client) SendParametersInRequestBody() {
+	c.commonClient.SendParametersInRequestBody()
 }
 
 //NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
@@ -74,6 +74,20 @@ func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Clie
 	return newErplyClient(comCli)
 }
 
+//NewClientFromCredentials makes a verifyUser Erply API call and initializes the client struct
+func NewClientFromCredentials(username, password, clientCode string, customCli *http.Client) (*Client, error) {
+	if customCli == nil {
+		customCli = common.GetDefaultHTTPClient()
+	}
+	sessionKey, err := auth.VerifyUser(username, password, clientCode, customCli)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewClient(sessionKey, clientCode, customCli)
+}
+
+// Deprecated
 // NewClient Takes three params:
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
