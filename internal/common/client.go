@@ -122,12 +122,20 @@ func (dsp *DefaultSessionProvider) Invalidate() {
 }
 
 type Client struct {
-	Url             string
-	httpClient      *http.Client
-	clientCode      string
-	partnerKey      string
-	headersFunc     AuthFunc
-	sessionProvider SessionProvider
+	Url                         string
+	httpClient                  *http.Client
+	clientCode                  string
+	partnerKey                  string
+	headersFunc                 AuthFunc
+	sessionProvider             SessionProvider
+	sendParametersInRequestBody bool
+}
+
+//SendParametersInRequestBody indicates to the client that the request should add the data payload in the
+//request body instead of using the query parameters. Using the request body eliminates the query size
+//limitations imposed by the maximum URL length
+func (cli *Client) SendParametersInRequestBody() {
+	cli.sendParametersInRequestBody = true
 }
 
 func (cli *Client) Close() {

@@ -4,6 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
@@ -18,11 +24,6 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/sales"
 	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
 	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
-	"net/http"
-	"net/url"
-	"strconv"
-	"sync"
-	"time"
 )
 
 type Client struct {
@@ -57,6 +58,13 @@ func (cl *Client) InvalidateSession() {
 
 func (cl *Client) GetSession() (sessionKey string, err error) {
 	return cl.commonClient.GetSession()
+}
+
+//SendParametersInRequestBody indicates to the client that the request should add the data payload in the
+//request body instead of using the query parameters. Using the request body eliminates the query size
+//limitations imposed by the maximum URL length
+func (cl *Client) SendParametersInRequestBody() {
+	cl.commonClient.SendParametersInRequestBody()
 }
 
 //NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
