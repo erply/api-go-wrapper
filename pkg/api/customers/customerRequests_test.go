@@ -3,13 +3,12 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/erply/api-go-wrapper/internal/common"
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestGetCustomersBulk(t *testing.T) {
@@ -134,14 +133,12 @@ func TestGetCustomersBulkResponseFailure(t *testing.T) {
 
 func TestAddCustomerRewardPoints(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		common.AssertFormValues(t, r, map[string]interface{}{
-			"clientCode": "someclient",
-			"sessionKey": "somesess",
-			"request":    "addCustomerRewardPoints",
-			"customerID": "1232131",
-			"invoiceID":  "34456",
-			"points":     "11",
-		})
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "addCustomerRewardPoints", r.URL.Query().Get("request"))
+		assert.Equal(t, "1232131", r.URL.Query().Get("customerID"))
+		assert.Equal(t, "34456", r.URL.Query().Get("invoiceID"))
+		assert.Equal(t, "11", r.URL.Query().Get("points"))
 
 		resp := AddCustomerRewardPointsResponse{
 			Status:                         sharedCommon.Status{ResponseStatus: "ok"},
@@ -442,13 +439,18 @@ func TestDeleteCustomer(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 
-		common.AssertFormValues(t, r, map[string]interface{}{
-			"clientCode":     "someclient",
-			"sessionKey":     "somesess",
-			"request":        "deleteCustomer",
-			"customerID":     "100000046",
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
 			"setContentType": "1",
-		})
+			"request":        "deleteCustomer",
+			"sessionKey":     "somesess",
+			"customerID":     "100000046",
+			"clientCode":     "someclient",
+		}, reqItems)
 	}))
 
 	defer srv.Close()

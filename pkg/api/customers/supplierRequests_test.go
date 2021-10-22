@@ -3,13 +3,12 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/erply/api-go-wrapper/internal/common"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 	"github.com/stretchr/testify/assert"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestGetSuppliersBulk(t *testing.T) {
@@ -344,13 +343,18 @@ func TestDeleteSupplier(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 
-		common.AssertFormValues(t, r, map[string]interface{}{
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
 			"setContentType": "1",
 			"request":        "deleteSupplier",
 			"sessionKey":     "somesess",
 			"supplierID":     "100000046",
 			"clientCode":     "someclient",
-		})
+		}, reqItems)
 	}))
 
 	defer srv.Close()
@@ -469,13 +473,18 @@ func TestSaveSupplierGroup(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 
-		common.AssertFormValues(t, r, map[string]interface{}{
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
 			"setContentType": "1",
 			"request":        "saveSupplierGroup",
 			"sessionKey":     "somesess",
 			"name":           "100000046",
 			"clientCode":     "someclient",
-		})
+		}, reqItems)
 	}))
 
 	defer srv.Close()
@@ -511,13 +520,18 @@ func TestSaveCompanyType(t *testing.T) {
 		_, err = w.Write(jsonRaw)
 		assert.NoError(t, err)
 
-		common.AssertFormValues(t, r, map[string]interface{}{
+		reqItems := make(map[string]interface{})
+		for key, vals := range r.URL.Query() {
+			reqItems[key] = vals[0]
+		}
+
+		assert.Equal(t, map[string]interface{}{
 			"setContentType": "1",
 			"request":        "saveCompanyType",
 			"sessionKey":     "somesess",
 			"name":           "100000046",
 			"clientCode":     "someclient",
-		})
+		}, reqItems)
 	}))
 
 	defer srv.Close()
