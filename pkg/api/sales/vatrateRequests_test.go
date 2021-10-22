@@ -3,23 +3,26 @@ package sales
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSaveVatRate(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "saveVatRate", r.URL.Query().Get("request"))
-		assert.Equal(t, "ID123", r.URL.Query().Get("vatRateID"))
-		assert.Equal(t, "VatName", r.URL.Query().Get("name"))
-		assert.Equal(t, "0.19", r.URL.Query().Get("rate"))
-		assert.Equal(t, "vatCode123", r.URL.Query().Get("code"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":    "saveVatRate",
+			"sessionKey": "somesess",
+			"clientCode": "someclient",
+			"vatRateID":  "ID123",
+			"name":       "VatName",
+			"rate":       "0.19",
+			"code":       "vatCode123",
+		})
 
 		resp := SaveVatRateResultResponse{
 			Status:            sharedCommon.Status{ResponseStatus: "ok"},
@@ -152,13 +155,15 @@ func TestSaveVatRateBulk(t *testing.T) {
 
 func TestSaveVatRateComponent(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "saveVatRateComponent", r.URL.Query().Get("request"))
-		assert.Equal(t, "ID123", r.URL.Query().Get("vatRateComponentID"))
-		assert.Equal(t, "#2333", r.URL.Query().Get("vatRateID"))
-		assert.Equal(t, "Some name", r.URL.Query().Get("name"))
-		assert.Equal(t, "8.76", r.URL.Query().Get("rate"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":            "saveVatRateComponent",
+			"sessionKey":         "somesess",
+			"clientCode":         "someclient",
+			"vatRateComponentID": "ID123",
+			"vatRateID":          "#2333",
+			"name":               "Some name",
+			"rate":               "8.76",
+		})
 
 		resp := SaveVatRateComponentResultResponse{
 			Status:                     sharedCommon.Status{ResponseStatus: "ok"},

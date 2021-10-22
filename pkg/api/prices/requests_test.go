@@ -3,12 +3,13 @@ package prices
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetSupplierPriceListsBulk(t *testing.T) {
@@ -139,11 +140,13 @@ func TestAddProductToSupplierPriceList(t *testing.T) {
 
 func TestEditProductToSupplierPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "editProductInSupplierPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "1234", r.URL.Query().Get("supplierPriceListProductID"))
-		assert.Equal(t, "20.23", r.URL.Query().Get("price"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":                    "editProductInSupplierPriceList",
+			"sessionKey":                 "somesess",
+			"clientCode":                 "someclient",
+			"supplierPriceListProductID": "1234",
+			"price":                      "20.23",
+		})
 
 		resp := ChangeProductToSupplierPriceListResponse{
 			Status:                                 sharedCommon.Status{ResponseStatus: "ok"},
@@ -711,11 +714,13 @@ func TestGetProductPriceListsResponseFailure(t *testing.T) {
 
 func TestDeleteProductsFromSupplierPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "deleteProductsFromSupplierPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "2223", r.URL.Query().Get("supplierPriceListID"))
-		assert.Equal(t, "3444,3445", r.URL.Query().Get("supplierPriceListProductIDs"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":                     "deleteProductsFromSupplierPriceList",
+			"sessionKey":                  "somesess",
+			"clientCode":                  "someclient",
+			"supplierPriceListID":         "2223",
+			"supplierPriceListProductIDs": "3444,3445",
+		})
 
 		resp := DeleteProductsFromSupplierPriceListResponse{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
@@ -847,14 +852,16 @@ func TestDeleteProductsFromSupplierPriceListBulk(t *testing.T) {
 
 func TestSaveSupplierPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "saveSupplierPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "Some Price Name 1", r.URL.Query().Get("name"))
-		assert.Equal(t, "34456", r.URL.Query().Get("supplierID"))
-		assert.Equal(t, "1", r.URL.Query().Get("productID"))
-		assert.Equal(t, "100", r.URL.Query().Get("price"))
-		assert.Equal(t, "10", r.URL.Query().Get("amount"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":    "saveSupplierPriceList",
+			"sessionKey": "somesess",
+			"clientCode": "someclient",
+			"name":       "Some Price Name 1",
+			"supplierID": "34456",
+			"productID":  "1",
+			"price":      "100",
+			"amount":     "10",
+		})
 
 		resp := SaveSupplierPriceListResultResponse{
 			Status:                      sharedCommon.Status{ResponseStatus: "ok"},
@@ -1000,12 +1007,14 @@ func TestSaveSupplierPriceListBulk(t *testing.T) {
 
 func TestSavePriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "savePriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "Some Price Name 1", r.URL.Query().Get("name"))
-		assert.Equal(t, "34456", r.URL.Query().Get("pricelistID"))
-		assert.Equal(t, "BASE_PRICE_LIST", r.URL.Query().Get("type"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":     "savePriceList",
+			"sessionKey":  "somesess",
+			"clientCode":  "someclient",
+			"name":        "Some Price Name 1",
+			"pricelistID": "34456",
+			"type":        "BASE_PRICE_LIST",
+		})
 
 		resp := SavePriceListResultResponse{
 			Status:               sharedCommon.Status{ResponseStatus: "ok"},
@@ -1282,12 +1291,14 @@ func TestChangeProductInPriceListBulk(t *testing.T) {
 
 func TestAddProductToPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "addProductToPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "3333", r.URL.Query().Get("priceListID"))
-		assert.Equal(t, "342314", r.URL.Query().Get("productID"))
-		assert.Equal(t, "22.22", r.URL.Query().Get("price"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":     "addProductToPriceList",
+			"sessionKey":  "somesess",
+			"clientCode":  "someclient",
+			"priceListID": "3333",
+			"productID":   "342314",
+			"price":       "22.22",
+		})
 
 		resp := ChangeProductToPriceListResponse{
 			Status:                          sharedCommon.Status{ResponseStatus: "ok"},
@@ -1324,11 +1335,13 @@ func TestAddProductToPriceList(t *testing.T) {
 
 func TestEditProductInPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "editProductInPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "1234", r.URL.Query().Get("priceListProductID"))
-		assert.Equal(t, "20.23", r.URL.Query().Get("price"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":            "editProductInPriceList",
+			"sessionKey":         "somesess",
+			"clientCode":         "someclient",
+			"priceListProductID": "1234",
+			"price":              "20.23",
+		})
 
 		resp := ChangeProductToPriceListResponse{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
@@ -1368,11 +1381,13 @@ func TestEditProductInPriceList(t *testing.T) {
 
 func TestDeleteProductsFromPriceList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
-		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
-		assert.Equal(t, "deleteProductInPriceList", r.URL.Query().Get("request"))
-		assert.Equal(t, "2223", r.URL.Query().Get("priceListID"))
-		assert.Equal(t, "3444,3445", r.URL.Query().Get("priceListProductIDs"))
+		common.AssertFormValues(t, r, map[string]interface{}{
+			"request":             "deleteProductInPriceList",
+			"sessionKey":          "somesess",
+			"clientCode":          "someclient",
+			"priceListID":         "2223",
+			"priceListProductIDs": "3444,3445",
+		})
 
 		resp := DeleteProductsFromPriceListResponse{
 			Status: sharedCommon.Status{ResponseStatus: "ok"},
