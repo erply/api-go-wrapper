@@ -38,6 +38,8 @@ type ServiceEndpoints struct {
 	Buum         Endpoint `json:"buum"`
 	Sales        Endpoint `json:"sales"`
 	Pricing      Endpoint `json:"pricing"`
+	Inventory    Endpoint `json:"inventory"`
+	Chair        Endpoint `json:"chair"`
 	PosAPI       Endpoint `json:"pos-api"`
 	Erply        Endpoint `json:"erply"`
 }
