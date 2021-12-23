@@ -87,7 +87,7 @@ func NewClientFromCredentials(username, password, clientCode string, customCli *
 	return NewClient(sessionKey, clientCode, customCli)
 }
 
-// Deprecated
+
 // NewClient Takes three params:
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
