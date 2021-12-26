@@ -26,8 +26,8 @@ type (
 	}
 
 	GetProductFilesResponse struct {
-		Status        sharedCommon.Status `json:"status"`
-		ProductBrands []ProductFile       `json:"records"`
+		Status       sharedCommon.Status `json:"status"`
+		ProductFiles []ProductFile       `json:"records"`
 	}
 
 	getProductGroupsResponse struct {
