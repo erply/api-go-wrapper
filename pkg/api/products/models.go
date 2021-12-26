@@ -85,7 +85,7 @@ type (
 	}
 
 	ProductFile struct {
-		FileID            int    `json:"fileID"`
+		FileID            int    `json:"productFileID"`
 		Name              string `json:"name"`
 		TypeID            int    `json:"typeID"`
 		TypeName          string `json:"typeName"`
