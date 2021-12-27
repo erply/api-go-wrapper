@@ -25,6 +25,11 @@ type (
 		ProductBrands []ProductBrand      `json:"records"`
 	}
 
+	GetProductFilesResponse struct {
+		Status       sharedCommon.Status `json:"status"`
+		ProductFiles []ProductFile       `json:"records"`
+	}
+
 	getProductGroupsResponse struct {
 		Status        sharedCommon.Status `json:"status"`
 		ProductGroups []ProductGroup      `json:"records"`
@@ -80,7 +85,7 @@ type (
 	}
 
 	ProductFile struct {
-		FileID            int    `json:"fileID"`
+		FileID            int    `json:"productFileID"`
 		Name              string `json:"name"`
 		TypeID            int    `json:"typeID"`
 		TypeName          string `json:"typeName"`
