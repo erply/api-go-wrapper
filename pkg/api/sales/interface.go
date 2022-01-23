@@ -65,5 +65,6 @@ type (
 
 		//shopping cart
 		CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error)
+		CalculateShoppingCartWithFullRowsResponse(ctx context.Context, filters map[string]string) (*ShoppingCartTotalsWithFullRows, error)
 	}
 )
