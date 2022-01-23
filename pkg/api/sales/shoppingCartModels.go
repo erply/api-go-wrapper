@@ -13,6 +13,13 @@ type (
 		Total             float64                     `json:"total"`
 		AppliedPromotions []ShoppingAppliedPromotions `json:"appliedPromotions"`
 	}
+	ShoppingCartTotalsWithFullRows struct {
+		Rows              map[string]map[string]interface{} `json:"rows"`
+		NetTotal          float64                           `json:"netTotal"`
+		VATTotal          float64                           `json:"vatTotal"`
+		Total             float64                           `json:"total"`
+		AppliedPromotions []ShoppingAppliedPromotions       `json:"appliedPromotions"`
+	}
 	ShoppingCartProduct struct {
 		RowNumber            int     `json:"rowNumber"`
 		ProductID            string  `json:"productID"`
