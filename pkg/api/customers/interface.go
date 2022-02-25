@@ -6,6 +6,7 @@ type Manager interface {
 	SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
 	SaveCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (SaveCustomerResponseBulk, error)
 	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
+	GetCustomersWithStatus(ctx context.Context, filters map[string]string) (*GetCustomersResponse, error)
 	GetCustomersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetCustomersResponseBulk, error)
 	DeleteCustomer(ctx context.Context, filters map[string]string) error
 	DeleteCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (DeleteCustomersResponseBulk, error)
