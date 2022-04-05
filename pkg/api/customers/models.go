@@ -213,6 +213,19 @@ type (
 		PricelistID5    int    `json:"pricelistID5"`
 	}
 
+	GetCustomerBalanceResponse struct {
+		Status  sharedCommon.Status `json:"status"`
+		Records []CustomerBalance   `json:"records"`
+	}
+
+	CustomerBalance struct {
+		CustomerID      int    `json:"customerID"`
+		ActualBalance   string `json:"actualBalance"`
+		CreditLimit     int    `json:"creditLimit"`
+		AvailableCredit string `json:"availableCredit"`
+		CreditAllowed   int    `json:"creditAllowed"`
+	}
+
 	PostCustomerResponse struct {
 		Status                sharedCommon.Status   `json:"status"`
 		CustomerImportReports CustomerImportReports `json:"records"`
