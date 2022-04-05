@@ -1,6 +1,8 @@
 package customers
 
 import (
+	"encoding/json"
+
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
@@ -219,11 +221,11 @@ type (
 	}
 
 	CustomerBalance struct {
-		CustomerID      int    `json:"customerID"`
-		ActualBalance   string `json:"actualBalance"`
-		CreditLimit     int    `json:"creditLimit"`
-		AvailableCredit string `json:"availableCredit"`
-		CreditAllowed   int    `json:"creditAllowed"`
+		CustomerID      int         `json:"customerID"`
+		ActualBalance   json.Number `json:"actualBalance"`
+		CreditLimit     int         `json:"creditLimit"`
+		AvailableCredit json.Number `json:"availableCredit"`
+		CreditAllowed   int         `json:"creditAllowed"`
 	}
 
 	PostCustomerResponse struct {

@@ -514,13 +514,13 @@ func TestGetCustomerBalance(t *testing.T) {
 	}
 
 	assert.Equal(t, 11, resp[0].CustomerID)
-	assert.Equal(t, "12", resp[0].ActualBalance)
+	assert.Equal(t, json.Number("12"), resp[0].ActualBalance)
 	assert.Equal(t, 13, resp[0].CreditLimit)
-	assert.Equal(t, "14", resp[0].AvailableCredit)
+	assert.Equal(t, json.Number("14"), resp[0].AvailableCredit)
 	assert.Equal(t, 0, resp[0].CreditAllowed)
 	assert.Equal(t, 21, resp[1].CustomerID)
-	assert.Equal(t, "22", resp[1].ActualBalance)
+	assert.Equal(t, json.Number("22"), resp[1].ActualBalance)
 	assert.Equal(t, 23, resp[1].CreditLimit)
-	assert.Equal(t, "24", resp[1].AvailableCredit)
+	assert.Equal(t, json.Number("24"), resp[1].AvailableCredit)
 	assert.Equal(t, 1, resp[1].CreditAllowed)
 }
