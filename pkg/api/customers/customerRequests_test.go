@@ -3,12 +3,13 @@ package customers
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCustomersBulk(t *testing.T) {
@@ -470,4 +471,56 @@ func TestDeleteCustomer(t *testing.T) {
 	if err != nil {
 		return
 	}
+}
+
+func TestGetCustomerBalance(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "getCustomerBalance", r.URL.Query().Get("request"))
+		assert.Equal(t, "11,22", r.URL.Query().Get("customerIDs"))
+		assert.Equal(t, "1", r.URL.Query().Get("getBalanceWithoutPrepayments"))
+
+		resp := GetCustomerBalanceResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			Records: []CustomerBalance{
+				{CustomerID: 11, ActualBalance: "12", CreditLimit: 13, AvailableCredit: "14", CreditAllowed: 0},
+				{CustomerID: 21, ActualBalance: "22", CreditLimit: 23, AvailableCredit: "24", CreditAllowed: 1},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"customerIDs":                  "11,22",
+		"getBalanceWithoutPrepayments": "1",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	resp, err := cl.GetCustomerBalance(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 11, resp[0].CustomerID)
+	assert.Equal(t, json.Number("12"), resp[0].ActualBalance)
+	assert.Equal(t, 13, resp[0].CreditLimit)
+	assert.Equal(t, json.Number("14"), resp[0].AvailableCredit)
+	assert.Equal(t, 0, resp[0].CreditAllowed)
+	assert.Equal(t, 21, resp[1].CustomerID)
+	assert.Equal(t, json.Number("22"), resp[1].ActualBalance)
+	assert.Equal(t, 23, resp[1].CreditLimit)
+	assert.Equal(t, json.Number("24"), resp[1].AvailableCredit)
+	assert.Equal(t, 1, resp[1].CreditAllowed)
 }
