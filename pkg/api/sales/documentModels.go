@@ -110,6 +110,7 @@ type (
 		DeliveryTypeName                string              `json:"deliveryTypeName"`
 		TriangularTransaction           string              `json:"triangularTransaction"`
 		PurchaseOrderDone               string              `json:"purchaseOrderDone"`
+		OrderInvoiced                   int                 `json:"orderInvoiced"`
 		TransactionTypeID               int                 `json:"transactionTypeID"`
 		TransactionTypeName             string              `json:"transactionTypeName"`
 		TransportTypeID                 int                 `json:"transportTypeID"`
