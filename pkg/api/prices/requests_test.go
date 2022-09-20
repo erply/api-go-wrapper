@@ -1505,3 +1505,165 @@ func TestDeleteProductsFromPriceListBulk(t *testing.T) {
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[0].Status)
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[1].Status)
 }
+
+func TestGetProductPrices(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := GetProductPricesResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			Records: []ProductPrice{
+				{
+					ProductID:           "56",
+					DefaultPrice:        "308",
+					DefaultPriceWithVAT: 350,
+					SpecialPrice:        "100.3",
+					SpecialPriceWithVAT: 118.3,
+				},
+				{
+					ProductID:           "89",
+					DefaultPrice:        "38",
+					DefaultPriceWithVAT: 60,
+					SpecialPrice:        "10.3",
+					SpecialPriceWithVAT: 18.3,
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	actualProductPriceItems, err := cl.GetProductPrices(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []ProductPrice{
+		{
+			ProductID:           "56",
+			DefaultPrice:        "308",
+			DefaultPriceWithVAT: 350,
+			SpecialPrice:        "100.3",
+			SpecialPriceWithVAT: 118.3,
+		},
+		{
+			ProductID:           "89",
+			DefaultPrice:        "38",
+			DefaultPriceWithVAT: 60,
+			SpecialPrice:        "10.3",
+			SpecialPriceWithVAT: 18.3,
+		},
+	}, actualProductPriceItems)
+}
+
+func TestGetProductPricesInPriceLists(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := GetProductPricesInPriceListsResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			Records: []ProductPricesInPriceLists{
+				{
+					ProductID:     56,
+					PricelistID:   7,
+					PricelistName: "name",
+					Price:         "100.3",
+				},
+				{
+					ProductID:     55,
+					PricelistID:   5,
+					PricelistName: "name1",
+					Price:         "10.3",
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	actualProductPriceItems, err := cl.GetProductPricesInPriceLists(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []ProductPricesInPriceLists{
+		{
+			ProductID:     56,
+			PricelistID:   7,
+			PricelistName: "name",
+			Price:         "100.3",
+		},
+		{
+			ProductID:     55,
+			PricelistID:   5,
+			PricelistName: "name1",
+			Price:         "10.3",
+		},
+	}, actualProductPriceItems)
+}
+
+func TestGetProductsWithChangedPrices(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := GetProductsWithChangedPricesResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			Records: []ProductsWithChangedPrices{
+				{
+					ProductIDs: []int{55, 56},
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	actualProductPriceItems, err := cl.GetProductsWithChangedPrices(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, []int{55, 56}, actualProductPriceItems)
+}
