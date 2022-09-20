@@ -720,3 +720,76 @@ func (cli *Client) DeleteProductsFromPriceListBulk(
 
 	return bulkResp, nil
 }
+
+func (cli *Client) GetProductPrices(ctx context.Context, filters map[string]string) ([]ProductPrice, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPrices", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPricesResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []ProductPrice{}, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPricesResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res.Records, nil
+}
+
+func (cli *Client) GetProductPricesInPriceLists(ctx context.Context, filters map[string]string) ([]ProductPricesInPriceLists, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPricesInPriceLists", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPricesInPriceListsResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []ProductPricesInPriceLists{}, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPricesInPriceListsResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res.Records, nil
+}
+
+func (cli *Client) GetProductsWithChangedPrices(ctx context.Context, filters map[string]string) ([]int, error) {
+	resp, err := cli.SendRequest(ctx, "getProductsWithChangedPrices", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductsWithChangedPricesResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsWithChangedPrices from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	if len(res.Records) < 1 {
+		return nil, nil
+	}
+
+	return res.Records[0].ProductIDs, nil
+}

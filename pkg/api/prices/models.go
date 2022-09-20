@@ -253,3 +253,47 @@ type DeleteProductsFromPriceListResponseBulk struct {
 	Status    sharedCommon.Status                   `json:"status"`
 	BulkItems []DeleteProductsFromPriceListBulkItem `json:"requests"`
 }
+
+type GetProductPricesResponse struct {
+	Status  sharedCommon.Status `json:"status"`
+	Records []ProductPrice      `json:"records"`
+}
+
+type ProductPrice struct {
+	ProductID             string                 `json:"productID"`
+	DefaultPrice          string                 `json:"defaultPrice"`
+	DefaultPriceWithVAT   float64                `json:"defaultPriceWithVAT"`
+	SpecialPrice          string                 `json:"specialPrice"`
+	SpecialPriceWithVAT   float64                `json:"specialPriceWithVAT"`
+	PriceCalculationSteps []PriceCalculationStep `json:"priceCalculationSteps"`
+}
+
+type PriceCalculationStep struct {
+	PriceListID   int     `json:"priceListID"`
+	PriceListName string  `json:"priceListName"`
+	Price         float64 `json:"price"`
+	Discount      float64 `json:"discount"`
+	Type          string  `json:"type"`
+	Percentage    float64 `json:"percentage"`
+}
+
+type GetProductPricesInPriceListsResponse struct {
+	Status  sharedCommon.Status         `json:"status"`
+	Records []ProductPricesInPriceLists `json:"records"`
+}
+
+type ProductPricesInPriceLists struct {
+	ProductID     int    `json:"productID"`
+	PricelistID   int    `json:"pricelistID"`
+	PricelistName string `json:"pricelistName"`
+	Price         string `json:"price"`
+}
+
+type GetProductsWithChangedPricesResponse struct {
+	Status  sharedCommon.Status         `json:"status"`
+	Records []ProductsWithChangedPrices `json:"records"`
+}
+
+type ProductsWithChangedPrices struct {
+	ProductIDs []int `json:"productIDs"`
+}
