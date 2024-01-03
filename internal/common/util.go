@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/erply/api-go-wrapper/pkg/api/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/erply/api-go-wrapper/pkg/api/log"
 )
 
 type BulkInput struct {
@@ -56,22 +57,32 @@ func setParams(params url.Values, filters map[string]string) {
 
 func (cli *Client) SendRequest(ctx context.Context, apiMethod string, filters map[string]string) (*http.Response, error) {
 	log.Log.Log(log.Debug, "will call %s with filters %+v", apiMethod, filters)
-	req, err := getHTTPRequest(cli, nil)
-	if err != nil {
-		return nil, common.NewFromError("failed to build http request", err, 0)
-	}
-	req = req.WithContext(ctx)
 	params := cli.headersFunc(apiMethod)
 	log.Log.Log(log.Debug, "extracted headers %+v", params)
 
-	params, err = cli.addSessionParams(params)
+	params, err := cli.addSessionParams(params)
 	if err != nil {
 		return nil, err
 	}
 
 	setParams(params, filters)
 
-	req.URL.RawQuery = params.Encode()
+	var req *http.Request
+	if cli.sendParametersInRequestBody {
+		req, err = getHTTPRequest(cli, strings.NewReader(params.Encode()))
+		if err != nil {
+			return nil, common.NewFromError("failed to build http request", err, 0)
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	} else {
+		req, err = getHTTPRequest(cli, nil)
+		if err != nil {
+			return nil, common.NewFromError("failed to build http request", err, 0)
+		}
+		req.URL.RawQuery = params.Encode()
+	}
+	req = req.WithContext(ctx)
+
 	resp, err := doRequest(req, cli)
 	if err != nil {
 		return nil, common.NewFromError(fmt.Sprintf("%v request failed", apiMethod), err, 0)

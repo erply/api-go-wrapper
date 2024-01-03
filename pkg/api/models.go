@@ -40,11 +40,11 @@ type GetUserOperationsLogResponse struct {
 	OperationLogs []OperationLog `json:"records"`
 }
 type OperationLog struct {
-	LogID     int    `json:"logID"`
+	LogID     int64  `json:"logID"`
 	Username  string `json:"username"`
 	Timestamp uint64 `json:"timestamp"`
 	TableName string `json:"tableName"`
-	ItemID    int    `json:"itemID"`
+	ItemID    int64  `json:"itemID"`
 	Operation string `json:"operation"`
 }
 

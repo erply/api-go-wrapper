@@ -1,6 +1,8 @@
 package customers
 
 import (
+	"encoding/json"
+
 	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
@@ -82,6 +84,11 @@ type (
 		// Web-shop related fields
 		Username  string `json:"webshopUsername"`
 		LastLogin string `json:"webshopLastLogin"`
+
+		// Detailed info
+		PriceListID  int `json:"priceListID"`
+		PriceListID2 int `json:"priceListID2"`
+		PriceListID3 int `json:"priceListID3"`
 	}
 
 	CompanyType struct {
@@ -187,6 +194,38 @@ type (
 	GetCustomersResponse struct {
 		Status    sharedCommon.Status `json:"status"`
 		Customers Customers           `json:"records"`
+	}
+
+	GetCustomerGroupsResponse struct {
+		Status    sharedCommon.Status `json:"status"`
+		Customers []CustomerGroup     `json:"records"`
+	}
+
+	CustomerGroup struct {
+		Added           int    `json:"added"`
+		ClientGroupID   int    `json:"clientGroupID"`
+		CustomerGroupID int    `json:"customerGroupID"`
+		LastModified    int    `json:"lastModified"`
+		Name            string `json:"name"`
+		ParentID        int    `json:"parentID"`
+		PricelistID     int    `json:"pricelistID"`
+		PricelistID2    int    `json:"pricelistID2"`
+		PricelistID3    int    `json:"pricelistID3"`
+		PricelistID4    int    `json:"pricelistID4"`
+		PricelistID5    int    `json:"pricelistID5"`
+	}
+
+	GetCustomerBalanceResponse struct {
+		Status  sharedCommon.Status `json:"status"`
+		Records []CustomerBalance   `json:"records"`
+	}
+
+	CustomerBalance struct {
+		CustomerID      int         `json:"customerID"`
+		ActualBalance   json.Number `json:"actualBalance"`
+		CreditLimit     int         `json:"creditLimit"`
+		AvailableCredit json.Number `json:"availableCredit"`
+		CreditAllowed   int         `json:"creditAllowed"`
 	}
 
 	PostCustomerResponse struct {

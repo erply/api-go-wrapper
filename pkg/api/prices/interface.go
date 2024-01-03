@@ -17,6 +17,8 @@ type Manager interface {
 	DeleteProductsFromSupplierPriceListBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductsFromSupplierPriceListResponseBulk, error)
 	SaveSupplierPriceList(ctx context.Context, filters map[string]string) (*SaveSupplierPriceListResult, error)
 	SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SaveSupplierPriceListResponseBulk, error)
+	GetPriceLists(ctx context.Context, filters map[string]string) (*GetRegularPriceListResult, error)
+	GetPriceListsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetRegularPriceListResponseBulk, error)
 	SavePriceList(ctx context.Context, filters map[string]string) (*SavePriceListResult, error)
 	SavePriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (SavePriceListResponseBulk, error)
 	AddProductToPriceList(ctx context.Context, filters map[string]string) (*ChangeProductToPriceListResult, error)
@@ -24,4 +26,7 @@ type Manager interface {
 	ChangeProductToPriceListBulk(ctx context.Context, bulkRequest []map[string]interface{}, baseFilters map[string]string) (ChangeProductToPriceListResponseBulk, error)
 	DeleteProductsFromPriceList(ctx context.Context, filters map[string]string) (*DeleteProductsFromPriceListResult, error)
 	DeleteProductsFromPriceListBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteProductsFromPriceListResponseBulk, error)
+	GetProductPrices(ctx context.Context, filters map[string]string) ([]ProductPrice, error)
+	GetProductPricesInPriceLists(ctx context.Context, filters map[string]string) ([]ProductPricesInPriceLists, error)
+	GetProductsWithChangedPrices(ctx context.Context, filters map[string]string) ([]int, error)
 }
