@@ -6,11 +6,12 @@ import (
 
 type (
 	VatRate struct {
-		ID     string `json:"id"`
-		Name   string `json:"name"`
-		Rate   string `json:"rate"`
-		Code   string `json:"code"`
-		Active string `json:"active"`
+		ID         string                      `json:"id"`
+		Name       string                      `json:"name"`
+		Rate       string                      `json:"rate"`
+		Code       string                      `json:"code"`
+		Active     string                      `json:"active"`
+		Attributes []sharedCommon.ObjAttribute `json:"attributes"`
 		//Added        string `json:"added"`
 		LastModified string `json:"lastModified"`
 		//IsReverseVat int    `json:"isReverseVat"`

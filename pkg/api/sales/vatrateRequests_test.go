@@ -418,3 +418,55 @@ func TestGetVatRatesBulk(t *testing.T) {
 
 	assert.Equal(t, expectedStatus, bulkResp.BulkItems[2].Status)
 }
+
+func TestGetVatRates(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		statusBulk := sharedCommon.StatusBulk{}
+		statusBulk.ResponseStatus = "ok"
+		resp := GetVatRatesResponse{
+			Status: sharedCommon.Status{ResponseStatus: "ok"},
+			VatRates: VatRates{
+				{
+					ID:   "123",
+					Rate: "100",
+				},
+				{
+					ID:   "1",
+					Rate: "10",
+				},
+			},
+		}
+		jsonRaw, err := json.Marshal(resp)
+		assert.NoError(t, err)
+
+		_, err = w.Write(jsonRaw)
+		assert.NoError(t, err)
+	}))
+
+	defer srv.Close()
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+
+	actualVatRateItems, err := cl.GetVatRates(
+		context.Background(),
+		map[string]string{},
+	)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, VatRates{
+		{
+			ID:   "123",
+			Rate: "100",
+		},
+		{
+			ID:   "1",
+			Rate: "10",
+		},
+	}, actualVatRateItems)
+}

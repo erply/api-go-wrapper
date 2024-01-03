@@ -5,11 +5,57 @@ ERPLY API Go SDK
 
 This SDK covers the [ERPLY API](https://erply.com/erply-api/) requests. 
 
+Quick Start
+------
+
+Initialize API client and make your first API call:
+```go
+package main
+
+import (
+ "context"
+ "fmt"
+
+ "github.com/erply/api-go-wrapper/pkg/api"
+)
+
+func main() {
+
+ //put your credentials here
+ const (
+  username   = ""
+  password   = ""
+  clientCode = ""
+ )
+	
+ cli, err := api.NewClientFromCredentials(username, password, clientCode, nil)
+ if err != nil {
+  panic(err)
+ }
+
+ //configure the client to send the data payload in the request body instead of the query parameters. 
+ //Using the request body eliminates the query size limitations imposed by the maximum URL length
+ cli.SendParametersInRequestBody()
+
+ //init context to control the request flow
+ ctx, cancel := context.WithTimeout(context.Background(), 30 * time.Second)
+ defer cancel()
+
+ //fetch the data from Erply API - in this example sales documents
+ salesDocs, err := cli.SalesManager.GetSalesDocuments(ctx, nil)
+ if err != nil {
+  panic(err)
+ }
+ 
+ ...
+}
+```
+
 Client Structure
 ------
 Majority of the request wrappers are available through the client.
 The client is described in `GoDoc` type `Client` and in `/pkg/api/client.go`. It is divided into sub-clients for each topic that the underlying API covers. 
-For now not all the requests are mapped to topics. Such request wrappers are in `/pkg/api` directory. 
+Not all the requests are mapped to topics. Such request wrappers are in `/pkg/api` directory. 
 Some requests are accessible not from the client, but from the `auth` package of this SDK. They are covered in the example in `/examples` directory.
 
 Install
@@ -32,6 +78,8 @@ Clients
 * You can also create a client that can act like a partner client, normal one and it is possible to define the headers that will be added for every request on your own. For that one please use the `NewClientWithCustomHeaders` constructor.
 
 You can find the example in the `/examples` directory for the client initialization process
+
+
 
 </details>
 

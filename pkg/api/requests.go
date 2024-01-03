@@ -81,7 +81,7 @@ func (c *Client) GetEmployees(ctx context.Context, filters map[string]string) ([
 	return res.Employees, nil
 }
 
-func (cli *Client) GetEmployeesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetEmployeesResponseBulk, error) {
+func (c *Client) GetEmployeesBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetEmployeesResponseBulk, error) {
 	var bulkResp GetEmployeesResponseBulk
 	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
 	for _, bulkFilterMap := range bulkFilters {
@@ -90,7 +90,7 @@ func (cli *Client) GetEmployeesBulk(ctx context.Context, bulkFilters []map[strin
 			Filters:    bulkFilterMap,
 		})
 	}
-	resp, err := cli.commonClient.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	resp, err := c.commonClient.SendRequestBulk(ctx, bulkInputs, baseFilters)
 	if err != nil {
 		return bulkResp, err
 	}

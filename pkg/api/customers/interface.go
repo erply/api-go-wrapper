@@ -6,11 +6,15 @@ type Manager interface {
 	SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)
 	SaveCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (SaveCustomerResponseBulk, error)
 	GetCustomers(ctx context.Context, filters map[string]string) ([]Customer, error)
+	GetCustomersWithStatus(ctx context.Context, filters map[string]string) (*GetCustomersResponse, error)
 	GetCustomersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetCustomersResponseBulk, error)
 	DeleteCustomer(ctx context.Context, filters map[string]string) error
 	DeleteCustomerBulk(ctx context.Context, customerMap []map[string]interface{}, attrs map[string]string) (DeleteCustomersResponseBulk, error)
 	VerifyCustomerUser(ctx context.Context, username, password string) (*WebshopClient, error)
 	ValidateCustomerUsername(ctx context.Context, username string) (bool, error)
+	GetCustomerGroups(ctx context.Context, filters map[string]string) ([]CustomerGroup, error)
+	// GetCustomerBalance will retrieve current balance (store credit) for requested customers.
+	GetCustomerBalance(ctx context.Context, filters map[string]string) ([]CustomerBalance, error)
 	GetSuppliers(ctx context.Context, filters map[string]string) ([]Supplier, error)
 	GetSuppliersBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetSuppliersResponseBulk, error)
 	SaveSupplier(ctx context.Context, filters map[string]string) (*CustomerImportReport, error)

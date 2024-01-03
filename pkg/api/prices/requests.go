@@ -152,6 +152,41 @@ func (cli *Client) GetSupplierPriceListsBulk(ctx context.Context, bulkFilters []
 	return bulkResp, nil
 }
 
+func (cli *Client) GetPriceListsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (GetRegularPriceListResponseBulk, error) {
+	var bulkResp GetRegularPriceListResponseBulk
+	bulkInputs := make([]common.BulkInput, 0, len(bulkFilters))
+	for _, bulkFilterMap := range bulkFilters {
+		bulkInputs = append(bulkInputs, common.BulkInput{
+			MethodName: "getPriceLists",
+			Filters:    bulkFilterMap,
+		})
+	}
+	resp, err := cli.SendRequestBulk(ctx, bulkInputs, baseFilters)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return bulkResp, err
+	}
+
+	if err := json.Unmarshal(body, &bulkResp); err != nil {
+		return bulkResp, fmt.Errorf("ERPLY API: failed to unmarshal GetRegularPriceListResponseBulk from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&bulkResp.Status) {
+		return bulkResp, sharedCommon.NewErplyError(bulkResp.Status.ErrorCode.String(), bulkResp.Status.Request+": "+bulkResp.Status.ResponseStatus, bulkResp.Status.ErrorCode)
+	}
+
+	for _, prodBulkItem := range bulkResp.BulkItems {
+		if !common.IsJSONResponseOK(&prodBulkItem.Status.Status) {
+			return bulkResp, sharedCommon.NewErplyError(prodBulkItem.Status.ErrorCode.String(), prodBulkItem.Status.Request+": "+prodBulkItem.Status.ResponseStatus, bulkResp.Status.ErrorCode)
+		}
+	}
+
+	return bulkResp, nil
+}
+
 func (cli *Client) GetProductsInSupplierPriceList(ctx context.Context, filters map[string]string) ([]ProductsInSupplierPriceList, error) {
 	resp, err := cli.SendRequest(ctx, "getProductsInSupplierPriceList", filters)
 	if err != nil {
@@ -432,6 +467,28 @@ func (cli *Client) SaveSupplierPriceListBulk(ctx context.Context, bulkRequest []
 	return bulkResp, nil
 }
 
+func (cli *Client) GetPriceLists(ctx context.Context, filters map[string]string) (*GetRegularPriceListResult, error) {
+	resp, err := cli.SendRequest(ctx, "getPriceLists", filters)
+	if err != nil {
+		return nil, sharedCommon.NewFromError("getPriceLists request failed", err, 0)
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &GetRegularPriceListResult{}
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetRegularPriceListsResponse from '%s': %v", string(body), err)
+	}
+
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res, nil
+}
+
 func (cli *Client) SavePriceList(ctx context.Context, filters map[string]string) (*SavePriceListResult, error) {
 	resp, err := cli.SendRequest(ctx, "savePriceList", filters)
 	if err != nil {
@@ -662,4 +719,77 @@ func (cli *Client) DeleteProductsFromPriceListBulk(
 	}
 
 	return bulkResp, nil
+}
+
+func (cli *Client) GetProductPrices(ctx context.Context, filters map[string]string) ([]ProductPrice, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPrices", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPricesResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []ProductPrice{}, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPricesResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res.Records, nil
+}
+
+func (cli *Client) GetProductPricesInPriceLists(ctx context.Context, filters map[string]string) ([]ProductPricesInPriceLists, error) {
+	resp, err := cli.SendRequest(ctx, "getProductPricesInPriceLists", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductPricesInPriceListsResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return []ProductPricesInPriceLists{}, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductPricesInPriceListsResponse from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	return res.Records, nil
+}
+
+func (cli *Client) GetProductsWithChangedPrices(ctx context.Context, filters map[string]string) ([]int, error) {
+	resp, err := cli.SendRequest(ctx, "getProductsWithChangedPrices", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetProductsWithChangedPricesResponse
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(body, &res); err != nil {
+		return nil, fmt.Errorf("ERPLY API: failed to unmarshal GetProductsWithChangedPrices from '%s': %v", string(body), err)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+
+	if len(res.Records) < 1 {
+		return nil, nil
+	}
+
+	return res.Records[0].ProductIDs, nil
 }

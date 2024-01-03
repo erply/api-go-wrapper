@@ -3,12 +3,13 @@ package addresses
 import (
 	"context"
 	"encoding/json"
-	"github.com/erply/api-go-wrapper/internal/common"
-	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetAddresses(t *testing.T) {
@@ -279,12 +280,12 @@ func TestGetAddressesBulkCustomUnmarshal(t *testing.T) {
 		{
 			AddressID: 123,
 			Address:   "Some Address 123",
-			TypeID:    "3",
+			TypeID:    3,
 		},
 		{
 			AddressID: 124,
 			Address:   "Some Address 124",
-			TypeID:    "4",
+			TypeID:    4,
 		},
 	}, suppliersBulk.BulkItems[0].Addresses)
 
@@ -294,7 +295,7 @@ func TestGetAddressesBulkCustomUnmarshal(t *testing.T) {
 		{
 			AddressID: 125,
 			Address:   "Some Address 125",
-			TypeID:    "5",
+			TypeID:    5,
 		},
 	}, suppliersBulk.BulkItems[1].Addresses)
 	assert.Equal(t, expectedStatus, suppliersBulk.BulkItems[1].Status)

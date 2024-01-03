@@ -12,6 +12,64 @@ import (
 	"time"
 )
 
+func TestGetProducts(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, "someclient", r.URL.Query().Get("clientCode"))
+		assert.Equal(t, "somesess", r.URL.Query().Get("sessionKey"))
+		assert.Equal(t, "getProducts", r.URL.Query().Get("request"))
+		assert.Equal(t, "11", r.URL.Query().Get("clientID"))
+		assert.Equal(t, "1", r.URL.Query().Get("getPriceListPrices"))
+		_, err := w.Write([]byte(`{
+			"status": {
+				"request": "getProducts",
+				"requestUnixTime": 1594897772,
+				"responseStatus": "ok",
+				"errorCode": 0,
+				"generationTime": 0.0655040740966796875,
+				"recordsTotal": 0,
+				"recordsInResponse": 0
+			},
+			"records": [{
+				"productID": 1,
+				"code": "product-1",
+				"price": 4.0,
+				"priceListPrice": "3.00"
+			},{
+				"productID": 2,
+				"code": "product-2",
+				"price": 2.0,
+				"priceListPrice": 5.00
+			}]
+		}`))
+		assert.NoError(t, err)
+	}))
+	defer srv.Close()
+
+	inpt := map[string]string{
+		"clientID":           "11",
+		"getPriceListPrices": "1",
+	}
+
+	cli := common.NewClient("somesess", "someclient", "", nil, nil)
+	cli.Url = srv.URL
+
+	cl := NewClient(cli)
+	resp, err := cl.GetProducts(context.Background(), inpt)
+	assert.NoError(t, err)
+	if err != nil {
+		return
+	}
+
+	assert.Equal(t, 1, resp[0].ProductID)
+	assert.Equal(t, "product-1", resp[0].Code)
+	assert.Equal(t, 4.0, resp[0].Price)
+	assert.Equal(t, 3.0, resp[0].PriceListPrice)
+	assert.Equal(t, 2, resp[1].ProductID)
+	assert.Equal(t, "product-2", resp[1].Code)
+	assert.Equal(t, 2.0, resp[1].Price)
+	assert.Equal(t, 5.0, resp[1].PriceListPrice)
+}
+
 func TestGetProductsBulk(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		statusBulk := sharedCommon.StatusBulk{}

@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/erply/api-go-wrapper/internal/common"
-	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/erply/api-go-wrapper/internal/common"
+	sharedCommon "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
 func (cli *Client) SaveCustomer(ctx context.Context, filters map[string]string) (*CustomerImportReport, error) {
@@ -46,6 +47,54 @@ func (cli *Client) GetCustomers(ctx context.Context, filters map[string]string) 
 		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
 	}
 	return res.Customers, nil
+}
+
+// GetCustomersWithStatus will list customers according to specified filters.
+func (cli *Client) GetCustomersWithStatus(ctx context.Context, filters map[string]string) (*GetCustomersResponse, error) {
+	resp, err := cli.SendRequest(ctx, "getCustomers", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCustomersResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCustomersResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return &res, nil
+}
+
+// GetCustomerGroups will list customers groups according to specified filters.
+func (cli *Client) GetCustomerGroups(ctx context.Context, filters map[string]string) ([]CustomerGroup, error) {
+	resp, err := cli.SendRequest(ctx, "getCustomerGroups", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCustomerGroupsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCustomerGroupsResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.Customers, nil
+}
+
+// GetCustomerBalance will retrieve current balance (store credit) for requested customers.
+func (cli *Client) GetCustomerBalance(ctx context.Context, filters map[string]string) ([]CustomerBalance, error) {
+	resp, err := cli.SendRequest(ctx, "getCustomerBalance", filters)
+	if err != nil {
+		return nil, err
+	}
+	var res GetCustomerBalanceResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, sharedCommon.NewFromError("failed to unmarshal GetCustomerBalanceResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res.Records, nil
 }
 
 // GetCustomersBulk will list customers according to specified filters sending a bulk request to fetch more customers than the default limit

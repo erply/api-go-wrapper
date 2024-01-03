@@ -163,6 +163,21 @@ func (cli *Client) SaveProductBulk(ctx context.Context, bulkFilters []map[string
 	return productsResp, nil
 }
 
+func (cli *Client) GetProductFiles(ctx context.Context, filters map[string]string) (GetProductFilesResponse, error) {
+	resp, err := cli.SendRequest(ctx, "getProductFiles", filters)
+	if err != nil {
+		return GetProductFilesResponse{}, err
+	}
+	var res GetProductFilesResponse
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return GetProductFilesResponse{}, sharedCommon.NewFromError("failed to unmarshal GetProductFilesResponse", err, 0)
+	}
+	if !common.IsJSONResponseOK(&res.Status) {
+		return GetProductFilesResponse{}, sharedCommon.NewFromResponseStatus(&res.Status)
+	}
+	return res, nil
+}
+
 func (cli *Client) DeleteProduct(ctx context.Context, filters map[string]string) error {
 	resp, err := cli.SendRequest(ctx, "deleteProduct", filters)
 	if err != nil {
