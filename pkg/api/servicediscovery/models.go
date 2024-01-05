@@ -15,7 +15,6 @@ type Endpoint struct {
 }
 
 type ServiceEndpoints struct {
-	InventoryTransaction Endpoint `json:"inventory-transaction"`
 	Cafa                 Endpoint `json:"cafa"`
 	Pim                  Endpoint `json:"pim"`
 	Wms                  Endpoint `json:"wms"`
@@ -42,5 +41,20 @@ type ServiceEndpoints struct {
 	Inventory            Endpoint `json:"inventory"`
 	Chair                Endpoint `json:"chair"`
 	PosAPI               Endpoint `json:"pos-api"`
+	Vin                  Endpoint `json:"vin"`
+	IntegrationLogs      Endpoint `json:"integration-logs"`
+	InventoryTransaction Endpoint `json:"inventory-transaction"`
+	InventoryDocuments   Endpoint `json:"inventory-documents"`
+	EInvoice             Endpoint `json:"e-invoice"`
+	Memberships          Endpoint `json:"memberships"`
+	CustomData           Endpoint `json:"custom-data"`
+	Stripe               Endpoint `json:"stripe"`
+	GoERP                Endpoint `json:"goerp"`
+	Logfiles             Endpoint `json:"logfiles"`
+	CommandBroker        Endpoint `json:"command-broker"`
+	EcomShopify          Endpoint `json:"ecom-shopify"`
+	Automation           Endpoint `json:"automation"`
+	WooCommerce          Endpoint `json:"woocommerce"`
+	Billing              Endpoint `json:"billing"`
 	Erply                Endpoint `json:"erply"`
 }
