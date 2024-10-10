@@ -55,7 +55,7 @@ type (
 		AssignmentsManger
 		ReportsManager
 		GetCoupons(ctx context.Context, filters map[string]string) (*GetCouponsResponse, error)
-		//payment requests
+		// payment requests
 		SavePayment(ctx context.Context, filters map[string]string) (int64, error)
 		SavePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (SavePaymentsResponseBulk, error)
 		GetPayments(ctx context.Context, filters map[string]string) ([]PaymentInfo, error)
@@ -63,8 +63,11 @@ type (
 		DeletePayment(ctx context.Context, filters map[string]string) error
 		DeletePaymentsBulk(ctx context.Context, bulkFilters []map[string]interface{}, baseFilters map[string]string) (DeleteResponseBulk, error)
 
-		//shopping cart
+		// shopping cart
 		CalculateShoppingCart(ctx context.Context, filters map[string]string) (*ShoppingCartTotals, error)
 		CalculateShoppingCartWithFullRowsResponse(ctx context.Context, filters map[string]string) (*ShoppingCartTotalsWithFullRows, error)
+
+		// ProcessRecurringBilling is Erply API call processRecurringBilling. https://learn-api.erply.com/requests/processrecurringbilling
+		ProcessRecurringBilling(ctx context.Context, filters map[string]string) ([]RecurringBillingProcessedInvoices, error)
 	}
 )
