@@ -22,7 +22,7 @@ func (cli *Client) ProcessRecurringBilling(ctx context.Context, filters map[stri
 
 	respData := RecurringBillingResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode processRecurringBilling response"))
+		return nil, errors.Wrap(err, "failed to decode processRecurringBilling response")
 	}
 	if !common.IsJSONResponseOK(&respData.Status) {
 		return nil, sharedCommon.NewFromResponseStatus(&respData.Status)
