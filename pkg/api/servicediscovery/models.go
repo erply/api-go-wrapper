@@ -17,6 +17,7 @@ type Endpoint struct {
 type ServiceEndpoints struct {
 	Cafa                 Endpoint `json:"cafa"`
 	Pim                  Endpoint `json:"pim"`
+	PimExtension         Endpoint `json:"pim-extension"`
 	Wms                  Endpoint `json:"wms"`
 	Promotion            Endpoint `json:"promotion"`
 	Reports              Endpoint `json:"reports"`
@@ -41,20 +42,30 @@ type ServiceEndpoints struct {
 	Inventory            Endpoint `json:"inventory"`
 	Chair                Endpoint `json:"chair"`
 	PosAPI               Endpoint `json:"pos-api"`
+	PointOfSale          Endpoint `json:"point-of-sale"`
 	Vin                  Endpoint `json:"vin"`
 	IntegrationLogs      Endpoint `json:"integration-logs"`
 	InventoryTransaction Endpoint `json:"inventory-transaction"`
+	InventoryDocument    Endpoint `json:"inventory-document"`
 	InventoryDocuments   Endpoint `json:"inventory-documents"`
 	EInvoice             Endpoint `json:"e-invoice"`
 	Memberships          Endpoint `json:"memberships"`
 	CustomData           Endpoint `json:"custom-data"`
 	Stripe               Endpoint `json:"stripe"`
 	GoERP                Endpoint `json:"goerp"`
+	GoErpUI              Endpoint `json:"goerp-ui"`
 	Logfiles             Endpoint `json:"logfiles"`
+	LogManager           Endpoint `json:"log-manager"`
 	CommandBroker        Endpoint `json:"command-broker"`
 	EcomShopify          Endpoint `json:"ecom-shopify"`
 	Automation           Endpoint `json:"automation"`
 	WooCommerce          Endpoint `json:"woocommerce"`
+	OfflinePOS           Endpoint `json:"offline-pos"`
 	Billing              Endpoint `json:"billing"`
+	FDR                  Endpoint `json:"file-data-api"`
+	Pointy               Endpoint `json:"pointy"`
+	Quickbook            Endpoint `json:"quickbook"`
+	Xero                 Endpoint `json:"xero"`
+	Query                Endpoint `json:"query"`
 	Erply                Endpoint `json:"erply"`
 }
