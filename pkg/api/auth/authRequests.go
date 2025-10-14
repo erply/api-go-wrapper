@@ -13,9 +13,9 @@ import (
 	"github.com/erply/api-go-wrapper/internal/common"
 )
 
-//VerifyUser will give you session key
+// VerifyUser will give you session key
 func VerifyUser(username, password, clientCode string, client *http.Client) (string, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	params.Add("username", username)
 	params.Add("clientCode", clientCode)
@@ -45,9 +45,9 @@ func VerifyUser(username, password, clientCode string, client *http.Client) (str
 	return res.Records[0].SessionKey, nil
 }
 
-//pass filters (including clientCode and sessionKey), pass client code, context and http client
+// pass filters (including clientCode and sessionKey), pass client code, context and http client
 func VerifyUserV2(ctx context.Context, filters map[string]string, clientCode string, cli *http.Client) (string, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	for k, v := range filters {
 		params.Add(k, v)
@@ -76,7 +76,7 @@ func VerifyUserV2(ctx context.Context, filters map[string]string, clientCode str
 }
 
 func VerifyUserV3(ctx context.Context, filters map[string]string, clientCode string, cli *http.Client) (*VerifyUserResponse, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	for k, v := range filters {
 		params.Add(k, v)
@@ -104,11 +104,11 @@ func VerifyUserV3(ctx context.Context, filters map[string]string, clientCode str
 	return res, nil
 }
 
-//VerifyUserFull executes the Erply API VerifyUser call and returns an object containing most of the resulting data.
-//If it is necessary to specify the length of the created session or pass some other additional parameters
-//to the underlying Erply API call, this can be done using the inputParams map.
+// VerifyUserFull executes the Erply API VerifyUser call and returns an object containing most of the resulting data.
+// If it is necessary to specify the length of the created session or pass some other additional parameters
+// to the underlying Erply API call, this can be done using the inputParams map.
 func VerifyUserFull(ctx context.Context, username, password, clientCode string, inputParams map[string]string, cli *http.Client) (*SessionKeyUser, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	for k, v := range inputParams {
 		params.Add(k, v)
@@ -142,11 +142,11 @@ func VerifyUserFull(ctx context.Context, username, password, clientCode string, 
 	return &res.Records[0], nil
 }
 
-//SwitchUser executes the Erply API SwitchUser call and returns an object containing most of the resulting data.
-//If it is necessary to specify the length of the created session or pass some other additional parameters
-//to the underlying Erply API call, this can be done using the inputParams map.
+// SwitchUser executes the Erply API SwitchUser call and returns an object containing most of the resulting data.
+// If it is necessary to specify the length of the created session or pass some other additional parameters
+// to the underlying Erply API call, this can be done using the inputParams map.
 func SwitchUser(ctx context.Context, sessionKey, pin, clientCode string, inputParams map[string]string, cli *http.Client) (*SessionKeyUser, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	for k, v := range inputParams {
 		params.Add(k, v)
@@ -184,9 +184,9 @@ type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-//GetSessionKeyUser returns user information for the used session key
+// GetSessionKeyUser returns user information for the used session key
 func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) (*SessionKeyUser, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	params.Add("sessionKey", sessionKey)
 	params.Add("doNotGenerateIdentityToken", "1")
@@ -229,9 +229,9 @@ func GetSessionKeyUser(sessionKey string, clientCode string, client HttpClient) 
 	return &res.Records[0], nil
 }
 
-//GetSessionKeyInfo returns session key expiration info
+// GetSessionKeyInfo returns session key expiration info
 func GetSessionKeyInfo(sessionKey string, clientCode string, client HttpClient) (*SessionKeyInfo, error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, clientCode)
+	requestUrl := common.GetBaseURL(clientCode)
 	params := url.Values{}
 	params.Add("sessionKey", sessionKey)
 	params.Add("request", "getSessionKeyInfo")

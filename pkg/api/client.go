@@ -4,12 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
-	"strconv"
-	"sync"
-	"time"
-
 	"github.com/erply/api-go-wrapper/internal/common"
 	"github.com/erply/api-go-wrapper/pkg/api/addresses"
 	"github.com/erply/api-go-wrapper/pkg/api/auth"
@@ -24,31 +18,36 @@ import (
 	"github.com/erply/api-go-wrapper/pkg/api/sales"
 	"github.com/erply/api-go-wrapper/pkg/api/servicediscovery"
 	"github.com/erply/api-go-wrapper/pkg/api/warehouse"
+	"net/http"
+	"net/url"
+	"strconv"
+	"sync"
+	"time"
 )
 
 type Client struct {
 	commonClient *common.Client
-	//Address requests
+	// Address requests
 	AddressProvider addresses.Manager
-	//Token requests
+	// Token requests
 	AuthProvider auth.Provider
-	//Company and Conf parameter requests
+	// Company and Conf parameter requests
 	CompanyManager company.Manager
-	//Customers and suppliers requests
+	// Customers and suppliers requests
 	CustomerManager customers.Manager
-	//POS related requests
+	// POS related requests
 	PosManager pos.Manager
-	//ListingDataProvider related requests
+	// ListingDataProvider related requests
 	ProductManager products.Manager
-	//SalesDocuments, Payments, Projects, ShoppingCart, VatRates
+	// SalesDocuments, Payments, Projects, ShoppingCart, VatRates
 	SalesManager sales.Manager
-	//Warehouse requests
+	// Warehouse requests
 	WarehouseManager warehouse.Manager
-	//Prices requests
+	// Prices requests
 	PricesManager prices.Manager
-	//Documents requests
+	// Documents requests
 	DocumentsManager documents.Manager
-	//Service Discovery
+	// Service Discovery
 	ServiceDiscoverer servicediscovery.ServiceDiscoverer
 }
 
@@ -60,21 +59,21 @@ func (c *Client) GetSession() (sessionKey string, err error) {
 	return c.commonClient.GetSession()
 }
 
-//SendParametersInRequestBody indicates to the client that the request should add the data payload in the
-//request body instead of using the query parameters. Using the request body eliminates the query size
-//limitations imposed by the maximum URL length
+// SendParametersInRequestBody indicates to the client that the request should add the data payload in the
+// request body instead of using the query parameters. Using the request body eliminates the query size
+// limitations imposed by the maximum URL length
 func (c *Client) SendParametersInRequestBody() {
 	c.commonClient.SendParametersInRequestBody()
 }
 
-//NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
-//developer more flexibility
+// NewUnvalidatedClient returns a new Client without validating any of the incoming parameters giving the
+// developer more flexibility
 func NewUnvalidatedClient(sk, cc, partnerKey string, httpCli *http.Client) *Client {
 	comCli := common.NewClient(sk, cc, partnerKey, httpCli, nil)
 	return newErplyClient(comCli)
 }
 
-//NewClientFromCredentials makes a verifyUser Erply API call and initializes the client struct
+// NewClientFromCredentials makes a verifyUser Erply API call and initializes the client struct
 func NewClientFromCredentials(username, password, clientCode string, customCli *http.Client) (*Client, error) {
 	if customCli == nil {
 		customCli = common.GetDefaultHTTPClient()
@@ -87,12 +86,11 @@ func NewClientFromCredentials(username, password, clientCode string, customCli *
 	return NewClient(sessionKey, clientCode, customCli)
 }
 
-
 // NewClient Takes three params:
 // sessionKey string obtained from credentials or jwt
 // clientCode erply customer identification number
 // and a custom http Client if needs to be overwritten. if nil will use default http client provided by the SDK
-//The headersSetToEveryRequest function will be executed on every request and supplied with the request name. There is an example in the /examples of you to use it
+// The headersSetToEveryRequest function will be executed on every request and supplied with the request name. There is an example in the /examples of you to use it
 func NewClient(sessionKey string, clientCode string, customCli *http.Client) (*Client, error) {
 	if sessionKey == "" || clientCode == "" {
 		return nil, errors.New("sessionKey and clientCode are required")
@@ -101,7 +99,7 @@ func NewClient(sessionKey string, clientCode string, customCli *http.Client) (*C
 	return newErplyClient(comCli), nil
 }
 
-//NewClientWithCustomHeaders enables defining the function that will set headers to every request by your own
+// NewClientWithCustomHeaders enables defining the function that will set headers to every request by your own
 func NewClientWithCustomHeaders(customHTTPCli *http.Client, headersSetToEveryRequest func(requestName string) url.Values) (*Client, error) {
 	if headersSetToEveryRequest == nil {
 		return nil, errors.New("the function that will set headers to every request is a required argument")
@@ -109,7 +107,7 @@ func NewClientWithCustomHeaders(customHTTPCli *http.Client, headersSetToEveryReq
 	return newErplyClient(common.NewClient("", "", "", customHTTPCli, headersSetToEveryRequest)), nil
 }
 
-//NewClientWithURL creates a new Client which can have a static URL which is not affected by clientCode
+// NewClientWithURL creates a new Client which can have a static URL which is not affected by clientCode
 // nor the headersSetToEveryRequest function if set. If the url parameter is set to an empty string, the URL
 // is still resolved normally. This allows creating clients which have a static url in your unit tests but function
 // normally in the rest of your code
@@ -139,16 +137,16 @@ func newErplyClient(c *common.Client) *Client {
 }
 
 type ClientBuilder struct {
-	UserName                   string                 //if set this will be used to fetch session key every time when session gets outdated
-	Password                   string                 //if set this will be used to fetch session key every time when session gets outdated
-	ClientCode                 string                 //required value for all requests
-	SessionKey                 string                 //if you don't set SessionProvider this key will be used to auth all requests
-	DefaultSessionLenSeconds   int                    //set the length of dynamically created sessions
-	URL                        string                 //change the base API url
-	PartnerKey                 string                 //set the partner key
-	HttpCli                    *http.Client           //you can adjust the http client transport options here
-	HeadersForEveryRequestFunc common.AuthFunc        //this will set headers for all outgoing requests except for the session key
-	SessionProvider            common.SessionProvider //custom session establishing logic, if not set DynamicSessionProvider is used which requires UserName and Password
+	UserName                   string                 // if set this will be used to fetch session key every time when session gets outdated
+	Password                   string                 // if set this will be used to fetch session key every time when session gets outdated
+	ClientCode                 string                 // required value for all requests
+	SessionKey                 string                 // if you don't set SessionProvider this key will be used to auth all requests
+	DefaultSessionLenSeconds   int                    // set the length of dynamically created sessions
+	URL                        string                 // change the base API url
+	PartnerKey                 string                 // set the partner key
+	HttpCli                    *http.Client           // you can adjust the http client transport options here
+	HeadersForEveryRequestFunc common.AuthFunc        // this will set headers for all outgoing requests except for the session key
+	SessionProvider            common.SessionProvider // custom session establishing logic, if not set DynamicSessionProvider is used which requires UserName and Password
 }
 
 type DynamicSessionProvider struct {
@@ -203,7 +201,7 @@ func (dsp *DynamicSessionProvider) isSessionValid() bool {
 }
 
 func (dsp *DynamicSessionProvider) getAuthUserFromAPI() (sessionKey string, validTill *time.Time, err error) {
-	requestUrl := fmt.Sprintf(common.BaseUrl, dsp.ClientCode)
+	requestUrl := common.GetBaseURL(dsp.ClientCode)
 	params := url.Values{}
 	params.Add("username", dsp.UserName)
 	params.Add("clientCode", dsp.ClientCode)

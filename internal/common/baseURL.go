@@ -1,9 +1,17 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+)
+
+var activeBaseDomain = BaseDomain
+
+func SetBaseDomain(domain string) {
+	activeBaseDomain = domain
+}
 
 func GetBaseURL(cc string) string {
-	return fmt.Sprintf(BaseUrl, cc)
+	return fmt.Sprintf(BaseUrl, cc, activeBaseDomain)
 }
 
 func GetBaseURLFromAuthFunc(f AuthFunc) string {
