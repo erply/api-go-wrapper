@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	common2 "github.com/erply/api-go-wrapper/pkg/api/common"
 )
 
@@ -33,6 +34,10 @@ type (
 	JwtTokenResponse struct {
 		Status  common2.Status `json:"status"`
 		Records JwtToken       `json:"records"`
+	}
+	JwtTokenSafeResponse struct {
+		Status  common2.Status  `json:"status"`
+		Records json.RawMessage `json:"records"`
 	}
 	JwtToken struct {
 		Token string `json:"token"`
