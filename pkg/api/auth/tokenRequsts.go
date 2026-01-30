@@ -62,7 +62,7 @@ func (cli *Client) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 	}
 	res := &JwtTokenSafeResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode GetJWTToken response"))
+		return nil, sharedCommon.NewFromError("failed to decode GetJWTToken response", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
@@ -82,7 +82,7 @@ func (cli *PartnerClient) GetJWTToken(ctx context.Context) (*JwtToken, error) {
 	}
 	res := &JwtTokenSafeResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("failed to decode GetJWTToken response"))
+		return nil, sharedCommon.NewFromError("failed to decode GetJWTToken response", err, 0)
 	}
 	if !common.IsJSONResponseOK(&res.Status) {
 		return nil, sharedCommon.NewFromResponseStatus(&res.Status)
